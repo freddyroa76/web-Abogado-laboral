@@ -1,0 +1,392 @@
+/* ============================================
+   ESTILOS: TU ABOGADO LABORAL (VERSIÓN FINAL)
+   Diseño: "Lead Legal" Clean & Elegant
+   ============================================ */
+
+/* 1. VARIABLES DE MARCA */
+:root {
+  --color-primario: #9e2a2b; /* Rojo Borgoña */
+  --color-secundario: #c4a77d; /* Dorado Mate */
+  --color-base: #2e3440; /* Gris Plomo Oscuro */
+  --color-negro: #1a1a1a; /* Casi Negro */
+  --color-blanco: #ffffff;
+  --color-gris-claro: #f4f6f8;
+  --fuente-principal: "Segoe UI", sans-serif;
+  --fuente-titulos: "Playfair Display", serif; /* Si carga, se ve elegante */
+}
+
+/* 2. RESET BÁSICO */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--fuente-principal);
+  background-color: var(--color-blanco);
+  color: #333;
+  line-height: 1.6;
+  overflow-x: hidden; /* Evita scroll horizontal */
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: 0.3s;
+}
+ul {
+  list-style: none;
+}
+
+/* 3. BARRA SUPERIOR (Top Bar) */
+.top-bar {
+  background-color: var(--color-negro);
+  color: #ccc;
+  padding: 10px 0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #333;
+}
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex; /* Asegura que los elementos se pongan al lado */
+  justify-content: space-between;
+  align-items: center;
+}
+.top-bar i {
+  margin-right: 5px;
+  color: var(--color-secundario);
+}
+.social-icons a {
+  margin-left: 15px;
+  color: #fff;
+}
+.social-icons a:hover {
+  color: var(--color-secundario);
+}
+
+/* 4. HEADER Y NAVEGACIÓN */
+header {
+  background-color: var(--color-base);
+  padding: 20px 0;
+  position: sticky; /* Menú fijo opcional */
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+header .logo h1 {
+  font-size: 1.8rem;
+  text-transform: uppercase;
+  color: var(--color-blanco);
+  font-family: var(--fuente-titulos);
+  letter-spacing: 1px;
+}
+header .logo span {
+  color: var(--color-secundario);
+}
+
+.nav-menu {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+
+.nav-menu a {
+  color: #e0e0e0;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  padding-bottom: 5px;
+}
+.nav-menu a:hover,
+.nav-menu a.active {
+  color: var(--color-secundario);
+  border-bottom: 2px solid var(--color-secundario);
+}
+
+/* Botón Especial en el Menú */
+.btn-primary {
+  background-color: var(--color-primario);
+  color: white !important;
+  padding: 10px 25px;
+  border-radius: 4px;
+  border: 1px solid var(--color-primario);
+  font-weight: bold;
+}
+.btn-primary:hover {
+  background-color: transparent;
+  border-color: var(--color-secundario);
+  color: var(--color-secundario) !important;
+}
+
+/* 5. HERO SECTION (Portada) - SOLUCIÓN SIN FOTOS */
+.hero {
+  height: 500px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  text-align: left;
+  color: white;
+  /* FONDO DEGRADADO (Se ve bien sin foto) */
+  background: linear-gradient(135deg, var(--color-base) 0%, #1a253a 100%);
+  border-bottom: 5px solid var(--color-secundario);
+}
+
+.hero-content {
+  max-width: 700px;
+  z-index: 2;
+}
+.hero h1 {
+  font-size: 3.5rem;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  font-family: var(--fuente-titulos);
+}
+.hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 30px;
+  font-weight: 300;
+}
+
+/* Animación Mouse */
+.scroll-downs {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.mousey {
+  width: 20px;
+  height: 35px;
+  border: 2px solid #fff;
+  border-radius: 25px;
+  display: flex;
+  justify-content: center;
+  padding-top: 5px;
+}
+.scroller {
+  width: 4px;
+  height: 10px;
+  background: #fff;
+  border-radius: 2px;
+  animation: scroll 2s infinite;
+}
+@keyframes scroll {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+}
+
+/* 6. SECCIONES GENERALES */
+.section {
+  padding: 80px 0;
+}
+.text-center {
+  text-align: center;
+}
+
+h2 {
+  font-size: 2.5rem;
+  color: var(--color-base);
+  margin-bottom: 15px;
+  font-family: var(--fuente-titulos);
+}
+
+/* 7. ACORDEÓN DE SERVICIOS (La magia de Lead Legal) */
+.galeria-servicios {
+  display: flex;
+  height: 450px; /* Altura de la sección */
+  width: 100%;
+  background-color: #000;
+}
+
+.item-galeria {
+  flex: 1;
+  position: relative;
+  transition: all 0.5s ease;
+  overflow: hidden;
+  cursor: pointer;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+
+  /* FONDO DE COLOR (Fallback si no hay foto) */
+  background: var(--color-base);
+  display: flex;
+  align-items: flex-end; /* Texto abajo */
+}
+
+/* Asignamos colores distintos a cada columna para que se vea bonito sin fotos */
+.item-galeria:nth-child(1) {
+  background: linear-gradient(to bottom, #2e3440, #1e222a);
+}
+.item-galeria:nth-child(2) {
+  background: linear-gradient(to bottom, #9e2a2b, #6d1b1c);
+} /* Rojo */
+.item-galeria:nth-child(3) {
+  background: linear-gradient(to bottom, #3b4554, #242a33);
+}
+
+.item-galeria:hover {
+  flex: 3;
+} /* Se expande al pasar el mouse */
+
+.overlay-servicio {
+  padding: 30px;
+  width: 100%;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  text-align: center;
+}
+
+.titulo-vertical {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  white-space: nowrap;
+  transform: rotate(-90deg); /* Texto de lado */
+  margin-bottom: 50px;
+  transition: 0.3s;
+}
+
+.item-galeria:hover .titulo-vertical {
+  transform: rotate(0deg); /* Se endereza */
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  border-bottom: 2px solid var(--color-secundario);
+  display: inline-block;
+}
+
+.desc-servicio {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  color: #ddd;
+  transition: 0.5s;
+}
+.item-galeria:hover .desc-servicio {
+  height: auto;
+  opacity: 1;
+  margin-top: 10px;
+}
+
+.btn-secondary {
+  display: inline-block;
+  border: 1px solid white;
+  color: white;
+  padding: 5px 15px;
+  margin-top: 10px;
+  font-size: 0.8rem;
+}
+.btn-secondary:hover {
+  background: white;
+  color: black;
+}
+
+/* 8. TESTIMONIOS (Estilo Limpio) */
+.grid-testimonios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+.testimonio-card {
+  background: white;
+  padding: 30px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  border-top: 4px solid var(--color-secundario);
+}
+.testimonio-card p {
+  font-style: italic;
+  color: #555;
+}
+.testimonio-card h4 {
+  margin-top: 15px;
+  color: var(--color-primario);
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* 9. FOOTER */
+footer {
+  background-color: var(--color-base);
+  color: white;
+  padding: 50px 0;
+  text-align: center;
+  border-top: 5px solid var(--color-secundario);
+}
+footer h2 {
+  color: white;
+  font-size: 1.5rem;
+}
+footer span {
+  color: var(--color-secundario);
+}
+
+/* 10. BOTÓN WHATSAPP FLOTANTE */
+.whatsapp-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #25d366;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+}
+.whatsapp-float:hover {
+  transform: scale(1.1);
+}
+
+/* RESPONSIVE (Móvil) */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+  .galeria-servicios {
+    flex-direction: column;
+    height: auto;
+  }
+  .item-galeria {
+    height: 200px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .item-galeria:hover {
+    flex: 1;
+  } /* En móvil no expandimos igual */
+  .titulo-vertical {
+    transform: rotate(0deg);
+    margin-bottom: 10px;
+  }
+  .desc-servicio {
+    height: auto;
+    opacity: 1;
+  }
+  .container {
+    flex-direction: column;
+    text-align: center;
+  }
+  .nav-menu {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+  }
+}
