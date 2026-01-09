@@ -3,27 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Abogada especialista en Derecho Laboral y Seguridad Social. Defensa estratégica en Barranquilla."
+    />
+    <link rel="icon" type="image/webp" href="img/favicon.webp" />
+
     <title>Tu Abogado Laboral | Dra. Johana Manga Padilla</title>
-    <link rel="stylesheet" href="css/estilos.css" />
+
+    <link rel="stylesheet" href="css/style.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
   </head>
   <body>
     <div class="top-bar">
       <div class="container">
-        <div class="info-contacto">
-          <i
-            class="fas fa-phone-alt"
-            style="color: var(--color-secundario)"
-          ></i>
-          (+57) 321 792 7495 |
-          <i
-            class="fas fa-envelope"
-            style="color: var(--color-secundario); margin-left: 10px"
-          ></i>
-          tuabogadolaboral@outlook.com
+        <div class="info">
+          <i class="fas fa-phone-alt"></i> (+57) 321 792 7495
+          <span class="separador">|</span>
+          <i class="fas fa-envelope"></i> tuabogadolaboral@outlook.com
         </div>
         <div class="social-icons">
           <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -34,188 +42,144 @@
     </div>
 
     <header>
-      <div class="container">
+      <div class="container header-container">
         <div class="logo">
           <a href="index.html">
-            <h1>Tu Abogado <span>Laboral</span></h1>
+            <img
+              src="img/logo-principal.webp"
+              alt="Tu Abogado Laboral Logo"
+              class="logo-img"
+            />
           </a>
         </div>
+
         <nav>
           <ul class="nav-menu">
-            <li><a href="index.html" class="active">Inicio</a></li>
-            <li><a href="nosotros.html">La Abogada</a></li>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="nosotros.html">Nosotros</a></li>
             <li><a href="servicios.html">Servicios</a></li>
             <li><a href="#testimonios">Testimonios</a></li>
-            <li>
-              <a
-                href="contacto.html"
-                class="btn btn-primary"
-                style="padding: 8px 20px"
-                >Contacto</a
-              >
-            </li>
+            <li><a href="contacto.html" class="btn-nav">Contacto</a></li>
           </ul>
         </nav>
       </div>
     </header>
 
-    <section
-      class="hero"
-      style="
-        background-image: linear-gradient(
-            rgba(14, 24, 43, 0.85),
-            rgba(14, 24, 43, 0.7)
-          ),
-          url('img/fondo-hero.jpg');
-      "
-    >
-      <div class="hero-content">
-        <p
-          style="
-            color: var(--color-secundario);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-          "
-        >
-          Bienvenidos, somos
+    <section class="hero">
+      <div class="container hero-content">
+        <span class="subtitle">Defensa Jurídica Experta</span>
+        <h1>Estrategias Legales <br />Que Dan Resultados</h1>
+        <p>
+          Especialistas en Derecho Laboral y Seguridad Social. Más de 10 años
+          protegiendo derechos en el sector público y privado.
         </p>
-        <h1 style="font-size: 3.5rem; margin-bottom: 10px; color: white">
-          TU ABOGADO LABORAL
-        </h1>
-        <p style="font-size: 1.2rem; font-weight: 300">
-          Firma especializada en Derecho Laboral y Seguridad Social.
-        </p>
-      </div>
 
-      <div class="scroll-downs">
-        <div class="mousey">
-          <div class="scroller"></div>
+        <div class="cta-group">
+          <a href="contacto.html" class="btn btn-primary">Solicitar Asesoría</a>
+          <a href="#servicios-acordeon" class="btn btn-outline"
+            >Áreas de Práctica</a
+          >
         </div>
       </div>
     </section>
 
     <section class="section text-center">
       <div class="container">
-        <h2 style="margin-bottom: 20px">
-          Asesoría legal estratégica para empresas y trabajadores
-        </h2>
-        <div
-          style="
-            width: 50px;
-            height: 3px;
-            background-color: var(--color-primario);
-            margin: 0 auto 30px auto;
-          "
-        ></div>
+        <h2 class="section-title">Soluciones Legales Efectivas</h2>
+        <div class="divider"></div>
         <p style="max-width: 800px; margin: 0 auto">
-          Somos una firma boutique liderada por la
-          <strong>Dra. Johana Manga Padilla</strong>. Nos dedicamos a la
-          estructuración legal de defensas, acompañamiento en litigios y manejo
-          jurídico integral ante entidades como Colpensiones y Juzgados
-          Laborales.
+          Liderado por la <strong>Dra. Johana Manga Padilla</strong>, ofrecemos
+          representación judicial experta ante Juzgados Laborales y
+          Colpensiones. Garantizamos una defensa técnica, rigurosa y ética.
         </p>
       </div>
     </section>
 
-    <section class="galeria-servicios">
-      <div
-        class="item-galeria"
-        style="background-image: url('img/laboral.jpg'); background-color: #333"
-      >
-        <div class="overlay-servicio">
-          <div class="titulo-vertical">Derecho Laboral</div>
-          <div class="desc-servicio">
-            Despidos, liquidaciones y contratos.<br />
-            <a
-              href="servicios.html"
-              class="btn btn-secondary"
-              style="margin-top: 10px; padding: 5px 15px; font-size: 0.8rem"
-              >Ver más</a
-            >
+    <div class="titulo-servicios text-center">
+      <h2>Nuestros Servicios</h2>
+    </div>
+
+    <section id="servicios-acordeon" class="galeria-acordeon">
+      <div class="panel-servicio">
+        <div class="overlay-info">
+          <h3>Derecho Laboral</h3>
+          <div class="contenido-oculto">
+            <p>
+              Defensa en despidos injustificados, liquidaciones y contratos.
+            </p>
+            <a href="servicios.html" class="btn-ver-mas">Ver Más</a>
           </div>
         </div>
       </div>
 
-      <div
-        class="item-galeria"
-        style="
-          background-image: url('img/pensiones.jpg');
-          background-color: #444;
-        "
-      >
-        <div class="overlay-servicio">
-          <div class="titulo-vertical">Seguridad Social</div>
-          <div class="desc-servicio">
-            Pensiones y Riesgos Laborales.<br />
-            <a
-              href="servicios.html"
-              class="btn btn-secondary"
-              style="margin-top: 10px; padding: 5px 15px; font-size: 0.8rem"
-              >Ver más</a
-            >
+      <div class="panel-servicio">
+        <div class="overlay-info">
+          <h3>Seguridad Social</h3>
+          <div class="contenido-oculto">
+            <p>Pensiones de vejez, invalidez y reclamaciones ante ARL.</p>
+            <a href="servicios.html" class="btn-ver-mas">Ver Más</a>
           </div>
         </div>
       </div>
 
-      <div
-        class="item-galeria"
-        style="
-          background-image: url('img/empresarial.jpg');
-          background-color: #555;
-        "
-      >
-        <div class="overlay-servicio">
-          <div class="titulo-vertical">Derecho Corporativo</div>
-          <div class="desc-servicio">
-            Defensa de empresas y blindaje jurídico.<br />
-            <a
-              href="servicios.html"
-              class="btn btn-secondary"
-              style="margin-top: 10px; padding: 5px 15px; font-size: 0.8rem"
-              >Ver más</a
-            >
+      <div class="panel-servicio">
+        <div class="overlay-info">
+          <h3>Derecho Corporativo</h3>
+          <div class="contenido-oculto">
+            <p>Blindaje jurídico preventivo para empresas y reglamentos.</p>
+            <a href="servicios.html" class="btn-ver-mas">Ver Más</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-servicio">
+        <div class="overlay-info">
+          <h3>Litigio Estratégico</h3>
+          <div class="contenido-oculto">
+            <p>Representación en audiencias complejas y casación.</p>
+            <a href="servicios.html" class="btn-ver-mas">Ver Más</a>
           </div>
         </div>
       </div>
     </section>
 
-    <section
-      id="testimonios"
-      class="section"
-      style="background-color: var(--gris-fondo)"
-    >
-      <div class="container text-center">
-        <h2 style="margin-bottom: 40px">Lo que dicen nuestros clientes</h2>
+    <section id="testimonios" class="section bg-light">
+      <div class="container">
+        <div class="text-center mb-50">
+          <h2>Lo Que Dicen Nuestros Clientes</h2>
+          <div class="divider"></div>
+        </div>
 
-        <div class="lista-servicios" style="margin-top: 0">
-          <div class="servicio" style="text-align: left">
-            <p style="font-style: italic">
-              "La Dra. Manga demostró una idoneidad excepcional en mi caso de
-              pensión. Su rapidez en las respuestas nos dio seguridad."
-            </p>
-            <h4 style="margin-top: 15px; color: var(--color-primario)">
-              — Cliente Pensional
-            </h4>
-          </div>
-          <div class="servicio" style="text-align: left">
-            <p style="font-style: italic">
+        <div class="grid-testimonios">
+          <div class="card-testimonio">
+            <p>
               "Excelente manejo de los procesos laborales de nuestra empresa.
               Aliados estratégicos clave."
             </p>
-            <h4 style="margin-top: 15px; color: var(--color-primario)">
-              — Incomac SAS
-            </h4>
+            <div class="autor">
+              <h4>Gerente General</h4>
+              <span>Incomac S.A.S</span>
+            </div>
           </div>
-          <div class="servicio" style="text-align: left">
-            <p style="font-style: italic">
+          <div class="card-testimonio">
+            <p>
+              "La Dra. Manga demostró una idoneidad excepcional. Su rapidez en
+              las respuestas nos dio seguridad."
+            </p>
+            <div class="autor">
+              <h4>Cliente Pensional</h4>
+              <span>Caso Colpensiones</span>
+            </div>
+          </div>
+          <div class="card-testimonio">
+            <p>
               "Gran capacidad de negociación y conocimiento técnico. Muy
               recomendada."
             </p>
-            <h4 style="margin-top: 15px; color: var(--color-primario)">
-              — Gramas y Parques
-            </h4>
+            <div class="autor">
+              <h4>Recursos Humanos</h4>
+              <span>Sector Salud</span>
+            </div>
           </div>
         </div>
       </div>
@@ -223,24 +187,56 @@
 
     <footer>
       <div class="container">
-        <div class="logo" style="margin-bottom: 20px">
-          <h2 style="color: white">TU ABOGADO <span>LABORAL</span></h2>
+        <div class="footer-grid">
+          <div class="footer-col brand-col">
+            <h3 class="footer-logo">TU ABOGADO <span>LABORAL</span></h3>
+            <p>
+              Transformamos problemas legales en soluciones estratégicas con
+              calidad y cumplimiento ético.
+            </p>
+            <div class="social-icons-footer">
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+          </div>
+
+          <div class="footer-col links-col">
+            <h4>Enlaces Rápidos</h4>
+            <ul>
+              <li><a href="index.html">› Inicio</a></li>
+              <li><a href="nosotros.html">› Nosotros</a></li>
+              <li><a href="servicios.html">› Servicios</a></li>
+              <li><a href="contacto.html">› Contacto</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col contact-col">
+            <h4>Contacto</h4>
+            <ul class="contact-list">
+              <li>
+                <i class="fas fa-map-marker-alt"></i> Barranquilla, Atlántico
+              </li>
+              <li><i class="fas fa-phone-alt"></i> (+57) 321 792 7495</li>
+              <li>
+                <i class="fas fa-envelope"></i> tuabogadolaboral@outlook.com
+              </li>
+            </ul>
+          </div>
         </div>
-        <p>Barranquilla, Atlántico - Colombia</p>
-        <p><strong>Teléfono:</strong> 321 792 7495</p>
-        <div class="social-icons" style="margin-top: 20px">
-          <a href="#"><i class="fab fa-whatsapp"></i></a>
-          <a href="#"><i class="far fa-envelope"></i></a>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="container bottom-container">
+          <p>&copy; 2026 Tu Abogado Laboral. Todos los derechos reservados.</p>
         </div>
-        <br />
-        <p style="font-size: 0.8rem; opacity: 0.5">
-          &copy; 2026 Tu Abogado Laboral. Todos los derechos reservados.
-        </p>
       </div>
     </footer>
 
-    <a href="https://wa.me/573217927495" class="whatsapp-float" target="_blank">
+    <a href="https://wa.me/573217927495" class="whatsapp-btn" target="_blank">
       <i class="fab fa-whatsapp"></i>
     </a>
+
+    <script src="js/main.js"></script>
   </body>
 </html>
