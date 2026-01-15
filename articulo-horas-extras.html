@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora de Horas Extras | Tu Abogado Laboral</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      /* --- ESTILOS ESPECÍFICOS DE LA CALCULADORA --- */
+      body {
+        font-family: "Lato", sans-serif;
+        margin: 0;
+        background-color: #f4f8fb;
+      }
+      .calc-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .calc-card {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(16, 33, 75, 0.08);
+        border: 1px solid #eee;
+        margin-bottom: 30px;
+      }
+      .form-group label {
+        display: block;
+        font-weight: 700;
+        color: #10214b;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+      }
+      .form-group small {
+        display: block;
+        color: #666;
+        font-size: 0.75rem;
+        margin-bottom: 8px;
+        background: #f4f8fb;
+        padding: 4px 8px;
+        border-radius: 4px;
+        width: fit-content;
+      }
+      .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      .input-icon {
+        position: absolute;
+        left: 15px;
+        color: #10214b;
+        z-index: 10;
+      }
+      .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 40px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: #f9f9f9;
+        box-sizing: border-box;
+      }
+      .form-control:focus {
+        border-color: #10214b;
+        background: #fff;
+        outline: none;
+      }
+      select.form-control {
+        cursor: pointer;
+        font-weight: bold;
+        color: #10214b;
+      }
+
+      .calc-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+      }
+      .hours-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .calc-grid,
+        .hours-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .btn-calculate {
+        background-color: #10214b;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 30px;
+        text-transform: uppercase;
+      }
+      .btn-calculate:hover {
+        background-color: #25d366;
+        transform: translateY(-2px);
+      }
+
+      /* --- ESTILOS RESULTADOS --- */
+      .result-container {
+        display: none;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid #eee;
+        margin-top: 20px;
+      }
+      .result-header {
+        background: #10214b;
+        color: white;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .result-body {
+        padding: 30px;
+      }
+
+      /* Grid de resultados dividido */
+      .result-split-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 20px;
+      }
+      @media (max-width: 600px) {
+        .result-split-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .result-column h4 {
+        margin: 0 0 15px 0;
+        color: #10214b;
+        font-size: 1rem;
+        border-bottom: 2px solid #e8f5e9;
+        padding-bottom: 5px;
+      }
+      .result-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+      }
+
+      /* Subtotales */
+      .subtotal-row {
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 1px dashed #ccc;
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+        color: #555;
+      }
+
+      .result-total {
+        background: #f4f8fb;
+        padding: 25px;
+        text-align: right;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 8px;
+      }
+      .total-value {
+        font-size: 2rem;
+        color: #25d366;
+        font-weight: 900;
+      }
+
+      .badge-info {
+        display: inline-block;
+        font-size: 0.8rem;
+        padding: 6px 10px;
+        border-radius: 6px;
+        margin-left: 0;
+        margin-right: 10px;
+        background: #e3f2fd;
+        color: #1565c0;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="container">
+        <div class="info">
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+        </div>
+      </div>
+    </div>
+    <header>
+      <div class="container header-container">
+        <div class="logo">
+          <a href="index.html"
+            ><img src="img/logo-principal.webp" alt="Logo" class="logo-img"
+          /></a>
+        </div>
+        <nav>
+          <ul class="nav-menu">
+            <li>
+              <a href="blog.html" style="color: #10214b; font-weight: bold"
+                ><i class="fas fa-arrow-left"></i> Volver a Herramientas</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section class="bg-light" style="padding: 40px 0">
+      <div class="calc-wrapper">
+        <div class="text-center mb-5" style="text-align: center">
+          <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
+            Calculadora de Horas Extras
+          </h1>
+          <p style="color: #666">
+            Seleccione el periodo para aplicar la norma correcta.
+          </p>
+        </div>
+
+        <div class="calc-card">
+          <form id="extrasForm">
+            <div
+              class="form-group"
+              style="
+                background: #eef2f6;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 25px;
+                border: 1px solid #dce4ec;
+              "
+            >
+              <label
+                ><i class="fas fa-calendar-check"></i> Periodo Aplicable
+                (Vigencia)</label
+              >
+              <small
+                >Ajusta automáticamente la Jornada Máxima y el % de Recargo
+                Dominical.</small
+              >
+              <div class="input-group">
+                <select
+                  id="periodoSelector"
+                  class="form-control"
+                  style="background: white"
+                >
+                  <option value="p_old">
+                    Antes de Jul 2023 (48h | Dom 75%)
+                  </option>
+                  <option value="p_2023">
+                    Jul 2023 - Jul 2024 (47h | Dom 75%)
+                  </option>
+                  <option value="p_2024">
+                    Jul 2024 - Jul 2025 (46h | Dom 75%)
+                  </option>
+                  <option value="p_2025" selected>
+                    Jul 2025 - Jul 2026 (44h | Dom 80%)
+                  </option>
+                  <option value="p_2026">
+                    Jul 2026 - Jul 2027 (42h | Dom 90%)
+                  </option>
+                  <option value="p_2027">
+                    Jul 2027 en adelante (42h | Dom 100%)
+                  </option>
+                </select>
+              </div>
+              <div
+                style="
+                  margin-top: 15px;
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 10px;
+                "
+              >
+                <span class="badge-info" id="badgeJornada"></span>
+                <span
+                  class="badge-info"
+                  id="badgeRecargo"
+                  style="background: #e8f5e9; color: #2e7d32"
+                ></span>
+              </div>
+            </div>
+
+            <div class="calc-grid">
+              <div class="form-group">
+                <label>Salario Base Mensual</label>
+                <div class="input-group">
+                  <i class="fas fa-dollar-sign input-icon"></i>
+                  <input
+                    type="number"
+                    id="salario"
+                    class="form-control"
+                    placeholder="Ej: 2000000"
+                    required
+                  />
+                </div>
+              </div>
+              <div
+                class="form-group"
+                style="display: flex; align-items: center"
+              >
+                <small style="font-size: 0.85rem; color: #888">
+                  * El sistema calculará el valor de la hora ordinaria
+                  dividiendo el salario entre el
+                  <strong>divisor indicado arriba</strong>.
+                </small>
+              </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0" />
+
+            <h3 style="font-size: 1.1rem; color: #10214b; margin-bottom: 15px">
+              Detalle de horas laboradas:
+            </h3>
+
+            <div class="hours-grid">
+              <div class="form-group">
+                <label>Extra Diurna</label>
+                <small>Recargo fijo: 25%</small>
+                <div class="input-group">
+                  <i class="far fa-clock input-icon"></i>
+                  <input
+                    type="number"
+                    id="hed"
+                    class="form-control"
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Extra Nocturna</label>
+                <small>Recargo fijo: 75%</small>
+                <div class="input-group">
+                  <i class="fas fa-moon input-icon"></i>
+                  <input
+                    type="number"
+                    id="hen"
+                    class="form-control"
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Extra Dom. Diurna</label>
+                <small>25% + Recargo Periodo</small>
+                <div class="input-group">
+                  <i class="fas fa-sun input-icon"></i>
+                  <input
+                    type="number"
+                    id="hedf"
+                    class="form-control"
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Extra Dom. Nocturna</label>
+                <small>75% + Recargo Periodo</small>
+                <div class="input-group">
+                  <i class="fas fa-stars input-icon"></i>
+                  <input
+                    type="number"
+                    id="hedfn"
+                    class="form-control"
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Recargo Nocturno</label>
+                <small>35% (Sin ser extra)</small>
+                <div class="input-group">
+                  <i class="fas fa-cloud-moon input-icon"></i>
+                  <input
+                    type="number"
+                    id="rn"
+                    class="form-control"
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Dom/Fest (Ordinaria)</label>
+                <small>Solo Recargo (Variable)</small>
+                <div class="input-group">
+                  <i class="fas fa-calendar-day input-icon"></i>
+                  <input
+                    type="number"
+                    id="df"
+                    class="form-control"
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-calculate">
+              <i class="fas fa-calculator"></i> Calcular Liquidación
+            </button>
+          </form>
+        </div>
+
+        <div id="resultCard" class="result-container">
+          <div class="result-header">
+            <div>
+              <h3 style="margin: 0; font-size: 1.2rem">
+                Resumen de Liquidación
+              </h3>
+              <small style="opacity: 0.8" id="resPeriodoTexto"
+                >Periodo Seleccionado</small
+              >
+            </div>
+          </div>
+
+          <div class="result-body">
+            <div
+              style="
+                background: #e8f5e9;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                text-align: center;
+                border: 1px solid #c8e6c9;
+              "
+            >
+              <label style="font-size: 0.9rem; color: #2e7d32; display: block"
+                >Valor Hora Ordinaria</label
+              >
+              <div
+                id="valHoraOrdinaria"
+                style="font-size: 1.4rem; font-weight: bold; color: #10214b"
+              >
+                $0
+              </div>
+              <small id="resDivisorUsado" style="color: #666">--</small>
+            </div>
+
+            <div class="result-split-grid">
+              <div class="result-column">
+                <h4><i class="fas fa-stopwatch"></i> Horas Extras</h4>
+                <div class="result-item">
+                  <label>Diurnas:</label><span id="resHed">$0</span>
+                </div>
+                <div class="result-item">
+                  <label>Nocturnas:</label><span id="resHen">$0</span>
+                </div>
+                <div class="result-item">
+                  <label>Dom. Diurnas:</label><span id="resHedf">$0</span>
+                </div>
+                <div class="result-item">
+                  <label>Dom. Nocturnas:</label><span id="resHedfn">$0</span>
+                </div>
+
+                <div class="subtotal-row">
+                  <span>Subtotal Extras:</span>
+                  <span id="subtotalExtras" style="color: #10214b">$0</span>
+                </div>
+              </div>
+
+              <div class="result-column">
+                <h4><i class="fas fa-bolt"></i> Recargos Ordinarios</h4>
+                <div class="result-item">
+                  <label>Rec. Nocturno:</label><span id="resRn">$0</span>
+                </div>
+                <div class="result-item">
+                  <label>Dom. Ordinario:</label><span id="resDf">$0</span>
+                </div>
+
+                <div style="height: 52px"></div>
+
+                <div class="subtotal-row">
+                  <span>Subtotal Recargos:</span>
+                  <span id="subtotalRecargos" style="color: #10214b">$0</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="result-total">
+              <span class="total-label">Total Nómina (Extras + Recargos):</span>
+              <span id="valTotal" class="total-value">$0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container" style="max-width: 1000px; margin: 0 auto">
+      <div
+        style="
+          background-color: #fff;
+          border-top: 3px solid #d4af37;
+          padding: 20px;
+          margin: 40px 0 20px 0;
+          border-radius: 4px;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+          text-align: center;
+          font-size: 0.85rem;
+          color: #666;
+          line-height: 1.5;
+        "
+      >
+        <p style="margin: 0">
+          <strong style="color: #10214b">Aviso Legal:</strong>
+          Esta herramienta realiza proyecciones basadas en la normativa laboral
+          vigente en Colombia. Los resultados son
+          <strong>aproximaciones ilustrativas</strong> y pueden variar según
+          convenciones colectivas o interpretaciones judiciales. El uso de este
+          simulador no crea una relación abogado-cliente ni sustituye una
+          liquidación oficial.
+          <span style="display: block; margin-top: 5px; font-style: italic">
+            Tu Abogado Laboral no se hace responsable por decisiones tomadas
+            basándose exclusivamente en estos datos.
+          </span>
+        </p>
+      </div>
+    </div>
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-col">
+            <div class="footer-logo">Tu Abogado <span>Laboral</span></div>
+            <p style="color: #ccc; margin-bottom: 20px; font-size: 0.9rem">
+              Defensa experta y estratégica en Derecho Laboral y Pensional.
+              Barranquilla, Colombia.
+            </p>
+            <div class="social-icons-footer">
+              <a
+                href="https://web.facebook.com/profile.php?id=100064878228146"
+                target="_blank"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a
+                href="https://www.instagram.com/tuabogadolaboralbq/"
+                target="_blank"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a
+                href="https://www.linkedin.com/in/dra-johana-manga-padilla-5745b542/"
+                target="_blank"
+                ><i class="fab fa-linkedin-in"></i
+              ></a>
+            </div>
+          </div>
+
+          <div class="footer-col links-col">
+            <h4>Enlaces Rápidos</h4>
+            <ul>
+              <li><a href="index.html">Inicio</a></li>
+              <li><a href="nosotros.html">Sobre Nosotros</a></li>
+              <li><a href="servicios.html">Áreas de Práctica</a></li>
+              <li><a href="blog.html">Herramientas</a></li>
+              <li><a href="contacto.html">Agendar Cita</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Contacto</h4>
+            <ul class="contact-list">
+              <li>
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Edificio Las Flores, Barranquilla</span>
+              </li>
+              <li>
+                <i class="fas fa-phone-alt"></i>
+                <span>+57 321 792 7495</span>
+              </li>
+              <li>
+                <i class="fas fa-envelope"></i>
+                <span>tuabogadolaboral@outlook.com</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="container">
+          <p>
+            &copy; 2026 Tu Abogado Laboral - Dra. Johana Manga. Todos los
+            derechos reservados.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // 1. CONFIGURACIÓN LEGAL (Validada 2026 y Reforma)
+      const CONSTANTES_PERIODO = {
+        p_old: {
+          divisor: 240,
+          dom: 0.75,
+          label: "48 Horas",
+          text: "Normativa Antigua",
+        },
+        p_2023: {
+          divisor: 235,
+          dom: 0.75,
+          label: "47 Horas",
+          text: "Transición 2023-2024",
+        },
+        p_2024: {
+          divisor: 230,
+          dom: 0.75,
+          label: "46 Horas",
+          text: "Transición 2024-2025",
+        },
+        p_2025: {
+          divisor: 220,
+          dom: 0.8,
+          label: "44 Horas",
+          text: "Reforma & Reducción 2025-2026",
+        },
+        p_2026: {
+          divisor: 210,
+          dom: 0.9,
+          label: "42 Horas",
+          text: "Reforma & Reducción 2026-2027",
+        },
+        p_2027: {
+          divisor: 210,
+          dom: 1.0,
+          label: "42 Horas",
+          text: "Implementación Total",
+        },
+      };
+
+      const selectorPeriodo = document.getElementById("periodoSelector");
+      const badgeJornada = document.getElementById("badgeJornada");
+      const badgeRecargo = document.getElementById("badgeRecargo");
+
+      // Función visual actualizada con DIVISOR explícito
+      function actualizarInfoVisual() {
+        const key = selectorPeriodo.value;
+        const config = CONSTANTES_PERIODO[key];
+
+        badgeJornada.innerHTML = `<i class="fas fa-clock"></i> Jornada: ${config.label} | Divisor: ${config.divisor}`;
+        badgeRecargo.innerHTML = `<i class="fas fa-percentage"></i> Recargo Dom: ${(
+          config.dom * 100
+        ).toFixed(0)}%`;
+      }
+
+      selectorPeriodo.addEventListener("change", actualizarInfoVisual);
+      actualizarInfoVisual();
+
+      const formatoPeso = new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+
+      // 2. LÓGICA DE CÁLCULO
+      document
+        .getElementById("extrasForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          // A. Obtener Configuración
+          const key = selectorPeriodo.value;
+          const config = CONSTANTES_PERIODO[key];
+          const divisorJornada = config.divisor;
+          const porcentajeDominical = config.dom;
+
+          // B. Obtener Inputs
+          let salario =
+            parseFloat(document.getElementById("salario").value) || 0;
+          let qtyHed = parseFloat(document.getElementById("hed").value) || 0;
+          let qtyHen = parseFloat(document.getElementById("hen").value) || 0;
+          let qtyRn = parseFloat(document.getElementById("rn").value) || 0;
+          let qtyDf = parseFloat(document.getElementById("df").value) || 0;
+          let qtyHedf = parseFloat(document.getElementById("hedf").value) || 0;
+          let qtyHedfn =
+            parseFloat(document.getElementById("hedfn").value) || 0;
+
+          // C. Factores
+          const FACTOR_HED = 1.25;
+          const FACTOR_HEN = 1.75;
+          const FACTOR_RN = 0.35;
+
+          const FACTOR_DF = 1.0 + porcentajeDominical;
+          const FACTOR_HEDF = 1.0 + 0.25 + porcentajeDominical;
+          const FACTOR_HEDFN = 1.0 + 0.75 + porcentajeDominical;
+
+          // D. Matemáticas Individuales
+          let valHora = salario / divisorJornada;
+
+          // Grupo Extras
+          let totalHed = Math.round(valHora * FACTOR_HED * qtyHed);
+          let totalHen = Math.round(valHora * FACTOR_HEN * qtyHen);
+          let totalHedf = Math.round(valHora * FACTOR_HEDF * qtyHedf);
+          let totalHedfn = Math.round(valHora * FACTOR_HEDFN * qtyHedfn);
+
+          // Grupo Recargos
+          let totalRn = Math.round(valHora * FACTOR_RN * qtyRn);
+          let totalDf = Math.round(valHora * FACTOR_DF * qtyDf);
+
+          // E. Subtotales y Totales
+          let subtotalExtras = totalHed + totalHen + totalHedf + totalHedfn;
+          let subtotalRecargos = totalRn + totalDf;
+          let granTotal = subtotalExtras + subtotalRecargos;
+
+          // F. Renderizado en Pantalla
+          document.getElementById("valHoraOrdinaria").textContent =
+            formatoPeso.format(Math.round(valHora));
+          document.getElementById(
+            "resDivisorUsado"
+          ).textContent = `Divisor usado: ${divisorJornada}`;
+          document.getElementById(
+            "resPeriodoTexto"
+          ).textContent = `Vigencia: ${config.text}`;
+
+          // Renderizar Items Individuales
+          document.getElementById("resHed").textContent =
+            formatoPeso.format(totalHed);
+          document.getElementById("resHen").textContent =
+            formatoPeso.format(totalHen);
+          document.getElementById("resHedf").textContent =
+            formatoPeso.format(totalHedf);
+          document.getElementById("resHedfn").textContent =
+            formatoPeso.format(totalHedfn);
+
+          document.getElementById("resRn").textContent =
+            formatoPeso.format(totalRn);
+          document.getElementById("resDf").textContent =
+            formatoPeso.format(totalDf);
+
+          // Renderizar Subtotales
+          document.getElementById("subtotalExtras").textContent =
+            formatoPeso.format(subtotalExtras);
+          document.getElementById("subtotalRecargos").textContent =
+            formatoPeso.format(subtotalRecargos);
+
+          // Renderizar Gran Total
+          document.getElementById("valTotal").textContent =
+            formatoPeso.format(granTotal);
+
+          // Animación Scroll
+          let resultCard = document.getElementById("resultCard");
+          resultCard.style.display = "block";
+          resultCard.scrollIntoView({ behavior: "smooth" });
+        });
+    </script>
+    <a
+      href="https://wa.me/573217927495"
+      class="whatsapp-btn"
+      target="_blank"
+      title="Contáctanos por WhatsApp"
+    >
+      <i class="fab fa-whatsapp"></i>
+    </a>
+  </body>
+</html>

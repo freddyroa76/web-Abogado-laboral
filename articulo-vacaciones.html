@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora de Vacaciones | Tu Abogado Laboral</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      /* REUTILIZANDO TUS ESTILOS EXISTENTES */
+      .calc-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .calc-card {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(16, 33, 75, 0.08);
+        border: 1px solid #eee;
+        margin-bottom: 30px;
+      }
+      .calc-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+      }
+      @media (max-width: 768px) {
+        .calc-grid {
+          grid-template-columns: 1fr;
+        }
+        .calc-card {
+          padding: 20px;
+        }
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 700;
+        color: #10214b;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+      }
+      .form-group small {
+        display: block;
+        color: #888;
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+      }
+
+      .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      .input-icon {
+        position: absolute;
+        left: 15px;
+        color: #10214b;
+      }
+      .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 40px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+        background: #f9f9f9;
+      }
+      .form-control:focus {
+        border-color: #10214b;
+        background: #fff;
+        outline: none;
+      }
+
+      /* Checkbox Wrapper (Estilo Consistente) */
+      .checkbox-wrapper {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #eee;
+      }
+      .checkbox-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .btn-calculate {
+        background-color: #10214b;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .btn-calculate:hover {
+        background-color: #25d366;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+      }
+
+      /* RESULTADOS */
+      .result-container {
+        display: none;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid #eee;
+        animation: slideDown 0.5s ease;
+      }
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .result-header {
+        background: #10214b;
+        color: white;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .result-body {
+        padding: 30px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        border-bottom: 1px solid #eee;
+      }
+      @media (max-width: 600px) {
+        .result-body {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+      }
+
+      .result-item label {
+        font-size: 0.85rem;
+        color: #666;
+        display: block;
+        margin-bottom: 5px;
+      }
+      .result-item span {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .result-total {
+        background: #f4f8fb;
+        padding: 25px;
+        text-align: right;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .total-label {
+        font-size: 1.2rem;
+        color: #10214b;
+        font-weight: bold;
+      }
+      .total-value {
+        font-size: 2rem;
+        color: #25d366;
+        font-weight: 900;
+      }
+
+      .cta-whatsapp {
+        display: block;
+        text-align: center;
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 15px;
+        margin: 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        border: 1px dashed #25d366;
+        transition: 0.3s;
+      }
+      .cta-whatsapp:hover {
+        background: #c8e6c9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="container">
+        <div class="info">
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+        </div>
+      </div>
+    </div>
+    <header>
+      <div class="container header-container">
+        <div class="logo">
+          <a href="index.html"
+            ><img src="img/logo-principal.webp" alt="Logo" class="logo-img"
+          /></a>
+        </div>
+        <nav>
+          <ul class="nav-menu">
+            <li>
+              <a href="blog.html" style="color: #10214b; font-weight: bold"
+                ><i class="fas fa-arrow-left"></i> Volver a Herramientas</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section class="bg-light" style="padding: 40px 0">
+      <div class="container">
+        <div class="text-center mb-5">
+          <h1 style="color: #10214b; font-size: 2.2rem">
+            Calculadora de Vacaciones
+          </h1>
+          <p style="color: #666; max-width: 600px; margin: 0 auto">
+            Calcule el valor de su descanso remunerado según la normativa
+            colombiana (CST).
+          </p>
+        </div>
+
+        <div class="calc-wrapper">
+          <div class="calc-card">
+            <form id="vacacionesForm">
+              <div class="calc-grid">
+                <div>
+                  <div class="form-group">
+                    <label>Salario Base Mensual</label>
+                    <small>Ingrese su salario fijo mensual</small>
+                    <div class="input-group">
+                      <i class="fas fa-dollar-sign input-icon"></i>
+                      <input
+                        type="number"
+                        id="salario"
+                        class="form-control"
+                        placeholder="Ingrese valor sin puntos"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="margin-top: 20px">
+                    <label>Otros Ingresos Mensuales</label>
+                    <small
+                      >Promedio de comisiones, recargos (Sin Aux.
+                      Transporte)</small
+                    >
+                    <div class="input-group">
+                      <i class="fas fa-coins input-icon"></i>
+                      <input
+                        type="number"
+                        id="otrosIngresos"
+                        class="form-control"
+                        placeholder="0"
+                        value="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="form-group">
+                    <label>Periodo de Cálculo</label>
+                    <small>Fechas para determinar tiempo trabajado</small>
+                    <div style="display: flex; gap: 10px">
+                      <input
+                        type="date"
+                        id="fechaInicio"
+                        class="form-control"
+                        style="padding-left: 15px"
+                        required
+                      />
+                      <input
+                        type="date"
+                        id="fechaFin"
+                        class="form-control"
+                        style="padding-left: 15px"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="margin-top: 20px">
+                    <label>Días de Vacaciones a Pagar</label>
+                    <div class="input-group">
+                      <i class="fas fa-calendar-day input-icon"></i>
+                      <input
+                        type="number"
+                        id="diasVacaciones"
+                        class="form-control"
+                        placeholder="Ej: 15"
+                        disabled
+                        style="background-color: #e9ecef"
+                      />
+                    </div>
+
+                    <div
+                      class="checkbox-wrapper"
+                      style="margin-top: 10px; padding: 10px"
+                    >
+                      <div class="checkbox-header">
+                        <input
+                          type="checkbox"
+                          id="checkAutomatico"
+                          checked
+                          style="
+                            width: 18px;
+                            height: 18px;
+                            accent-color: #10214b;
+                          "
+                        />
+                        <span style="font-size: 0.85rem; color: #333">
+                          Calcular automáticamente (15 días por año)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-calculate">
+                <i class="fas fa-calculator"></i> Calcular Vacaciones
+              </button>
+            </form>
+          </div>
+
+          <div id="resultCard" class="result-container">
+            <div class="result-header">
+              <div>
+                <h3 style="margin: 0; font-size: 1.2rem">
+                  Resultado de la Liquidación
+                </h3>
+                <small id="periodoTexto" style="opacity: 0.8"
+                  >Periodo: -- a --</small
+                >
+              </div>
+              <div style="text-align: right">
+                <i
+                  class="fas fa-umbrella-beach"
+                  style="font-size: 2rem; opacity: 0.5"
+                ></i>
+              </div>
+            </div>
+
+            <div class="result-body">
+              <div style="border-right: 1px solid #eee; padding-right: 20px">
+                <h4
+                  style="
+                    color: #10214b;
+                    border-bottom: 2px solid #eee;
+                    padding-bottom: 10px;
+                    margin-bottom: 15px;
+                  "
+                >
+                  Datos Base
+                </h4>
+
+                <div class="result-item" style="margin-bottom: 15px">
+                  <label>Base Salarial (Sin Aux. Transporte)</label>
+                  <span id="resBase">$0</span>
+                </div>
+                <div class="result-item">
+                  <label>Días Trabajados en el Periodo</label>
+                  <span id="resDiasTrabajados" style="color: #10214b"
+                    >0 días</span
+                  >
+                </div>
+              </div>
+
+              <div>
+                <h4
+                  style="
+                    color: #10214b;
+                    border-bottom: 2px solid #eee;
+                    padding-bottom: 10px;
+                    margin-bottom: 15px;
+                  "
+                >
+                  Liquidación
+                </h4>
+
+                <div class="result-item" style="margin-bottom: 15px">
+                  <label>Días de Vacaciones Calculados</label>
+                  <span id="resDiasVacaciones" style="font-weight: bold"
+                    >0</span
+                  >
+                </div>
+
+                <p style="font-size: 0.8rem; color: #888; line-height: 1.3">
+                  Fórmula: (Base ÷ 30) × Días de Vacaciones
+                </p>
+              </div>
+            </div>
+
+            <div class="result-total">
+              <span class="total-label">Total a Pagar:</span>
+              <span id="valTotal" class="total-value">$0</span>
+            </div>
+
+            <a
+              href="https://wa.me/573217927495?text=Hola%20Tu%20Abogado%20Laboral,%20tengo%20dudas%20con%20el%20pago%20de%20mis%20vacaciones."
+              target="_blank"
+              class="cta-whatsapp"
+            >
+              <i class="fab fa-whatsapp"></i> ¿Dudas con el pago? Contactar
+              Abogado
+            </a>
+          </div>
+
+          <p
+            style="
+              text-align: center;
+              font-size: 0.8rem;
+              color: #999;
+              margin-top: 20px;
+            "
+          >
+            * Nota: Las vacaciones no incluyen Auxilio de Transporte en su base
+            de liquidación (Art. 192 CST).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="container" style="max-width: 1000px; margin: 0 auto">
+      <div
+        style="
+          background-color: #fff;
+          border-top: 3px solid #d4af37;
+          padding: 20px;
+          margin: 40px 0 20px 0;
+          border-radius: 4px;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+          text-align: center;
+          font-size: 0.85rem;
+          color: #666;
+          line-height: 1.5;
+        "
+      >
+        <p style="margin: 0">
+          <strong style="color: #10214b">Aviso Legal:</strong>
+          Esta herramienta realiza proyecciones basadas en la normativa laboral
+          vigente en Colombia. Los resultados son
+          <strong>aproximaciones ilustrativas</strong> y pueden variar según
+          convenciones colectivas o interpretaciones judiciales. El uso de este
+          simulador no crea una relación abogado-cliente ni sustituye una
+          liquidación oficial.
+          <span style="display: block; margin-top: 5px; font-style: italic">
+            Tu Abogado Laboral no se hace responsable por decisiones tomadas
+            basándose exclusivamente en estos datos.
+          </span>
+        </p>
+      </div>
+    </div>
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-col">
+            <div class="footer-logo">Tu Abogado <span>Laboral</span></div>
+            <p style="color: #ccc; margin-bottom: 20px; font-size: 0.9rem">
+              Defensa experta y estratégica en Derecho Laboral y Pensional.
+              Barranquilla, Colombia.
+            </p>
+            <div class="social-icons-footer">
+              <a
+                href="https://web.facebook.com/profile.php?id=100064878228146"
+                target="_blank"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a
+                href="https://www.instagram.com/tuabogadolaboralbq/"
+                target="_blank"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a
+                href="https://www.linkedin.com/in/dra-johana-manga-padilla-5745b542/"
+                target="_blank"
+                ><i class="fab fa-linkedin-in"></i
+              ></a>
+            </div>
+          </div>
+
+          <div class="footer-col links-col">
+            <h4>Enlaces Rápidos</h4>
+            <ul>
+              <li><a href="index.html">Inicio</a></li>
+              <li><a href="nosotros.html">Sobre Nosotros</a></li>
+              <li><a href="servicios.html">Áreas de Práctica</a></li>
+              <li><a href="blog.html">Herramientas</a></li>
+              <li><a href="contacto.html">Agendar Cita</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Contacto</h4>
+            <ul class="contact-list">
+              <li>
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Edificio Las Flores, Barranquilla</span>
+              </li>
+              <li>
+                <i class="fas fa-phone-alt"></i>
+                <span>+57 321 792 7495</span>
+              </li>
+              <li>
+                <i class="fas fa-envelope"></i>
+                <span>tuabogadolaboral@outlook.com</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="container">
+          <p>
+            &copy; 2026 Tu Abogado Laboral - Dra. Johana Manga. Todos los
+            derechos reservados.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // CONFIGURACIÓN DE ELEMENTOS
+      const checkAutomatico = document.getElementById("checkAutomatico");
+      const inputDiasVacaciones = document.getElementById("diasVacaciones");
+
+      // Lógica Checkbox Automático
+      checkAutomatico.addEventListener("change", function () {
+        if (this.checked) {
+          inputDiasVacaciones.disabled = true;
+          inputDiasVacaciones.style.backgroundColor = "#e9ecef";
+          inputDiasVacaciones.value = ""; // Se limpia para mostrar que es automático
+        } else {
+          inputDiasVacaciones.disabled = false;
+          inputDiasVacaciones.style.backgroundColor = "#fff";
+          inputDiasVacaciones.focus();
+        }
+      });
+
+      const formatoPeso = new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+      });
+
+      // CALCULAR DÍAS (Lógica 360)
+      function calcularDias360(fechaInicio, fechaFin) {
+        let inicio = new Date(fechaInicio);
+        let fin = new Date(fechaFin);
+
+        inicio.setMinutes(inicio.getMinutes() + inicio.getTimezoneOffset());
+        fin.setMinutes(fin.getMinutes() + fin.getTimezoneOffset());
+
+        if (fin < inicio) return 0;
+
+        let day1 = inicio.getDate();
+        let month1 = inicio.getMonth() + 1;
+        let year1 = inicio.getFullYear();
+
+        let day2 = fin.getDate();
+        let month2 = fin.getMonth() + 1;
+        let year2 = fin.getFullYear();
+
+        if (day1 === 31) day1 = 30;
+        if (day2 === 31) day2 = 30;
+
+        return (
+          (year2 - year1) * 360 + (month2 - month1) * 30 + (day2 - day1) + 1
+        );
+      }
+
+      // SUBMIT EVENT
+      document
+        .getElementById("vacacionesForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          let salario =
+            parseFloat(document.getElementById("salario").value) || 0;
+          let otros =
+            parseFloat(document.getElementById("otrosIngresos").value) || 0;
+          let fechaInicio = document.getElementById("fechaInicio").value;
+          let fechaFin = document.getElementById("fechaFin").value;
+
+          if (!fechaInicio || !fechaFin) {
+            alert("Por favor ingrese las fechas.");
+            return;
+          }
+
+          // 1. Calcular tiempo trabajado
+          let diasTrabajados = calcularDias360(fechaInicio, fechaFin);
+
+          // 2. Definir Días de Vacaciones a pagar
+          let diasVacacionesAPagar = 0;
+
+          if (checkAutomatico.checked) {
+            // Regla: 15 días por cada 360 trabajados
+            diasVacacionesAPagar = (diasTrabajados * 15) / 360;
+          } else {
+            // Valor manual del usuario
+            diasVacacionesAPagar = parseFloat(inputDiasVacaciones.value) || 0;
+          }
+
+          // 3. Definir Base (Salario + Otros, SIN Aux Transporte)
+          let baseLiquidacion = salario + otros;
+
+          // 4. Fórmula Matemática: (Base / 30) * DíasVacaciones
+          // Esta es equivalente a (Base * DiasTrabajados) / 720 si es automático
+          let totalVacaciones = (baseLiquidacion / 30) * diasVacacionesAPagar;
+
+          // MOSTRAR RESULTADOS
+          document.getElementById("resBase").textContent =
+            formatoPeso.format(baseLiquidacion);
+          document.getElementById("resDiasTrabajados").textContent =
+            diasTrabajados + " días";
+          document.getElementById("resDiasVacaciones").textContent =
+            diasVacacionesAPagar.toFixed(2) + " días";
+          document.getElementById("periodoTexto").textContent =
+            "Periodo: " + fechaInicio + " a " + fechaFin;
+
+          document.getElementById("valTotal").textContent =
+            formatoPeso.format(totalVacaciones);
+
+          // Animación
+          let resultCard = document.getElementById("resultCard");
+          resultCard.style.display = "block";
+          resultCard.scrollIntoView({ behavior: "smooth" });
+        });
+    </script>
+    <a
+      href="https://wa.me/573217927495"
+      class="whatsapp-btn"
+      target="_blank"
+      title="Contáctanos por WhatsApp"
+    >
+      <i class="fab fa-whatsapp"></i>
+    </a>
+  </body>
+</html>

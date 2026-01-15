@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora de Retención en la Fuente | Tu Abogado Laboral</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      /* --- ESTILOS ESPECÍFICOS --- */
+      body {
+        font-family: "Lato", sans-serif;
+        background-color: #f4f8fb;
+        margin: 0;
+      }
+      .calc-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .calc-card {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(16, 33, 75, 0.08);
+        border: 1px solid #eee;
+        margin-bottom: 30px;
+      }
+      .section-title {
+        color: #10214b;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-bottom: 2px solid #e8f5e9;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        margin-top: 0;
+      }
+      .form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+      }
+      @media (max-width: 800px) {
+        .form-grid-2 {
+          grid-template-columns: 1fr;
+        }
+      }
+      .form-group label {
+        display: block;
+        font-weight: 700;
+        color: #10214b;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+      }
+      .form-group small {
+        display: block;
+        color: #666;
+        font-size: 0.75rem;
+        margin-bottom: 5px;
+      }
+      .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      .input-icon {
+        position: absolute;
+        left: 15px;
+        color: #10214b;
+        z-index: 10;
+      }
+      .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 40px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: #f9f9f9;
+        box-sizing: border-box;
+      }
+      .form-control:focus {
+        border-color: #10214b;
+        background: #fff;
+        outline: none;
+      }
+      select.form-control {
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .checkbox-wrapper {
+        background: #f0f4f8;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid #dce4ec;
+        margin-bottom: 20px;
+      }
+      .checkbox-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .btn-calculate {
+        background-color: #10214b;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 30px;
+        text-transform: uppercase;
+      }
+      .btn-calculate:hover {
+        background-color: #25d366;
+        transform: translateY(-2px);
+      }
+
+      /* RESULTADOS */
+      .result-container {
+        display: none;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        border: 1px solid #eee;
+        margin-top: 20px;
+      }
+      .result-header {
+        background: linear-gradient(90deg, #10214b 0%, #004494 100%);
+        color: white;
+        padding: 25px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .header-title h3 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 800;
+      }
+      .header-uvt {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-top: 5px;
+      }
+      .result-body {
+        padding: 30px;
+      }
+      .res-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 20px;
+      }
+      @media (max-width: 700px) {
+        .res-grid {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+      }
+      .res-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .res-item label {
+        color: #333;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+      .res-item small {
+        display: block;
+        color: #888;
+        font-size: 0.75rem;
+        font-weight: normal;
+      }
+      .res-item span {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #10214b;
+      }
+      .text-red {
+        color: #dc3545 !important;
+      }
+      .final-result {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #e9ecef;
+      }
+      .final-label {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #10214b;
+      }
+      .final-value {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="container">
+        <div class="info">
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+        </div>
+      </div>
+    </div>
+    <header>
+      <div class="container header-container">
+        <div class="logo">
+          <a href="index.html"
+            ><img src="img/logo-principal.webp" alt="Logo" class="logo-img"
+          /></a>
+        </div>
+        <nav>
+          <ul class="nav-menu">
+            <li>
+              <a href="blog.html" style="color: #10214b; font-weight: bold"
+                ><i class="fas fa-arrow-left"></i> Volver a Herramientas</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section class="bg-light" style="padding: 40px 0">
+      <div class="calc-wrapper">
+        <div class="text-center mb-5">
+          <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
+            Calculadora de Retención en la Fuente
+          </h1>
+          <p style="color: #666">
+            Cálculo preciso para Empleados e Independientes (Normativa DIAN).
+          </p>
+        </div>
+
+        <div class="calc-card">
+          <form id="retefuenteForm">
+            <div
+              style="
+                background: #eef2f6;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 25px;
+                border: 1px solid #dce4ec;
+              "
+            >
+              <label
+                style="font-size: 0.9rem; color: #10214b; font-weight: bold"
+                ><i class="fas fa-cog"></i> Configuración UVT</label
+              >
+              <div
+                style="
+                  display: flex;
+                  gap: 15px;
+                  align-items: center;
+                  margin-top: 10px;
+                "
+              >
+                <div style="flex: 1">
+                  <small>Valor UVT (Año Vigente):</small>
+                  <div class="input-group">
+                    <i class="fas fa-chart-bar input-icon"></i>
+                    <input
+                      type="number"
+                      id="valUvt"
+                      class="form-control"
+                      value="52374"
+                      style="background: #fff; font-weight: bold"
+                    />
+                  </div>
+                </div>
+                <div style="flex: 2">
+                  <small style="color: #666; font-style: italic"
+                    >* UVT 2026 proyectada (o ajuste al año que
+                    necesite).</small
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div>
+                <h3 class="section-title">
+                  <i class="fas fa-money-bill-wave"></i> Ingresos Mensuales
+                </h3>
+                <div class="form-group">
+                  <label>Tipo de Contribuyente</label>
+                  <div class="input-group">
+                    <i class="fas fa-user input-icon"></i>
+                    <select class="form-control" id="tipoContribuyente">
+                      <option value="empleado">Empleado (Asalariado)</option>
+                      <option value="independiente">
+                        Independiente (Honorarios)
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label id="lblSalario">Salario Base Mensual</label>
+                  <div class="input-group">
+                    <i class="fas fa-dollar-sign input-icon"></i>
+                    <input
+                      type="number"
+                      id="salario"
+                      class="form-control"
+                      placeholder="Ej: 6000000"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Bonificaciones / Otros</label>
+                  <div class="input-group">
+                    <i class="fas fa-gift input-icon"></i>
+                    <input
+                      type="number"
+                      id="bonos"
+                      class="form-control"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Comisiones</label>
+                  <div class="input-group">
+                    <i class="fas fa-chart-line input-icon"></i>
+                    <input
+                      type="number"
+                      id="comisiones"
+                      class="form-control"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 class="section-title">
+                  <i class="fas fa-file-invoice-dollar"></i> Deducciones y
+                  Rentas
+                </h3>
+                <div class="form-group">
+                  <label>Recibe Auxilio de Transporte</label>
+                  <div class="checkbox-wrapper" style="padding: 10px">
+                    <div class="checkbox-header" style="margin: 0">
+                      <input
+                        type="checkbox"
+                        id="checkAux"
+                        style="
+                          width: 18px;
+                          height: 18px;
+                          accent-color: #10214b;
+                          cursor: pointer;
+                        "
+                      />
+                      <span style="font-size: 0.9rem; margin-left: 10px"
+                        >Sí, incluir en base</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Aportes Voluntarios (Pensión/AFC)</label>
+                  <div class="input-group">
+                    <i class="fas fa-piggy-bank input-icon"></i>
+                    <input
+                      type="number"
+                      id="voluntarios"
+                      class="form-control"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Intereses de Vivienda</label>
+                  <div class="input-group">
+                    <i class="fas fa-home input-icon"></i>
+                    <input
+                      type="number"
+                      id="interesesVivienda"
+                      class="form-control"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Medicina Prepagada</label>
+                  <div class="input-group">
+                    <i class="fas fa-heartbeat input-icon"></i>
+                    <input
+                      type="number"
+                      id="prepagada"
+                      class="form-control"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Dependientes</label>
+                  <div class="checkbox-wrapper" style="padding: 10px">
+                    <div class="checkbox-header" style="margin: 0">
+                      <input
+                        type="checkbox"
+                        id="checkDependientes"
+                        style="
+                          width: 18px;
+                          height: 18px;
+                          accent-color: #10214b;
+                          cursor: pointer;
+                        "
+                      />
+                      <span style="font-size: 0.9rem; margin-left: 10px"
+                        >Tiene personas a cargo</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-calculate">
+              <i class="fas fa-calculator"></i> Calcular Retención
+            </button>
+          </form>
+        </div>
+
+        <div id="resultCard" class="result-container">
+          <div class="result-header">
+            <div class="header-title">
+              <h3>Resumen de Retención en la Fuente</h3>
+              <div class="header-uvt" id="headerUvtText">
+                Valor UVT Utilizado: $52.374
+              </div>
+            </div>
+            <div>
+              <i
+                class="fas fa-print"
+                style="font-size: 1.5rem; cursor: pointer; opacity: 0.8"
+                onclick="window.print()"
+                title="Imprimir"
+              ></i>
+            </div>
+          </div>
+
+          <div class="result-body">
+            <div class="res-grid">
+              <div>
+                <div class="res-item">
+                  <div>
+                    <label>Ingresos Totales</label
+                    ><small>Suma de salario, bonos y comisiones</small>
+                  </div>
+                  <span id="resIngresos">$0</span>
+                </div>
+                <div class="res-item">
+                  <div>
+                    <label id="lblAportes">Aportes a Seguridad Social</label>
+                    <small id="smallAportes">(Salud + Pensión)</small>
+                  </div>
+                  <span id="resSeguridadSocial" class="text-red">$0</span>
+                </div>
+                <div class="res-item">
+                  <label>Fondo Voluntario / AFC</label>
+                  <span id="resVoluntarios">$0</span>
+                </div>
+                <div class="res-item">
+                  <label>Intereses de Vivienda</label>
+                  <span id="resVivienda">$0</span>
+                </div>
+                <div
+                  class="res-item"
+                  style="
+                    border-bottom: 2px solid #ddd;
+                    background: #f8f9fa;
+                    padding: 10px 5px;
+                  "
+                >
+                  <div>
+                    <label>Base Gravable (Depurada)</label
+                    ><small>Base final para tabla</small>
+                  </div>
+                  <span id="resBaseGravable">$0</span>
+                </div>
+              </div>
+
+              <div>
+                <div class="res-item">
+                  <label>Fondo Solidaridad Pensional</label>
+                  <span id="resFsp" class="text-red">$0</span>
+                </div>
+                <div class="res-item">
+                  <label>Medicina Prepagada</label>
+                  <span id="resPrepagada">$0</span>
+                </div>
+                <div class="res-item">
+                  <div>
+                    <label>Deducción Dependientes</label
+                    ><small>10% del ingreso (Tope 32 UVT)</small>
+                  </div>
+                  <span id="resDependientes">$0</span>
+                </div>
+                <div class="res-item">
+                  <div>
+                    <label>Renta Exenta (25%)</label
+                    ><small>Tope anual 790 UVT</small>
+                  </div>
+                  <span id="resRenta25" class="text-red">$0</span>
+                </div>
+                <div class="res-item" style="border: none"></div>
+              </div>
+            </div>
+
+            <div class="final-result">
+              <span class="final-label">Total a Retener (DIAN):</span>
+              <span class="final-value" id="valRetencion">$0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container" style="max-width: 1000px; margin: 0 auto">
+      <div
+        style="
+          background-color: #fff;
+          border-top: 3px solid #d4af37;
+          padding: 20px;
+          margin: 40px 0 20px 0;
+          border-radius: 4px;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+          text-align: center;
+          font-size: 0.85rem;
+          color: #666;
+          line-height: 1.5;
+        "
+      >
+        <p style="margin: 0">
+          <strong style="color: #10214b">Aviso Legal:</strong>
+          Esta herramienta realiza proyecciones basadas en la normativa laboral
+          vigente en Colombia. Los resultados son
+          <strong>aproximaciones ilustrativas</strong> y pueden variar según
+          convenciones colectivas o interpretaciones judiciales. El uso de este
+          simulador no crea una relación abogado-cliente ni sustituye una
+          liquidación oficial.
+          <span style="display: block; margin-top: 5px; font-style: italic">
+            Tu Abogado Laboral no se hace responsable por decisiones tomadas
+            basándose exclusivamente en estos datos.
+          </span>
+        </p>
+      </div>
+    </div>
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-col">
+            <div class="footer-logo">Tu Abogado <span>Laboral</span></div>
+            <p style="color: #ccc; margin-bottom: 20px; font-size: 0.9rem">
+              Defensa experta y estratégica en Derecho Laboral y Pensional.
+              Barranquilla, Colombia.
+            </p>
+            <div class="social-icons-footer">
+              <a
+                href="https://web.facebook.com/profile.php?id=100064878228146"
+                target="_blank"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a
+                href="https://www.instagram.com/tuabogadolaboralbq/"
+                target="_blank"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a
+                href="https://www.linkedin.com/in/dra-johana-manga-padilla-5745b542/"
+                target="_blank"
+                ><i class="fab fa-linkedin-in"></i
+              ></a>
+            </div>
+          </div>
+
+          <div class="footer-col links-col">
+            <h4>Enlaces Rápidos</h4>
+            <ul>
+              <li><a href="index.html">Inicio</a></li>
+              <li><a href="nosotros.html">Sobre Nosotros</a></li>
+              <li><a href="servicios.html">Áreas de Práctica</a></li>
+              <li><a href="blog.html">Herramientas</a></li>
+              <li><a href="contacto.html">Agendar Cita</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Contacto</h4>
+            <ul class="contact-list">
+              <li>
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Edificio Las Flores, Barranquilla</span>
+              </li>
+              <li>
+                <i class="fas fa-phone-alt"></i>
+                <span>+57 321 792 7495</span>
+              </li>
+              <li>
+                <i class="fas fa-envelope"></i>
+                <span>tuabogadolaboral@outlook.com</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="container">
+          <p>
+            &copy; 2026 Tu Abogado Laboral - Dra. Johana Manga. Todos los
+            derechos reservados.
+          </p>
+        </div>
+      </div>
+    </footer>
+    <script>
+      const formatoPeso = new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+
+      // UI: Cambiar etiquetas según tipo
+      document
+        .getElementById("tipoContribuyente")
+        .addEventListener("change", function () {
+          const lblSalario = document.getElementById("lblSalario");
+          if (this.value === "independiente") {
+            lblSalario.textContent = "Honorarios Mensuales";
+          } else {
+            lblSalario.textContent = "Salario Base Mensual";
+          }
+        });
+
+      document
+        .getElementById("retefuenteForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          // 1. OBTENER VARIABLES
+          const getVal = (id) =>
+            parseFloat(document.getElementById(id).value) || 0;
+
+          let UVT = getVal("valUvt");
+          let tipo = document.getElementById("tipoContribuyente").value;
+
+          let salario = getVal("salario");
+          let bonos = getVal("bonos");
+          let comisiones = getVal("comisiones");
+          let ingresosTotales = salario + bonos + comisiones;
+
+          // --- CÁLCULO INCR (Seguridad Social) ---
+          let totalINCR = 0;
+          let valorVisualAportes = 0;
+          let salud = 0,
+            pension = 0,
+            fsp = 0,
+            arl = 0;
+          let textoAportes = "Aportes Salud y Pensión (4%)";
+
+          if (tipo === "empleado") {
+            let baseSS = salario + comisiones;
+            salud = baseSS * 0.04;
+            pension = baseSS * 0.04;
+            fsp = baseSS > 5200000 ? baseSS * 0.01 : 0;
+
+            totalINCR = salud + pension + fsp;
+            valorVisualAportes = salud + pension;
+          } else {
+            let ibc = ingresosTotales * 0.4;
+            salud = ibc * 0.125;
+            pension = ibc * 0.16;
+            arl = ibc * 0.00522;
+            fsp = ibc > 5200000 ? ibc * 0.01 : 0;
+
+            totalINCR = salud + pension + arl + fsp;
+            valorVisualAportes = totalINCR - fsp;
+            textoAportes = "SS Independiente (Salud, Pensión, ARL)";
+          }
+
+          let ingresoNeto = ingresosTotales - totalINCR;
+
+          // --- DEDUCCIONES ---
+          let voluntarias = getVal("voluntarios");
+          let vivienda = getVal("interesesVivienda");
+          if (vivienda > 100 * UVT) vivienda = 100 * UVT;
+          let prepagada = getVal("prepagada");
+          if (prepagada > 16 * UVT) prepagada = 16 * UVT;
+          let dependientes = 0;
+          if (document.getElementById("checkDependientes").checked) {
+            dependientes = ingresosTotales * 0.1;
+            if (dependientes > 32 * UVT) dependientes = 32 * UVT;
+          }
+          let totalDeducciones = vivienda + prepagada + dependientes;
+
+          // --- RENTA EXENTA 25% ---
+          let base25 = ingresoNeto - totalDeducciones - voluntarias;
+          if (base25 < 0) base25 = 0;
+          let renta25 = base25 * 0.25;
+
+          // --- LÍMITE 40% ---
+          let totalAlivios = totalDeducciones + voluntarias + renta25;
+          let limite40 = ingresoNeto * 0.4;
+          let topeAbsoluto40 = (1340 / 12) * UVT;
+          let limiteReal = Math.min(limite40, topeAbsoluto40);
+          let aliviosFinales = Math.min(totalAlivios, limiteReal);
+
+          // --- BASE GRAVABLE FINAL ---
+          let baseGravable = ingresoNeto - aliviosFinales;
+          if (baseGravable < 0) baseGravable = 0;
+
+          // --- TABLA ART 383 (AJUSTADA Y PRECISA) ---
+          let baseUVT = baseGravable / UVT;
+          let retencionUVT = 0;
+
+          // Formula exacta Art 383 Estatuto Tributario
+          if (baseUVT > 2300) {
+            retencionUVT = (baseUVT - 2300) * 0.39 + 770;
+          } else if (baseUVT > 945) {
+            retencionUVT = (baseUVT - 945) * 0.37 + 268;
+          } else if (baseUVT > 640) {
+            retencionUVT = (baseUVT - 640) * 0.35 + 162;
+          } else if (baseUVT > 360) {
+            retencionUVT = (baseUVT - 360) * 0.33 + 69;
+          } else if (baseUVT > 150) {
+            retencionUVT = (baseUVT - 150) * 0.28 + 10;
+          } else if (baseUVT > 95) {
+            retencionUVT = (baseUVT - 95) * 0.19;
+          } else {
+            retencionUVT = 0;
+          }
+
+          // Redondeo tributario oficial: Al múltiplo de 1000 más cercano
+          let retencionPesos = Math.round((retencionUVT * UVT) / 1000) * 1000;
+
+          // --- RENDERIZADO ---
+          document.getElementById(
+            "headerUvtText"
+          ).textContent = `Valor UVT Utilizado: $${new Intl.NumberFormat().format(
+            UVT
+          )}`;
+          document.getElementById("resIngresos").textContent =
+            formatoPeso.format(ingresosTotales);
+
+          document.getElementById("lblAportes").textContent = textoAportes;
+          document.getElementById("smallAportes").textContent =
+            tipo === "empleado"
+              ? "(4% Salud + 4% Pensión)"
+              : "(Deducción total pagada)";
+          document.getElementById("resSeguridadSocial").textContent =
+            "- " + formatoPeso.format(valorVisualAportes);
+
+          document.getElementById("resFsp").textContent =
+            "- " + formatoPeso.format(fsp);
+          document.getElementById("resVoluntarios").textContent =
+            formatoPeso.format(voluntarias);
+          document.getElementById("resVivienda").textContent =
+            formatoPeso.format(vivienda);
+          document.getElementById("resPrepagada").textContent =
+            formatoPeso.format(prepagada);
+          document.getElementById("resDependientes").textContent =
+            formatoPeso.format(dependientes);
+          document.getElementById("resRenta25").textContent =
+            "- " + formatoPeso.format(renta25);
+          document.getElementById("resBaseGravable").textContent =
+            formatoPeso.format(baseGravable);
+
+          // RESULTADO FINAL EXACTO
+          document.getElementById("valRetencion").textContent =
+            formatoPeso.format(retencionPesos);
+
+          let resultCard = document.getElementById("resultCard");
+          resultCard.style.display = "block";
+          resultCard.scrollIntoView({ behavior: "smooth" });
+        });
+    </script>
+    <a
+      href="https://wa.me/573217927495"
+      class="whatsapp-btn"
+      target="_blank"
+      title="Contáctanos por WhatsApp"
+    >
+      <i class="fab fa-whatsapp"></i>
+    </a>
+  </body>
+</html>

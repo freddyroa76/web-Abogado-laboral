@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Calculadora de Costos Laborales (Empleador) | Tu Abogado Laboral
+    </title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      /* --- ESTILOS BASE --- */
+      body {
+        font-family: "Lato", sans-serif;
+        background-color: #f4f8fb;
+        margin: 0;
+      }
+
+      .calc-wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .calc-card {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(16, 33, 75, 0.08);
+        border: 1px solid #eee;
+        margin-bottom: 30px;
+      }
+
+      .section-title {
+        color: #10214b;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-bottom: 2px solid #e8f5e9;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        margin-top: 0;
+      }
+
+      .form-grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      @media (max-width: 900px) {
+        .form-grid-3 {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 700;
+        color: #10214b;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+      }
+      .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      .input-icon {
+        position: absolute;
+        left: 15px;
+        color: #10214b;
+        z-index: 10;
+      }
+      .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 40px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: #f9f9f9;
+        box-sizing: border-box;
+      }
+      .form-control:focus {
+        border-color: #10214b;
+        background: #fff;
+        outline: none;
+      }
+      select.form-control {
+        cursor: pointer;
+        font-weight: bold;
+        color: #10214b;
+      }
+
+      /* Checkboxes Estilizados (Para auxilio transporte) */
+      .checkbox-wrapper {
+        background: #f0f4f8;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid #dce4ec;
+        margin-bottom: 10px;
+      }
+      .checkbox-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .btn-calculate {
+        background-color: #10214b;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 30px;
+        text-transform: uppercase;
+      }
+      .btn-calculate:hover {
+        background-color: #25d366;
+        transform: translateY(-2px);
+      }
+
+      /* RESULTADOS */
+      .result-container {
+        display: none;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        border: 1px solid #eee;
+        margin-top: 20px;
+      }
+      .result-header {
+        background: #10214b;
+        color: white;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* Grid de Resultados */
+      .cost-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border-bottom: 1px solid #eee;
+      }
+      @media (max-width: 800px) {
+        .cost-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .cost-column {
+        padding: 25px;
+        border-right: 1px dashed #ddd;
+      }
+      .cost-column:last-child {
+        border-right: none;
+      }
+
+      .col-title {
+        font-size: 1.1rem;
+        font-weight: 900;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #10214b;
+        border-bottom: 2px solid #f0f4f8;
+        padding-bottom: 10px;
+      }
+
+      .item-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+        color: #555;
+      }
+      .item-row span {
+        font-weight: bold;
+        color: #333;
+      }
+
+      .subtotal-box {
+        background: #f9fafb;
+        padding: 10px;
+        border-radius: 6px;
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+        color: #10214b;
+      }
+
+      .total-section {
+        background: #10214b;
+        color: white;
+        padding: 30px;
+        text-align: right;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .total-value {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #25d366;
+      }
+      .total-label {
+        font-size: 1.2rem;
+        opacity: 0.9;
+      }
+
+      .badge-exonerado {
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        margin-left: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="container">
+        <div class="info">
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+        </div>
+      </div>
+    </div>
+    <header>
+      <div class="container header-container">
+        <div class="logo">
+          <a href="index.html"
+            ><img src="img/logo-principal.webp" alt="Logo" class="logo-img"
+          /></a>
+        </div>
+        <nav>
+          <ul class="nav-menu">
+            <li>
+              <a href="blog.html" style="color: #10214b; font-weight: bold"
+                ><i class="fas fa-arrow-left"></i> Volver a Herramientas</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section class="bg-light" style="padding: 40px 0">
+      <div class="calc-wrapper">
+        <div class="text-center mb-5">
+          <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
+            Calculadora de Costos para Empleador
+          </h1>
+          <p style="color: #666">
+            Calcule el costo real de nómina incluyendo prestaciones, seguridad
+            social y parafiscales.
+          </p>
+        </div>
+
+        <div class="calc-card">
+          <form id="costosForm">
+            <div
+              style="
+                background: #eef2f6;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 25px;
+                border: 1px solid #dce4ec;
+              "
+            >
+              <label
+                style="font-size: 0.9rem; color: #10214b; font-weight: bold"
+                ><i class="fas fa-briefcase"></i> Datos de Contratación y
+                Riesgos</label
+              >
+
+              <div class="form-grid-3" style="margin-top: 15px">
+                <div class="form-group">
+                  <label>Nivel de Riesgo ARL</label>
+                  <div class="input-group">
+                    <i class="fas fa-hard-hat input-icon"></i>
+                    <select
+                      id="nivelArl"
+                      class="form-control"
+                      style="padding-left: 40px"
+                    >
+                      <option value="0.00522">
+                        Nivel I (0.522%) - Oficinas
+                      </option>
+                      <option value="0.01044">
+                        Nivel II (1.044%) - Manufactura baja
+                      </option>
+                      <option value="0.02436">
+                        Nivel III (2.436%) - Riesgo medio
+                      </option>
+                      <option value="0.04350">
+                        Nivel IV (4.350%) - Transporte/Químicos
+                      </option>
+                      <option value="0.06960">
+                        Nivel V (6.960%) - Construcción/Minería
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group" style="grid-column: span 2">
+                  <label>Beneficio Tributario (Exoneración Aportes)</label>
+                  <div class="input-group">
+                    <i class="fas fa-hand-holding-usd input-icon"></i>
+                    <select
+                      id="selectExonerado"
+                      class="form-control"
+                      style="padding-left: 40px"
+                    >
+                      <option value="no" selected>No Exonerada</option>
+                      <option value="si">Exonerada</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="section-title">
+              <i class="fas fa-money-bill-wave"></i> Datos Salariales
+            </h3>
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label>Salario Base Mensual</label>
+                <div class="input-group">
+                  <i class="fas fa-dollar-sign input-icon"></i>
+                  <input
+                    type="number"
+                    id="salario"
+                    class="form-control"
+                    placeholder="0"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Auxilio de Transporte</label>
+                <div class="checkbox-wrapper">
+                  <div class="checkbox-header">
+                    <input
+                      type="checkbox"
+                      id="checkAux"
+                      style="width: 18px; height: 18px; accent-color: #10214b"
+                    />
+                    <span>¿Paga Auxilio?</span>
+                  </div>
+                  <div
+                    id="inputAuxContainer"
+                    style="display: none; margin-top: 10px"
+                  >
+                    <input
+                      type="number"
+                      id="auxilioVal"
+                      class="form-control"
+                      placeholder="Valor auxilio"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Total Otros Salariales</label>
+                <div class="input-group">
+                  <i class="fas fa-plus-circle input-icon"></i>
+                  <input
+                    type="number"
+                    id="otrosSalariales"
+                    class="form-control"
+                    placeholder="0"
+                  />
+                </div>
+                <small>Extras, Recargos, Comisiones</small>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-calculate">
+              <i class="fas fa-calculator"></i> Calcular Costo Total Empresa
+            </button>
+          </form>
+        </div>
+
+        <div id="resultCard" class="result-container">
+          <div class="result-header">
+            <h3>
+              <i class="fas fa-chart-pie"></i> Desglose de Costos Mensuales
+            </h3>
+            <span style="opacity: 0.8">Vista Empleador</span>
+          </div>
+
+          <div class="cost-grid">
+            <div class="cost-column">
+              <div class="col-title">
+                <i class="fas fa-hand-holding-usd"></i> Pagos y Reservas
+              </div>
+
+              <div
+                style="
+                  background: #f0f4f8;
+                  padding: 10px;
+                  border-radius: 5px;
+                  margin-bottom: 15px;
+                "
+              >
+                <div class="item-row">
+                  <span>Salario + Extras:</span>
+                  <span id="resSalarioTotal">$0</span>
+                </div>
+                <div class="item-row">
+                  <span>Aux. Transporte:</span> <span id="resAux">$0</span>
+                </div>
+                <div
+                  class="item-row"
+                  style="
+                    border-top: 1px solid #ddd;
+                    margin-top: 5px;
+                    padding-top: 5px;
+                    color: #10214b;
+                  "
+                >
+                  <strong>Total Nómina:</strong>
+                  <strong id="resNominaBasica">$0</strong>
+                </div>
+              </div>
+
+              <h5 style="color: #666; margin: 10px 0 5px 0; font-size: 0.9rem">
+                Provisiones Prestaciones:
+              </h5>
+              <div class="item-row">
+                <label>Cesantías (8.33%):</label
+                ><span id="resCesantias">$0</span>
+              </div>
+              <div class="item-row">
+                <label>Int. Cesantías (1%):</label
+                ><span id="resIntereses">$0</span>
+              </div>
+              <div class="item-row">
+                <label>Prima (8.33%):</label><span id="resPrima">$0</span>
+              </div>
+              <div class="item-row">
+                <label>Vacaciones (4.17%):</label
+                ><span id="resVacaciones">$0</span>
+              </div>
+
+              <div class="subtotal-box">
+                <span>Total Prestaciones:</span>
+                <span id="subTotalPrestaciones">$0</span>
+              </div>
+            </div>
+
+            <div class="cost-column">
+              <div class="col-title">
+                <i class="fas fa-user-shield"></i> Seguridad Social
+                <small style="font-weight: normal; font-size: 0.7rem"
+                  >(Aporte Empleador)</small
+                >
+              </div>
+
+              <div class="item-row">
+                <label>Salud (8.5%):</label>
+                <span id="resSalud">$0</span>
+              </div>
+              <div class="item-row">
+                <label>Pensión (12%):</label>
+                <span id="resPension">$0</span>
+              </div>
+              <div class="item-row">
+                <label>ARL (Riesgo <span id="txtNivelArl">I</span>):</label>
+                <span id="resARL">$0</span>
+              </div>
+
+              <div
+                class="subtotal-box"
+                style="background: #e3f2fd; color: #1565c0"
+              >
+                <span>Total Seg. Social:</span> <span id="subTotalSS">$0</span>
+              </div>
+
+              <p
+                style="
+                  font-size: 0.75rem;
+                  color: #888;
+                  margin-top: 10px;
+                  line-height: 1.3;
+                "
+              >
+                * Nota: El empleado aporta un 4% adicional a Salud y 4% a
+                Pensión, que se descuentan de su nómina, no son costo extra
+                empresa.
+              </p>
+            </div>
+
+            <div class="cost-column">
+              <div class="col-title">
+                <i class="fas fa-building"></i> Parafiscales
+              </div>
+
+              <div class="item-row">
+                <label>Caja Comp. (4%):</label>
+                <span id="resCaja">$0</span>
+              </div>
+              <div class="item-row">
+                <label>SENA (2%):</label>
+                <span id="resSena">$0</span>
+              </div>
+              <div class="item-row">
+                <label>ICBF (3%):</label>
+                <span id="resICBF">$0</span>
+              </div>
+
+              <div
+                class="subtotal-box"
+                style="background: #fff3e0; color: #e65100"
+              >
+                <span>Total Parafiscales:</span>
+                <span id="subTotalParafiscales">$0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="total-section">
+            <div>
+              <div class="total-label">COSTO TOTAL PARA LA EMPRESA</div>
+              <small style="opacity: 0.7"
+                >(Nómina + Prestaciones + SS + Parafiscales)</small
+              >
+            </div>
+            <div class="total-value" id="valGranTotal">$0</div>
+          </div>
+        </div>
+
+        <p
+          style="
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #888;
+          "
+        >
+          * Cálculo de provisiones basado en días calendario (30). La base de
+          vacaciones excluye auxilio de transporte.
+        </p>
+      </div>
+    </section>
+
+    <div class="container" style="max-width: 1000px; margin: 0 auto">
+      <div
+        style="
+          background-color: #fff;
+          border-top: 3px solid #d4af37;
+          padding: 20px;
+          margin: 40px 0 20px 0;
+          border-radius: 4px;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+          text-align: center;
+          font-size: 0.85rem;
+          color: #666;
+          line-height: 1.5;
+        "
+      >
+        <p style="margin: 0">
+          <strong style="color: #10214b">Aviso Legal:</strong>
+          Esta herramienta realiza proyecciones basadas en la normativa laboral
+          vigente en Colombia. Los resultados son
+          <strong>aproximaciones ilustrativas</strong> y pueden variar según
+          convenciones colectivas o interpretaciones judiciales. El uso de este
+          simulador no crea una relación abogado-cliente ni sustituye una
+          liquidación oficial.
+          <span style="display: block; margin-top: 5px; font-style: italic">
+            Tu Abogado Laboral no se hace responsable por decisiones tomadas
+            basándose exclusivamente en estos datos.
+          </span>
+        </p>
+      </div>
+    </div>
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-col">
+            <div class="footer-logo">Tu Abogado <span>Laboral</span></div>
+            <p style="color: #ccc; margin-bottom: 20px; font-size: 0.9rem">
+              Defensa experta y estratégica en Derecho Laboral y Pensional.
+              Barranquilla, Colombia.
+            </p>
+            <div class="social-icons-footer">
+              <a
+                href="https://web.facebook.com/profile.php?id=100064878228146"
+                target="_blank"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a
+                href="https://www.instagram.com/tuabogadolaboralbq/"
+                target="_blank"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a
+                href="https://www.linkedin.com/in/dra-johana-manga-padilla-5745b542/"
+                target="_blank"
+                ><i class="fab fa-linkedin-in"></i
+              ></a>
+            </div>
+          </div>
+
+          <div class="footer-col links-col">
+            <h4>Enlaces Rápidos</h4>
+            <ul>
+              <li><a href="index.html">Inicio</a></li>
+              <li><a href="nosotros.html">Sobre Nosotros</a></li>
+              <li><a href="servicios.html">Áreas de Práctica</a></li>
+              <li><a href="blog.html">Herramientas</a></li>
+              <li><a href="contacto.html">Agendar Cita</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Contacto</h4>
+            <ul class="contact-list">
+              <li>
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Edificio Las Flores, Barranquilla</span>
+              </li>
+              <li>
+                <i class="fas fa-phone-alt"></i>
+                <span>+57 321 792 7495</span>
+              </li>
+              <li>
+                <i class="fas fa-envelope"></i>
+                <span>tuabogadolaboral@outlook.com</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="container">
+          <p>
+            &copy; 2026 Tu Abogado Laboral - Dra. Johana Manga. Todos los
+            derechos reservados.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // 1. INTERFAZ: Checkboxes Interactivos
+      const checkAux = document.getElementById("checkAux");
+      const inputAuxContainer = document.getElementById("inputAuxContainer");
+      const auxilioVal = document.getElementById("auxilioVal");
+
+      checkAux.addEventListener("change", function () {
+        if (this.checked) {
+          inputAuxContainer.style.display = "block";
+          auxilioVal.focus();
+        } else {
+          inputAuxContainer.style.display = "none";
+          auxilioVal.value = "";
+        }
+      });
+
+      // Formato Moneda
+      const formatoPeso = new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+
+      // 2. LÓGICA DE CÁLCULO
+      document
+        .getElementById("costosForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          // A. OBTENER DATOS
+          const getVal = (id) =>
+            parseFloat(document.getElementById(id).value) || 0;
+
+          let salarioBase = getVal("salario");
+          let otrosSalariales = getVal("otrosSalariales");
+          let valorAuxilio = checkAux.checked ? getVal("auxilioVal") : 0;
+
+          let porcentajeARL = parseFloat(
+            document.getElementById("nivelArl").value
+          );
+          // Lógica simplificada: Si value es "si", es true. Si es "no", es false.
+          let exonerado =
+            document.getElementById("selectExonerado").value === "si";
+
+          // B. DEFINIR BASES
+          let baseSalarial = salarioBase + otrosSalariales;
+          let basePrestacional = baseSalarial + valorAuxilio;
+          let ibc = baseSalarial;
+
+          // C. CÁLCULOS
+
+          // 1. Nómina Básica
+          let nominaBasica = basePrestacional;
+
+          // 2. Provisiones Prestaciones
+          let cesantias = basePrestacional * 0.0833;
+          let intereses = basePrestacional * 0.01;
+          let prima = basePrestacional * 0.0833;
+          let vacaciones = baseSalarial * 0.0417;
+
+          let totalPrestaciones = cesantias + intereses + prima + vacaciones;
+
+          // 3. Seguridad Social (Parte Empleador)
+          let aporteSalud = 0;
+          if (!exonerado) {
+            aporteSalud = ibc * 0.085;
+          }
+
+          let aportePension = ibc * 0.12;
+          let aporteARL = ibc * porcentajeARL;
+
+          let totalSegSocial = aporteSalud + aportePension + aporteARL;
+
+          // 4. Parafiscales
+          let caja = baseSalarial * 0.04;
+
+          let sena = 0;
+          let icbf = 0;
+
+          if (!exonerado) {
+            sena = baseSalarial * 0.02;
+            icbf = baseSalarial * 0.03;
+          }
+
+          let totalParafiscales = caja + sena + icbf;
+
+          // D. GRAN TOTAL
+          let costoTotalEmpresa =
+            nominaBasica +
+            totalPrestaciones +
+            totalSegSocial +
+            totalParafiscales;
+
+          // E. RENDERIZAR
+          document.getElementById("resSalarioTotal").textContent =
+            formatoPeso.format(baseSalarial);
+          document.getElementById("resAux").textContent =
+            formatoPeso.format(valorAuxilio);
+          document.getElementById("resNominaBasica").textContent =
+            formatoPeso.format(nominaBasica);
+
+          document.getElementById("resCesantias").textContent =
+            formatoPeso.format(cesantias);
+          document.getElementById("resIntereses").textContent =
+            formatoPeso.format(intereses);
+          document.getElementById("resPrima").textContent =
+            formatoPeso.format(prima);
+          document.getElementById("resVacaciones").textContent =
+            formatoPeso.format(vacaciones);
+          document.getElementById("subTotalPrestaciones").textContent =
+            formatoPeso.format(totalPrestaciones);
+
+          document.getElementById("resSalud").innerHTML =
+            formatoPeso.format(aporteSalud) +
+            (exonerado
+              ? " <span class='badge-exonerado'>Exonerado</span>"
+              : "");
+          document.getElementById("resPension").textContent =
+            formatoPeso.format(aportePension);
+          document.getElementById("resARL").textContent =
+            formatoPeso.format(aporteARL);
+          document.getElementById("subTotalSS").textContent =
+            formatoPeso.format(totalSegSocial);
+
+          let selArl = document.getElementById("nivelArl");
+          let textoNivel =
+            selArl.options[selArl.selectedIndex].text.split(" ")[1];
+          document.getElementById("txtNivelArl").textContent = textoNivel;
+
+          document.getElementById("resCaja").textContent =
+            formatoPeso.format(caja);
+          document.getElementById("resSena").innerHTML =
+            formatoPeso.format(sena) +
+            (exonerado
+              ? " <span class='badge-exonerado'>Exonerado</span>"
+              : "");
+          document.getElementById("resICBF").innerHTML =
+            formatoPeso.format(icbf) +
+            (exonerado
+              ? " <span class='badge-exonerado'>Exonerado</span>"
+              : "");
+          document.getElementById("subTotalParafiscales").textContent =
+            formatoPeso.format(totalParafiscales);
+
+          document.getElementById("valGranTotal").textContent =
+            formatoPeso.format(costoTotalEmpresa);
+
+          let resultCard = document.getElementById("resultCard");
+          resultCard.style.display = "block";
+          resultCard.scrollIntoView({ behavior: "smooth" });
+        });
+    </script>
+    <a
+      href="https://wa.me/573217927495"
+      class="whatsapp-btn"
+      target="_blank"
+      title="Contáctanos por WhatsApp"
+    >
+      <i class="fab fa-whatsapp"></i>
+    </a>
+  </body>
+</html>

@@ -609,3 +609,203 @@ footer {
     display: none;
   }
 }
+/* =========================================
+   MEJORAS SEO Y ACCESIBILIDAD (PASO 2D)
+   ========================================= */
+
+/* 1. ACCESIBILIDAD DE TECLADO (FOCUS) */
+/* Esto ayuda a personas que navegan sin mouse y es premiado por Google */
+button:focus,
+a:focus,
+.btn:focus,
+input:focus,
+textarea:focus {
+  outline: 2px solid var(--secondary); /* Usa tu color dorado */
+  outline-offset: 2px;
+}
+
+/* 2. OPTIMIZACIÓN DE CARGA DE FUENTES (CORE WEB VITALS) */
+/* 'swap' muestra el texto inmediatamente con una fuente básica 
+   mientras carga la fuente bonita, evitando el "texto invisible" */
+@font-face {
+  font-family: "Lato";
+  font-style: normal;
+  font-weight: 300 400 700;
+  font-display: swap;
+  src: local("Lato"),
+    url("https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap");
+}
+
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 400 700 900;
+  font-display: swap;
+  src: local("Montserrat"),
+    url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap");
+}
+
+/* 3. MEJORA DE CONTRASTE EN FOOTER */
+/* El texto original era muy transparente (0.4), difícil de leer */
+.footer-bottom {
+  color: rgba(255, 255, 255, 0.85); /* Aumentado de 0.4 a 0.85 */
+}
+
+/* 4. UTILIDAD PARA LECTORES DE PANTALLA (SEO SEMÁNTICO) */
+/* Usa la clase .sr-only para esconder texto visualmente pero que Google lo lea.
+   Ejemplo: <a href="..."><i class="fa fa-facebook"></i><span class="sr-only">Facebook</span></a> */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* =========================================
+   ESTILOS DEL BLOG Y NOTICIAS
+   ========================================= */
+
+/* Layout Principal del Blog */
+.blog-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 2 partes contenido, 1 parte sidebar */
+  gap: 40px;
+  padding: 60px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Tarjetas de Artículos (Grid) */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.blog-card {
+  background: var(--white);
+  border-radius: 4px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: var(--transition);
+  border-bottom: 3px solid transparent;
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+  border-bottom: 3px solid var(--secondary);
+}
+
+.blog-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.blog-content {
+  padding: 25px;
+}
+
+.blog-meta {
+  font-size: 0.8rem;
+  color: var(--tertiary); /* Taupe oscuro */
+  color: #888;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.blog-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  line-height: 1.3;
+}
+.blog-card h3 a {
+  color: var(--primary);
+}
+.blog-card h3 a:hover {
+  color: var(--secondary);
+}
+
+/* Sidebar (Barra Lateral) */
+.sidebar-widget {
+  background: var(--white);
+  padding: 30px;
+  margin-bottom: 30px;
+  border-radius: 4px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.widget-title {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--secondary);
+  padding-bottom: 10px;
+  color: var(--primary);
+}
+
+.cat-list li {
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+}
+.cat-list li a {
+  display: flex;
+  justify-content: space-between;
+  color: #555;
+  font-weight: 500;
+}
+.cat-list li a:hover {
+  color: var(--secondary);
+  padding-left: 5px;
+}
+
+/* Estilos de Artículo Individual (Single Post) */
+.article-header {
+  margin-bottom: 30px;
+}
+.article-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+.article-body {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #444;
+}
+.article-body h2 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+  color: var(--primary);
+}
+.article-body ul {
+  list-style: disc;
+  margin-left: 20px;
+  margin-bottom: 20px;
+}
+.article-body p {
+  margin-bottom: 20px;
+}
+
+/* Cita destacada dentro del artículo */
+.article-quote {
+  border-left: 4px solid var(--secondary);
+  padding-left: 20px;
+  font-style: italic;
+  background: #f9f9f9;
+  padding: 20px;
+  margin: 30px 0;
+}
+
+/* Responsivo del Blog */
+@media (max-width: 900px) {
+  .blog-container {
+    grid-template-columns: 1fr;
+  }
+  .article-header h1 {
+    font-size: 2rem;
+  }
+}
