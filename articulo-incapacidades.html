@@ -3,8 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Herramienta en Construcción | Tu Abogado Laboral</title>
+    <title>Calculadora de Incapacidades Laborales | Tu Abogado Laboral</title>
+    <meta
+      name="description"
+      content="Liquidador de incapacidades 2026. Calcula pagos por EPS, ARL y Empleador con validación de prórrogas y piso legal."
+    />
+
     <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
       rel="stylesheet"
@@ -13,17 +19,276 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+
+    <style>
+      /* --- ESTILOS ESPECÍFICOS DE ESTA HERRAMIENTA --- */
+      body {
+        font-family: "Lato", sans-serif;
+        background-color: #f4f8fb;
+        margin: 0;
+      }
+      .calc-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .calc-card {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(16, 33, 75, 0.08);
+        border: 1px solid #eee;
+        margin-bottom: 30px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 700;
+        color: #10214b;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+      }
+      .form-group small {
+        display: block;
+        color: #666;
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+        background: #f0f7ff;
+        padding: 5px;
+        border-radius: 4px;
+      }
+
+      .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      .input-icon {
+        position: absolute;
+        left: 15px;
+        color: #10214b;
+        z-index: 10;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 40px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: #f9f9f9;
+        box-sizing: border-box;
+        transition: 0.3s;
+      }
+      .form-control:focus {
+        border-color: #10214b;
+        background: #fff;
+        outline: none;
+      }
+
+      select.form-control {
+        cursor: pointer;
+        font-weight: bold;
+        color: #10214b;
+      }
+
+      .form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+      }
+      @media (max-width: 768px) {
+        .form-grid-2 {
+          grid-template-columns: 1fr;
+        }
+        .calc-card {
+          padding: 20px;
+        }
+      }
+
+      .btn-calculate {
+        background-color: #10214b;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 30px;
+        text-transform: uppercase;
+      }
+      .btn-calculate:hover {
+        background-color: #d4af37;
+        transform: translateY(-2px);
+      }
+
+      /* --- RESULTADOS --- */
+      #resultsContainer {
+        display: none;
+        margin-top: 40px;
+      }
+      .result-container {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid #eee;
+      }
+      .result-header {
+        background: #10214b;
+        color: white;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .result-body {
+        padding: 30px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .input-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        font-size: 0.85rem;
+        margin-bottom: 30px;
+      }
+      .input-item label {
+        display: block;
+        color: #666;
+        font-weight: bold;
+        margin-bottom: 3px;
+      }
+      .input-item span {
+        color: #10214b;
+        font-weight: 800;
+        font-size: 1rem;
+      }
+
+      .simple-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      .simple-table th {
+        text-align: left;
+        padding: 12px;
+        background: #f5f5f5;
+        color: #333;
+        font-size: 0.9rem;
+        border-bottom: 2px solid #ddd;
+      }
+      .simple-table td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        font-size: 0.95rem;
+      }
+      .simple-table tr:last-child td {
+        font-weight: bold;
+        border-bottom: none;
+      }
+      .simple-table .highlight-row {
+        background-color: #e3f2fd;
+      }
+
+      .total-final {
+        background: #f4f8fb;
+        padding: 25px;
+        text-align: right;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .total-label {
+        font-size: 1.2rem;
+        color: #10214b;
+        font-weight: bold;
+      }
+      .total-value {
+        font-size: 2rem;
+        color: #25d366;
+        font-weight: 900;
+      }
+
+      .btn-pdf {
+        display: block;
+        width: 250px;
+        margin: 30px auto 0;
+        padding: 15px;
+        background: #c62828;
+        color: white;
+        text-align: center;
+        border: none;
+        border-radius: 50px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+        font-size: 1rem;
+      }
+      .btn-pdf:hover {
+        background: #b71c1c;
+        transform: scale(1.05);
+      }
+
+      .whatsapp-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #25d366;
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 35px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+      .whatsapp-btn:hover {
+        background-color: #128c7e;
+        transform: scale(1.1);
+      }
+
+      /* Badge para tipo de incapacidad */
+      .badge-type {
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+      .badge-comun {
+        background-color: #e3f2fd;
+        color: #1565c0;
+      }
+      .badge-laboral {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+      }
+    </style>
   </head>
   <body>
     <div class="top-bar">
       <div class="container">
         <div class="info">
-          <i class="fas fa-phone-alt"></i> (+57) 321 792 7495 |
-          <i class="fas fa-envelope"></i> tuabogadolaboral@outlook.com
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
         </div>
       </div>
     </div>
-
     <header>
       <div class="container header-container">
         <div class="logo">
@@ -43,118 +308,251 @@
       </div>
     </header>
 
-    <section
-      class="bg-light"
-      style="
-        min-height: 60vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 40px 20px;
-      "
-    >
-      <div
-        class="container text-center"
-        style="
-          background: white;
-          padding: 50px;
-          border-radius: 10px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-          max-width: 600px;
-        "
-      >
-        <i
-          class="fas fa-hard-hat"
-          style="font-size: 4rem; color: #d7bd88; margin-bottom: 20px"
-        ></i>
-
-        <h1 style="color: #10214b; margin-bottom: 15px">
-          Herramienta en Calibración
-        </h1>
-
-        <p
-          style="
-            color: #666;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 30px;
-          "
-        >
-          Estamos ajustando las fórmulas matemáticas de esta calculadora para
-          garantizar que cumpla con la normativa laboral colombiana 2026.
-          <br /><br />
-          <strong>¡Pero no se quede sin su dato!</strong>
-        </p>
-
-        <div
-          style="
-            background: #e8f5e9;
-            padding: 20px;
-            border-radius: 6px;
-            margin-bottom: 30px;
-            border: 1px solid #c8e6c9;
-          "
-        >
-          <p style="margin-bottom: 15px; font-weight: bold; color: #2e7d32">
-            ¿Necesita este cálculo urgente?
+    <section class="bg-light">
+      <div class="calc-wrapper">
+        <div class="text-center mb-5" style="text-align: center">
+          <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
+            Calculadora de Incapacidades
+          </h1>
+          <p style="color: #666">
+            Liquide correctamente enfermedad general, laboral y prórrogas
+            (Vigencia 2026).
           </p>
-          <a
-            href="https://wa.me/573217927495?text=Hola%20Dra.%20Manga,%20la%20herramienta%20web%20está%20en%20mantenimiento%20y%20necesito%20ayuda%20con%20un%20cálculo."
-            class="btn"
-            target="_blank"
-            style="
-              background-color: #25d366;
-              color: white;
-              padding: 12px 25px;
-              border-radius: 50px;
-              text-decoration: none;
-              font-weight: bold;
-              display: inline-flex;
-              align-items: center;
-              gap: 10px;
-            "
-          >
-            <i class="fab fa-whatsapp" style="font-size: 1.2rem"></i> Pedir
-            Cálculo Manual
-          </a>
         </div>
 
-        <a href="blog.html" style="color: #10214b; text-decoration: underline"
-          >Regresar al menú principal</a
-        >
+        <div class="calc-card">
+          <form id="incapacidadForm">
+            <div
+              style="
+                background: #eef2f6;
+                padding: 10px;
+                border-radius: 6px;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                border: 1px solid #dce4ec;
+              "
+            >
+              <small
+                style="
+                  margin: 0;
+                  background: none;
+                  font-weight: bold;
+                  color: #10214b;
+                "
+                >Parámetros SMLV:</small
+              >
+              <div style="display: flex; align-items: center; gap: 5px">
+                <label style="margin: 0; font-size: 0.8rem">SMMLV</label>
+                <input
+                  type="number"
+                  id="confSalarioMin"
+                  class="form-control"
+                  value="1705905"
+                  style="
+                    border: 1px solid #ccc;
+                    padding: 3px;
+                    border-radius: 4px;
+                    width: 100px;
+                    color: #666;
+                    height: auto;
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label>Salario Base (IBC)</label>
+                <div class="input-group">
+                  <i class="fas fa-dollar-sign input-icon"></i>
+                  <input
+                    type="number"
+                    id="salarioBase"
+                    class="form-control"
+                    placeholder="Ej: 2500000"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Origen de la Incapacidad</label>
+                <div class="input-group">
+                  <i class="fas fa-file-medical input-icon"></i>
+                  <select id="tipoIncapacidad" class="form-control">
+                    <option value="comun">
+                      Enfermedad General / Accidente Común
+                    </option>
+                    <option value="laboral">
+                      Accidente de Trabajo / Enfermedad Laboral
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-grid-2" style="margin-top: 20px">
+              <div class="form-group">
+                <label>Días de Incapacidad (Actual)</label>
+                <div class="input-group">
+                  <i class="far fa-clock input-icon"></i>
+                  <input
+                    type="number"
+                    id="diasSolicitados"
+                    class="form-control"
+                    placeholder="Ej: 5"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Días Acumulados (Prórroga)</label>
+                <div class="input-group">
+                  <i class="fas fa-history input-icon"></i>
+                  <input
+                    type="number"
+                    id="diasAcumulados"
+                    class="form-control"
+                    value="0"
+                  />
+                </div>
+                <small style="font-size: 0.75rem"
+                  >Si es continuación de una anterior, ingrese cuántos días
+                  lleva. Si es nueva, deje en 0.</small
+                >
+              </div>
+            </div>
+
+            <button type="submit" id="btnCalcular" class="btn-calculate">
+              <i class="fas fa-calculator"></i> Calcular Prestación
+            </button>
+          </form>
+        </div>
+
+        <div id="resultsContainer">
+          <div class="result-container" id="printArea">
+            <div class="result-header">
+              <div>
+                <h3 style="margin: 0; font-size: 1.3rem">
+                  Liquidación de Incapacidad
+                </h3>
+                <small style="opacity: 0.9"
+                  >Detalle de pagos y responsables</small
+                >
+              </div>
+              <div style="text-align: right">
+                <i
+                  class="fas fa-hand-holding-medical"
+                  style="font-size: 2rem; opacity: 0.5"
+                ></i>
+              </div>
+            </div>
+
+            <div class="result-body">
+              <div class="input-summary-grid">
+                <div class="input-item">
+                  <label>Origen:</label><span id="resOrigen">--</span>
+                </div>
+                <div class="input-item">
+                  <label>IBC:</label><span id="resIBC">--</span>
+                </div>
+                <div class="input-item">
+                  <label>Días a Pagar:</label><span id="resDias">--</span>
+                </div>
+              </div>
+
+              <h4
+                style="
+                  color: #10214b;
+                  border-bottom: 1px solid #eee;
+                  padding-bottom: 5px;
+                "
+              >
+                Responsabilidad del Pago
+              </h4>
+              <table class="simple-table">
+                <thead>
+                  <tr>
+                    <th>Entidad Responsable</th>
+                    <th style="text-align: center">Días</th>
+                    <th>Detalle</th>
+                    <th style="text-align: right">Valor</th>
+                  </tr>
+                </thead>
+                <tbody id="tablaResultados"></tbody>
+              </table>
+
+              <h4
+                style="
+                  color: #10214b;
+                  border-bottom: 1px solid #eee;
+                  padding-bottom: 5px;
+                  margin-top: 25px;
+                "
+              >
+                Aportes Seguridad Social (Trabajador)
+              </h4>
+              <div
+                style="
+                  background: #fff3e0;
+                  padding: 10px;
+                  border-radius: 4px;
+                  font-size: 0.8rem;
+                  color: #e65100;
+                  margin-bottom: 10px;
+                "
+              >
+                <i class="fas fa-exclamation-triangle"></i> Durante la
+                incapacidad, se debe cotizar Salud y Pensión sobre el valor
+                recibido.
+              </div>
+              <table class="simple-table">
+                <tbody>
+                  <tr>
+                    <td>Aporte Salud (4%)</td>
+                    <td id="resSalud" style="text-align: right; color: #c62828">
+                      $0
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Aporte Pensión (4%)</td>
+                    <td
+                      id="resPension"
+                      style="text-align: right; color: #c62828"
+                    >
+                      $0
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="total-final">
+              <span class="total-label">Neto a Recibir:</span>
+              <span id="resNeto" class="total-value">$0</span>
+            </div>
+
+            <p
+              style="
+                text-align: center;
+                margin-top: 20px;
+                font-size: 0.8rem;
+                color: #999;
+              "
+            >
+              * Cálculo basado en Art. 227 CST, Ley 776/2002 y Sentencia
+              C-543/2007 (Piso Mínimo).
+            </p>
+          </div>
+
+          <button onclick="downloadPDF()" class="btn-pdf">
+            <i class="fas fa-file-pdf"></i> Descargar Informe PDF
+          </button>
+        </div>
       </div>
     </section>
 
-    <div class="container" style="max-width: 1000px; margin: 0 auto">
-      <div
-        style="
-          background-color: #fff;
-          border-top: 3px solid #d4af37;
-          padding: 20px;
-          margin: 40px 0 20px 0;
-          border-radius: 4px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-          text-align: center;
-          font-size: 0.85rem;
-          color: #666;
-          line-height: 1.5;
-        "
-      >
-        <p style="margin: 0">
-          <strong style="color: #10214b">Aviso Legal:</strong>
-          Esta herramienta realiza proyecciones basadas en la normativa laboral
-          vigente en Colombia. Los resultados son
-          <strong>aproximaciones ilustrativas</strong> y pueden variar según
-          convenciones colectivas o interpretaciones judiciales. El uso de este
-          simulador no crea una relación abogado-cliente ni sustituye una
-          liquidación oficial.
-          <span style="display: block; margin-top: 5px; font-style: italic">
-            Tu Abogado Laboral no se hace responsable por decisiones tomadas
-            basándose exclusivamente en estos datos.
-          </span>
-        </p>
-      </div>
-    </div>
     <footer>
       <div class="container">
         <div class="footer-grid">
@@ -182,7 +580,6 @@
               ></a>
             </div>
           </div>
-
           <div class="footer-col links-col">
             <h4>Enlaces Rápidos</h4>
             <ul>
@@ -193,21 +590,19 @@
               <li><a href="contacto.html">Agendar Cita</a></li>
             </ul>
           </div>
-
           <div class="footer-col">
             <h4>Contacto</h4>
             <ul class="contact-list">
               <li>
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Edificio Las Flores, Barranquilla</span>
+                <i class="fas fa-map-marker-alt"></i
+                ><span>Edificio Las Flores, Barranquilla</span>
               </li>
               <li>
-                <i class="fas fa-phone-alt"></i>
-                <span>+57 321 792 7495</span>
+                <i class="fas fa-phone-alt"></i><span>+57 321 792 7495</span>
               </li>
               <li>
-                <i class="fas fa-envelope"></i>
-                <span>tuabogadolaboral@outlook.com</span>
+                <i class="fas fa-envelope"></i
+                ><span>tuabogadolaboral@outlook.com</span>
               </li>
             </ul>
           </div>
@@ -215,17 +610,218 @@
       </div>
       <div class="footer-bottom">
         <div class="container">
-          <p>&copy; 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
+          <p>
+            &copy; 2026 Tu Abogado Laboral - Dra. Johana Manga. Todos los
+            derechos reservados.
+          </p>
         </div>
       </div>
     </footer>
-    <a
-      href="https://wa.me/573217927495"
-      class="whatsapp-btn"
-      target="_blank"
-      title="Contáctanos por WhatsApp"
-    >
-      <i class="fab fa-whatsapp"></i>
-    </a>
+
+    <a href="https://wa.me/573217927495" class="whatsapp-btn" target="_blank"
+      ><i class="fab fa-whatsapp"></i
+    ></a>
+
+    <script>
+      const formatoPeso = new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+
+      // --- PDF GENERATOR ---
+      function downloadPDF() {
+        const element = document.getElementById("printArea");
+        const opt = {
+          margin: [0.3, 0.3, 0.3, 0.3],
+          filename: "Liquidacion_Incapacidad.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+          jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+        };
+        html2pdf().set(opt).from(element).save();
+      }
+
+      // --- MOTOR LÓGICO DE INCAPACIDADES ---
+      document
+        .getElementById("incapacidadForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const btn = document.getElementById("btnCalcular");
+
+          try {
+            btn.innerHTML =
+              '<i class="fas fa-spinner fa-spin"></i> Calculando...';
+
+            // 1. Obtener Datos
+            const salarioBase =
+              parseFloat(document.getElementById("salarioBase").value) || 0;
+            const diasSolicitados =
+              parseInt(document.getElementById("diasSolicitados").value) || 0;
+            const diasAcumulados =
+              parseInt(document.getElementById("diasAcumulados").value) || 0;
+            const tipoOrigen = document.getElementById("tipoIncapacidad").value;
+            const smlv = parseFloat(
+              document.getElementById("confSalarioMin").value
+            );
+
+            if (diasSolicitados <= 0)
+              throw new Error("Ingrese una cantidad de días válida.");
+
+            // 2. Valores Diarios
+            const valorDiaSalario = salarioBase / 30;
+            const valorDiaMinimo = smlv / 30;
+
+            // 3. Acumuladores
+            let totales = {
+              empresa: 0,
+              diasEmpresa: 0,
+              eps: 0,
+              diasEps: 0,
+              arl: 0,
+              diasArl: 0,
+              afp: 0,
+              diasAfp: 0,
+              totalBruto: 0,
+            };
+
+            // 4. ALGORITMO DE ITERACIÓN DIARIA (La magia Senior)
+            const diaInicio = diasAcumulados + 1;
+            const diaFin = diasAcumulados + diasSolicitados;
+
+            for (let i = diaInicio; i <= diaFin; i++) {
+              let porcentaje = 0;
+              let entidad = "";
+              let detalle = "";
+
+              if (tipoOrigen === "laboral") {
+                // --- ESCENARIO ARL (Fácil) ---
+                porcentaje = 1.0;
+                entidad = "arl";
+              } else {
+                // --- ESCENARIO COMÚN (Escalera) ---
+                if (i <= 2) {
+                  porcentaje = 0.6667;
+                  entidad = "empresa";
+                } else if (i <= 90) {
+                  porcentaje = 0.6667;
+                  entidad = "eps";
+                } else if (i <= 180) {
+                  porcentaje = 0.5;
+                  entidad = "eps";
+                } else if (i <= 540) {
+                  porcentaje = 0.5;
+                  entidad = "afp";
+                } else {
+                  porcentaje = 0.5;
+                  entidad = "eps"; // Simplificación >540
+                }
+              }
+
+              // Cálculo con PISO MÍNIMO (Sentencia C-543/07)
+              let valorDia = valorDiaSalario * porcentaje;
+              if (valorDia < valorDiaMinimo) {
+                valorDia = valorDiaMinimo; // Ajuste automático al mínimo
+              }
+
+              // Acumular
+              if (entidad === "empresa") {
+                totales.empresa += valorDia;
+                totales.diasEmpresa++;
+              }
+              if (entidad === "eps") {
+                totales.eps += valorDia;
+                totales.diasEps++;
+              }
+              if (entidad === "arl") {
+                totales.arl += valorDia;
+                totales.diasArl++;
+              }
+              if (entidad === "afp") {
+                totales.afp += valorDia;
+                totales.diasAfp++;
+              }
+
+              totales.totalBruto += valorDia;
+            }
+
+            // 5. Deducciones (4% Salud + 4% Pensión sobre lo recibido)
+            const dedSalud = totales.totalBruto * 0.04;
+            const dedPension = totales.totalBruto * 0.04;
+            const neto = totales.totalBruto - dedSalud - dedPension;
+
+            // 6. Renderizado
+            document.getElementById("resOrigen").innerHTML =
+              tipoOrigen === "laboral"
+                ? '<span class="badge-type badge-laboral">Origen Laboral</span>'
+                : '<span class="badge-type badge-comun">Origen Común</span>';
+
+            document.getElementById("resIBC").textContent =
+              formatoPeso.format(salarioBase);
+            document.getElementById("resDias").textContent = diasSolicitados;
+
+            // Construir Tabla Dinámica
+            let htmlTabla = "";
+
+            if (totales.diasEmpresa > 0) {
+              htmlTabla += `<tr><td><strong>Empresa</strong></td><td style="text-align:center;">${
+                totales.diasEmpresa
+              }</td><td>Días 1-2 (66.67%*)</td><td style="text-align:right;">${formatoPeso.format(
+                totales.empresa
+              )}</td></tr>`;
+            }
+            if (totales.diasEps > 0) {
+              htmlTabla += `<tr><td><strong>EPS</strong></td><td style="text-align:center;">${
+                totales.diasEps
+              }</td><td>Incapacidad (66.67% / 50%)</td><td style="text-align:right;">${formatoPeso.format(
+                totales.eps
+              )}</td></tr>`;
+            }
+            if (totales.diasArl > 0) {
+              htmlTabla += `<tr><td><strong>ARL</strong></td><td style="text-align:center;">${
+                totales.diasArl
+              }</td><td>Riesgo Laboral (100%)</td><td style="text-align:right;">${formatoPeso.format(
+                totales.arl
+              )}</td></tr>`;
+            }
+            if (totales.diasAfp > 0) {
+              htmlTabla += `<tr><td><strong>Fondo Pensiones</strong></td><td style="text-align:center;">${
+                totales.diasAfp
+              }</td><td>Rehabilitación (>180 días)</td><td style="text-align:right;">${formatoPeso.format(
+                totales.afp
+              )}</td></tr>`;
+            }
+
+            // Fila Total Bruto
+            htmlTabla += `<tr class="highlight-row"><td><strong>TOTAL BRUTO</strong></td><td></td><td></td><td style="text-align:right;"><strong>${formatoPeso.format(
+              totales.totalBruto
+            )}</strong></td></tr>`;
+
+            document.getElementById("tablaResultados").innerHTML = htmlTabla;
+
+            // Deducciones y Neto
+            document.getElementById("resSalud").textContent =
+              "-" + formatoPeso.format(dedSalud);
+            document.getElementById("resPension").textContent =
+              "-" + formatoPeso.format(dedPension);
+            document.getElementById("resNeto").textContent =
+              formatoPeso.format(neto);
+
+            const results = document.getElementById("resultsContainer");
+            results.style.display = "block";
+            results.scrollIntoView({ behavior: "smooth" });
+          } catch (e) {
+            alert(e.message);
+          } finally {
+            setTimeout(
+              () =>
+                (btn.innerHTML =
+                  '<i class="fas fa-calculator"></i> Calcular Prestación'),
+              500
+            );
+          }
+        });
+    </script>
   </body>
 </html>

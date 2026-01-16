@@ -3,8 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Herramienta en Construcción | Tu Abogado Laboral</title>
+    <title>
+      Calculadora de Licencias de Maternidad y Paternidad | Tu Abogado Laboral
+    </title>
     <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
       rel="stylesheet"
@@ -13,17 +16,274 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+
+    <style>
+      /* --- ESTILOS ESPECÍFICOS DE ESTA HERRAMIENTA --- */
+      body {
+        font-family: "Lato", sans-serif;
+        background-color: #f4f8fb;
+        margin: 0;
+      }
+      .calc-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .calc-card {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(16, 33, 75, 0.08);
+        border: 1px solid #eee;
+        margin-bottom: 30px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 700;
+        color: #10214b;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+      }
+      .form-group small {
+        display: block;
+        color: #666;
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+      }
+
+      .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      .input-icon {
+        position: absolute;
+        left: 15px;
+        color: #10214b;
+        z-index: 10;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 40px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: #f9f9f9;
+        box-sizing: border-box;
+        transition: 0.3s;
+      }
+      .form-control:focus {
+        border-color: #10214b;
+        background: #fff;
+        outline: none;
+      }
+      .form-control.no-icon {
+        padding-left: 15px;
+      }
+
+      select.form-control {
+        cursor: pointer;
+        font-weight: bold;
+        color: #10214b;
+      }
+
+      .form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+      }
+      .form-grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+      }
+      @media (max-width: 768px) {
+        .form-grid-2,
+        .form-grid-3 {
+          grid-template-columns: 1fr;
+        }
+        .calc-card {
+          padding: 20px;
+        }
+      }
+
+      .btn-calculate {
+        background-color: #10214b;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 30px;
+        text-transform: uppercase;
+      }
+      .btn-calculate:hover {
+        background-color: #d4af37;
+        transform: translateY(-2px);
+      }
+
+      /* Checkbox Estilizado */
+      .check-group {
+        background: #f0f7ff;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #dce4ec;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .check-group:hover {
+        border-color: #10214b;
+      }
+      .check-group input {
+        width: 18px;
+        height: 18px;
+        accent-color: #10214b;
+      }
+      .check-group label {
+        margin: 0;
+        cursor: pointer;
+        font-size: 0.95rem;
+      }
+
+      /* Módulos Condicionales */
+      .conditional-box {
+        display: none;
+        margin-top: 15px;
+        padding: 15px;
+        border-left: 3px solid #d4af37;
+        background: #fffdf5;
+      }
+
+      /* RESULTADOS */
+      #resultsContainer {
+        display: none;
+        margin-top: 40px;
+      }
+      .result-container {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid #eee;
+      }
+      .result-header {
+        background: #10214b;
+        color: white;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .result-body {
+        padding: 30px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .simple-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      .simple-table th {
+        text-align: left;
+        padding: 12px;
+        background: #f5f5f5;
+        color: #333;
+        font-size: 0.9rem;
+        border-bottom: 2px solid #ddd;
+      }
+      .simple-table td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        font-size: 0.95rem;
+      }
+      .simple-table tr:last-child td {
+        font-weight: bold;
+        border-bottom: none;
+      }
+
+      .total-final {
+        background: #f4f8fb;
+        padding: 25px;
+        text-align: right;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .total-label {
+        font-size: 1.2rem;
+        color: #10214b;
+        font-weight: bold;
+      }
+      .total-value {
+        font-size: 2rem;
+        color: #25d366;
+        font-weight: 900;
+      }
+
+      .btn-pdf {
+        display: block;
+        width: 250px;
+        margin: 30px auto 0;
+        padding: 15px;
+        background: #c62828;
+        color: white;
+        text-align: center;
+        border: none;
+        border-radius: 50px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+        font-size: 1rem;
+      }
+      .btn-pdf:hover {
+        background: #b71c1c;
+        transform: scale(1.05);
+      }
+
+      .whatsapp-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #25d366;
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 35px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+      .whatsapp-btn:hover {
+        background-color: #128c7e;
+        transform: scale(1.1);
+      }
+    </style>
   </head>
   <body>
     <div class="top-bar">
       <div class="container">
         <div class="info">
-          <i class="fas fa-phone-alt"></i> (+57) 321 792 7495 |
-          <i class="fas fa-envelope"></i> tuabogadolaboral@outlook.com
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
         </div>
       </div>
     </div>
-
     <header>
       <div class="container header-container">
         <div class="logo">
@@ -43,118 +303,298 @@
       </div>
     </header>
 
-    <section
-      class="bg-light"
-      style="
-        min-height: 60vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 40px 20px;
-      "
-    >
-      <div
-        class="container text-center"
-        style="
-          background: white;
-          padding: 50px;
-          border-radius: 10px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-          max-width: 600px;
-        "
-      >
-        <i
-          class="fas fa-hard-hat"
-          style="font-size: 4rem; color: #d7bd88; margin-bottom: 20px"
-        ></i>
-
-        <h1 style="color: #10214b; margin-bottom: 15px">
-          Herramienta en Calibración
-        </h1>
-
-        <p
-          style="
-            color: #666;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 30px;
-          "
-        >
-          Estamos ajustando las fórmulas matemáticas de esta calculadora para
-          garantizar que cumpla con la normativa laboral colombiana 2026.
-          <br /><br />
-          <strong>¡Pero no se quede sin su dato!</strong>
-        </p>
-
-        <div
-          style="
-            background: #e8f5e9;
-            padding: 20px;
-            border-radius: 6px;
-            margin-bottom: 30px;
-            border: 1px solid #c8e6c9;
-          "
-        >
-          <p style="margin-bottom: 15px; font-weight: bold; color: #2e7d32">
-            ¿Necesita este cálculo urgente?
+    <section class="bg-light">
+      <div class="calc-wrapper">
+        <div class="text-center mb-5" style="text-align: center">
+          <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
+            Calculadora de Licencias
+          </h1>
+          <p style="color: #666">
+            Cálculo de Maternidad y Paternidad (Ley 1822 de 2017 y Ley 2114 de
+            2021).
           </p>
-          <a
-            href="https://wa.me/573217927495?text=Hola%20Dra.%20Manga,%20la%20herramienta%20web%20está%20en%20mantenimiento%20y%20necesito%20ayuda%20con%20un%20cálculo."
-            class="btn"
-            target="_blank"
-            style="
-              background-color: #25d366;
-              color: white;
-              padding: 12px 25px;
-              border-radius: 50px;
-              text-decoration: none;
-              font-weight: bold;
-              display: inline-flex;
-              align-items: center;
-              gap: 10px;
-            "
-          >
-            <i class="fab fa-whatsapp" style="font-size: 1.2rem"></i> Pedir
-            Cálculo Manual
-          </a>
         </div>
 
-        <a href="blog.html" style="color: #10214b; text-decoration: underline"
-          >Regresar al menú principal</a
-        >
+        <div class="calc-card">
+          <form id="licenciaForm">
+            <h3
+              style="
+                color: #10214b;
+                border-bottom: 2px solid #eee;
+                padding-bottom: 10px;
+                margin-bottom: 25px;
+                font-size: 1.2rem;
+              "
+            >
+              <i class="fas fa-user"></i> 1. Datos del Solicitante
+            </h3>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label>Rol del Trabajador(a)</label>
+                <div class="input-group">
+                  <i class="fas fa-venus-mars input-icon"></i>
+                  <select id="rolTrabajador" class="form-control">
+                    <option value="madre">
+                      Madre (Licencia de Maternidad)
+                    </option>
+                    <option value="padre">
+                      Padre (Licencia de Paternidad)
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label id="lblSalario">Salario Base (IBC)</label>
+                <div class="input-group">
+                  <i class="fas fa-dollar-sign input-icon"></i>
+                  <input
+                    type="number"
+                    id="salarioBase"
+                    class="form-control"
+                    placeholder="Ej: 1500000"
+                    required
+                  />
+                </div>
+                <small id="helpSalario"
+                  >Si es salario variable, ingrese el promedio del último
+                  año.</small
+                >
+              </div>
+            </div>
+
+            <h3
+              style="
+                color: #10214b;
+                border-bottom: 2px solid #eee;
+                padding-bottom: 10px;
+                margin-bottom: 25px;
+                margin-top: 30px;
+                font-size: 1.2rem;
+              "
+            >
+              <i class="fas fa-baby"></i> 2. Detalles del Nacimiento
+            </h3>
+
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label>Fecha Probable de Parto (FPP)</label>
+                <input
+                  type="date"
+                  id="fechaProbable"
+                  class="form-control no-icon"
+                  required
+                />
+                <small>Fecha estimada por el médico.</small>
+              </div>
+              <div class="form-group">
+                <label>Fecha Real de Nacimiento</label>
+                <input
+                  type="date"
+                  id="fechaNacimiento"
+                  class="form-control no-icon"
+                  required
+                />
+                <small>Fecha de inicio de la licencia.</small>
+              </div>
+              <div class="form-group" style="display: flex; align-items: end">
+                <div class="check-group" style="width: 100%">
+                  <input type="checkbox" id="partoMultiple" />
+                  <label for="partoMultiple">¿Parto Múltiple?</label>
+                </div>
+              </div>
+            </div>
+
+            <div id="seccionCompartida" style="margin-top: 25px">
+              <div class="check-group">
+                <input type="checkbox" id="licenciaCompartida" />
+                <label for="licenciaCompartida"
+                  ><strong>Optar por Licencia Parental Compartida</strong> (Ley
+                  2114)</label
+                >
+              </div>
+
+              <div id="boxCompartida" class="conditional-box">
+                <div class="form-group">
+                  <label>Semanas a ceder al padre (Máximo 6):</label>
+                  <div class="input-group">
+                    <i class="fas fa-exchange-alt input-icon"></i>
+                    <select
+                      id="semanasCeder"
+                      class="form-control"
+                      style="max-width: 200px"
+                    >
+                      <option value="1">1 Semana</option>
+                      <option value="2">2 Semanas</option>
+                      <option value="3">3 Semanas</option>
+                      <option value="4">4 Semanas</option>
+                      <option value="5">5 Semanas</option>
+                      <option value="6">6 Semanas</option>
+                    </select>
+                  </div>
+                  <small
+                    >Estas semanas se restarán de la madre y se sumarán al
+                    padre.</small
+                  >
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" id="btnCalcular" class="btn-calculate">
+              <i class="fas fa-calculator"></i> Calcular Licencia
+            </button>
+          </form>
+        </div>
+
+        <div id="resultsContainer">
+          <div class="result-container" id="printArea">
+            <div class="result-header">
+              <div>
+                <h3 style="margin: 0; font-size: 1.3rem">
+                  Liquidación de Prestación Económica
+                </h3>
+                <small style="opacity: 0.9"
+                  >Licencia de
+                  <span id="resTipoLicencia">Maternidad</span></small
+                >
+              </div>
+              <div style="text-align: right">
+                <i
+                  class="fas fa-baby-carriage"
+                  style="font-size: 2rem; opacity: 0.5"
+                ></i>
+              </div>
+            </div>
+
+            <div class="result-body">
+              <div
+                class="input-summary-grid"
+                style="grid-template-columns: 1fr 1fr"
+              >
+                <div class="input-item">
+                  <label>Fecha Inicio:</label><span id="resInicio">--</span>
+                </div>
+                <div class="input-item">
+                  <label>Fecha Retorno:</label
+                  ><span id="resFin" style="color: #c62828">--</span>
+                </div>
+              </div>
+
+              <h4
+                style="
+                  color: #10214b;
+                  border-bottom: 1px solid #eee;
+                  padding-bottom: 5px;
+                "
+              >
+                Detalle del Tiempo
+              </h4>
+              <table class="simple-table">
+                <thead>
+                  <tr>
+                    <th>Concepto</th>
+                    <th style="text-align: right">Días</th>
+                  </tr>
+                </thead>
+                <tbody id="tablaTiempos"></tbody>
+                <tfoot>
+                  <tr style="background: #f4f8fb">
+                    <td><strong>TOTAL DÍAS A DISFRUTAR</strong></td>
+                    <td style="text-align: right">
+                      <strong
+                        id="resTotalDias"
+                        style="font-size: 1.1rem; color: #10214b"
+                        >0</strong
+                      >
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+
+              <h4
+                style="
+                  color: #10214b;
+                  border-bottom: 1px solid #eee;
+                  padding-bottom: 5px;
+                  margin-top: 25px;
+                "
+              >
+                Liquidación Monetaria
+              </h4>
+              <table class="simple-table">
+                <thead>
+                  <tr>
+                    <th>Concepto</th>
+                    <th style="text-align: right">Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      Valor Bruto Licencia <br /><small>(IBC x Días)</small>
+                    </td>
+                    <td
+                      id="resValorBruto"
+                      style="text-align: right; font-weight: bold"
+                    >
+                      $0
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      Aporte Salud (4%) <br /><small style="color: #c62828"
+                        >A cargo del trabajador</small
+                      >
+                    </td>
+                    <td
+                      id="resDedSalud"
+                      style="text-align: right; color: #c62828"
+                    >
+                      $0
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      Aporte Pensión (4%) <br /><small style="color: #c62828"
+                        >A cargo del trabajador</small
+                      >
+                    </td>
+                    <td
+                      id="resDedPension"
+                      style="text-align: right; color: #c62828"
+                    >
+                      $0
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="total-final">
+              <span class="total-label">Valor Neto a Pagar:</span>
+              <span id="totalNeto" class="total-value">$0</span>
+            </div>
+
+            <p
+              style="
+                text-align: center;
+                margin-top: 20px;
+                font-size: 0.8rem;
+                color: #999;
+              "
+            >
+              * Cálculo basado en Art. 236 CST y Ley 2114 de 2021. Este valor lo
+              reconoce la EPS al empleador.
+            </p>
+          </div>
+
+          <button onclick="downloadPDF()" class="btn-pdf">
+            <i class="fas fa-file-pdf"></i> Descargar Informe PDF
+          </button>
+        </div>
       </div>
     </section>
 
-    <div class="container" style="max-width: 1000px; margin: 0 auto">
-      <div
-        style="
-          background-color: #fff;
-          border-top: 3px solid #d4af37;
-          padding: 20px;
-          margin: 40px 0 20px 0;
-          border-radius: 4px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-          text-align: center;
-          font-size: 0.85rem;
-          color: #666;
-          line-height: 1.5;
-        "
-      >
-        <p style="margin: 0">
-          <strong style="color: #10214b">Aviso Legal:</strong>
-          Esta herramienta realiza proyecciones basadas en la normativa laboral
-          vigente en Colombia. Los resultados son
-          <strong>aproximaciones ilustrativas</strong> y pueden variar según
-          convenciones colectivas o interpretaciones judiciales. El uso de este
-          simulador no crea una relación abogado-cliente ni sustituye una
-          liquidación oficial.
-          <span style="display: block; margin-top: 5px; font-style: italic">
-            Tu Abogado Laboral no se hace responsable por decisiones tomadas
-            basándose exclusivamente en estos datos.
-          </span>
-        </p>
-      </div>
-    </div>
     <footer>
       <div class="container">
         <div class="footer-grid">
@@ -182,7 +622,6 @@
               ></a>
             </div>
           </div>
-
           <div class="footer-col links-col">
             <h4>Enlaces Rápidos</h4>
             <ul>
@@ -193,21 +632,19 @@
               <li><a href="contacto.html">Agendar Cita</a></li>
             </ul>
           </div>
-
           <div class="footer-col">
             <h4>Contacto</h4>
             <ul class="contact-list">
               <li>
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Edificio Las Flores, Barranquilla</span>
+                <i class="fas fa-map-marker-alt"></i
+                ><span>Edificio Las Flores, Barranquilla</span>
               </li>
               <li>
-                <i class="fas fa-phone-alt"></i>
-                <span>+57 321 792 7495</span>
+                <i class="fas fa-phone-alt"></i><span>+57 321 792 7495</span>
               </li>
               <li>
-                <i class="fas fa-envelope"></i>
-                <span>tuabogadolaboral@outlook.com</span>
+                <i class="fas fa-envelope"></i
+                ><span>tuabogadolaboral@outlook.com</span>
               </li>
             </ul>
           </div>
@@ -215,18 +652,182 @@
       </div>
       <div class="footer-bottom">
         <div class="container">
-          <p>&copy; 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
+          <p>
+            &copy; 2026 Tu Abogado Laboral - Dra. Johana Manga. Todos los
+            derechos reservados.
+          </p>
         </div>
       </div>
     </footer>
-    >
-    <a
-      href="https://wa.me/573217927495"
-      class="whatsapp-btn"
-      target="_blank"
-      title="Contáctanos por WhatsApp"
-    >
-      <i class="fab fa-whatsapp"></i>
-    </a>
+
+    <a href="https://wa.me/573217927495" class="whatsapp-btn" target="_blank"
+      ><i class="fab fa-whatsapp"></i
+    ></a>
+
+    <script>
+      const formatoPeso = new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+
+      // --- PDF GENERATOR ---
+      function downloadPDF() {
+        const element = document.getElementById("printArea");
+        const opt = {
+          margin: [0.3, 0.3, 0.3, 0.3],
+          filename: "Licencia_Maternidad.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+          jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+        };
+        html2pdf().set(opt).from(element).save();
+      }
+
+      // --- UI LOGIC ---
+      const rolSelect = document.getElementById("rolTrabajador");
+      const secCompartida = document.getElementById("seccionCompartida");
+      const checkCompartida = document.getElementById("licenciaCompartida");
+      const boxCompartida = document.getElementById("boxCompartida");
+
+      rolSelect.addEventListener("change", function () {
+        if (this.value === "padre") {
+          secCompartida.style.display = "none";
+          checkCompartida.checked = false;
+          boxCompartida.style.display = "none";
+        } else {
+          secCompartida.style.display = "block";
+        }
+      });
+
+      checkCompartida.addEventListener("change", function () {
+        boxCompartida.style.display = this.checked ? "block" : "none";
+      });
+
+      // --- CALCULADORA ---
+      document
+        .getElementById("licenciaForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const btn = document.getElementById("btnCalcular");
+
+          try {
+            btn.innerHTML =
+              '<i class="fas fa-spinner fa-spin"></i> Calculando...';
+
+            // 1. Obtener Datos
+            const rol = rolSelect.value;
+            const salario =
+              parseFloat(document.getElementById("salarioBase").value) || 0;
+            const fProbable = new Date(
+              document.getElementById("fechaProbable").value + "T00:00:00"
+            );
+            const fNacimiento = new Date(
+              document.getElementById("fechaNacimiento").value + "T00:00:00"
+            );
+            const esMultiple = document.getElementById("partoMultiple").checked;
+            const esCompartida = checkCompartida.checked;
+            const semanasCedidas = esCompartida
+              ? parseInt(document.getElementById("semanasCeder").value)
+              : 0;
+
+            if (fNacimiento > new Date())
+              alert("Nota: Ha ingresado una fecha de nacimiento futura.");
+
+            // 2. Lógica de Días (El Cerebro)
+            let diasBase = 0;
+            let diasPrematuro = 0;
+            let diasMultiple = 0;
+            let diasCedidos = 0;
+            let tablaHtml = "";
+
+            if (rol === "madre") {
+              // MADRE: 18 Semanas Base
+              diasBase = 126;
+              tablaHtml += `<tr><td>Licencia Estándar (18 semanas)</td><td style="text-align:right;">126</td></tr>`;
+
+              // Prematuro? (FProbable - FNacimiento > 0)
+              const diffTime = fProbable - fNacimiento;
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+              if (diffDays > 0) {
+                diasPrematuro = diffDays;
+                tablaHtml += `<tr><td>Adicional por Prematuez</td><td style="text-align:right;">${diasPrematuro}</td></tr>`;
+              }
+
+              // Múltiple?
+              if (esMultiple) {
+                diasMultiple = 14; // 2 semanas
+                tablaHtml += `<tr><td>Adicional Parto Múltiple (2 sem)</td><td style="text-align:right;">14</td></tr>`;
+              }
+
+              // Compartida? (Resta)
+              if (esCompartida) {
+                diasCedidos = semanasCedidas * 7;
+                tablaHtml += `<tr><td style="color:#c62828;">(-) Cedidos al padre (${semanasCedidas} sem)</td><td style="text-align:right; color:#c62828;">-${diasCedidos}</td></tr>`;
+              }
+            } else {
+              // PADRE: 2 Semanas Base (Ley 2114)
+              diasBase = 14;
+              tablaHtml += `<tr><td>Licencia Paternidad (2 semanas)</td><td style="text-align:right;">14</td></tr>`;
+
+              // Nota: La ley no suma explícitamente prematuridad al padre igual que a la madre, pero si la madre cede semanas:
+              // Aquí asumimos que si el usuario selecciona "Padre", está calculando su licencia propia base.
+              // Si quisiera ver las semanas compartidas, debería sumarlas, pero esta calculadora es individual.
+            }
+
+            // Total Días
+            const totalDias =
+              diasBase + diasPrematuro + diasMultiple - diasCedidos;
+
+            // Fecha Retorno
+            const fRetorno = new Date(fNacimiento);
+            fRetorno.setDate(fRetorno.getDate() + totalDias);
+
+            // Cálculos Financieros
+            const valorDia = salario / 30;
+            const valorBruto = valorDia * totalDias;
+
+            // Deducciones (Salud 4% y Pensión 4% sobre el valor de la licencia)
+            const dedSalud = valorBruto * 0.04;
+            const dedPension = valorBruto * 0.04;
+            const neto = valorBruto - dedSalud - dedPension;
+
+            // 3. Renderizar
+            document.getElementById("resTipoLicencia").textContent =
+              rol === "madre" ? "Maternidad" : "Paternidad";
+            document.getElementById("resInicio").textContent =
+              fNacimiento.toLocaleDateString();
+            document.getElementById("resFin").textContent =
+              fRetorno.toLocaleDateString();
+
+            document.getElementById("tablaTiempos").innerHTML = tablaHtml;
+            document.getElementById("resTotalDias").textContent = totalDias;
+
+            document.getElementById("resValorBruto").textContent =
+              formatoPeso.format(valorBruto);
+            document.getElementById("resDedSalud").textContent =
+              "-" + formatoPeso.format(dedSalud);
+            document.getElementById("resDedPension").textContent =
+              "-" + formatoPeso.format(dedPension);
+            document.getElementById("totalNeto").textContent =
+              formatoPeso.format(neto);
+
+            const results = document.getElementById("resultsContainer");
+            results.style.display = "block";
+            results.scrollIntoView({ behavior: "smooth" });
+          } catch (e) {
+            alert(e.message);
+          } finally {
+            setTimeout(
+              () =>
+                (btn.innerHTML =
+                  '<i class="fas fa-calculator"></i> Calcular Licencia'),
+              500
+            );
+          }
+        });
+    </script>
   </body>
 </html>
