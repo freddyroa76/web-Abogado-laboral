@@ -3,8 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Herramienta en Construcción | Tu Abogado Laboral</title>
+    <title>Calculadora de Indemnización | Tu Abogado Laboral</title>
+
     <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
       rel="stylesheet"
@@ -13,17 +15,341 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+
+    <style>
+      /* --- ESTILOS ESTÁNDAR (Base común) --- */
+      body {
+        font-family: "Lato", sans-serif;
+        margin: 0;
+        background-color: #f4f8fb;
+      }
+      .calc-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .calc-card {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(16, 33, 75, 0.08);
+        border: 1px solid #eee;
+        margin-bottom: 30px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 700;
+        color: #10214b;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+      }
+      .form-group small {
+        display: block;
+        color: #666;
+        font-size: 0.75rem;
+        margin-bottom: 8px;
+        background: #f4f8fb;
+        padding: 4px 8px;
+        border-radius: 4px;
+        width: fit-content;
+      }
+
+      .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      .input-icon {
+        position: absolute;
+        left: 15px;
+        color: #10214b;
+        z-index: 10;
+      }
+      .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 40px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: #f9f9f9;
+        box-sizing: border-box;
+        transition: 0.3s;
+      }
+      .form-control:focus {
+        border-color: #10214b;
+        background: #fff;
+        outline: none;
+      }
+      .form-control.no-icon {
+        padding-left: 15px;
+      } /* Ajuste para inputs sin icono */
+      select.form-control {
+        cursor: pointer;
+        font-weight: bold;
+        color: #10214b;
+      }
+
+      .calc-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+      }
+      .form-grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+      }
+      @media (max-width: 768px) {
+        .calc-grid,
+        .form-grid-3 {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .btn-calculate {
+        background-color: #10214b;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 30px;
+        text-transform: uppercase;
+      }
+      .btn-calculate:hover {
+        background-color: #25d366;
+        transform: translateY(-2px);
+      }
+
+      /* --- ESTILOS ESPECÍFICOS INDEMNIZACIÓN (Necesarios para la tabla) --- */
+      .period-manager {
+        margin-top: 20px;
+        display: none;
+      } /* Oculto por defecto */
+      .period-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr auto;
+        gap: 10px;
+        align-items: end;
+        margin-bottom: 15px;
+      }
+
+      .btn-add {
+        background: #28a745;
+        color: white;
+        border: none;
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+      }
+      .btn-add:hover {
+        background: #218838;
+        transform: scale(1.05);
+      }
+      .btn-delete {
+        background: #dc3545;
+        color: white;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .history-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 0.9rem;
+        background: white;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #eee;
+      }
+      .history-table th {
+        background: #e9ecef;
+        padding: 12px;
+        text-align: left;
+        color: #555;
+        font-weight: bold;
+      }
+      .history-table td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .info-box {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        color: #0d47a1;
+        line-height: 1.4;
+      }
+      .info-box.warn {
+        background: #fff3e0;
+        border-color: #ff9800;
+        color: #e65100;
+      }
+
+      /* --- RESULTADOS TIPO INFORME (Específico Indemnización) --- */
+      #resultsContainer {
+        display: none;
+        margin-top: 40px;
+      }
+      .result-container {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid #eee;
+      }
+      .result-header {
+        background: #10214b;
+        color: white;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .result-body {
+        padding: 30px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .input-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        font-size: 0.85rem;
+        margin-bottom: 30px;
+      }
+      .input-item label {
+        display: block;
+        color: #666;
+        font-weight: bold;
+        margin-bottom: 3px;
+      }
+      .input-item span {
+        color: #10214b;
+        font-weight: 800;
+        font-size: 1rem;
+      }
+
+      .simple-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      .simple-table th {
+        text-align: left;
+        padding: 12px;
+        background: #f5f5f5;
+        color: #333;
+        font-size: 0.9rem;
+        border-bottom: 2px solid #ddd;
+      }
+      .simple-table td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        font-size: 0.95rem;
+      }
+      .simple-table tr:last-child td {
+        font-weight: bold;
+        border-bottom: none;
+      }
+
+      .total-final {
+        background: #f4f8fb;
+        padding: 25px;
+        text-align: right;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .total-label {
+        font-size: 1.2rem;
+        color: #10214b;
+        font-weight: bold;
+      }
+      .total-value {
+        font-size: 2rem;
+        color: #25d366;
+        font-weight: 900;
+      }
+
+      .btn-pdf {
+        display: block;
+        width: 250px;
+        margin: 30px auto 0;
+        padding: 15px;
+        background: #c62828;
+        color: white;
+        text-align: center;
+        border: none;
+        border-radius: 50px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+        font-size: 1rem;
+      }
+      .btn-pdf:hover {
+        background: #b71c1c;
+        transform: scale(1.05);
+      }
+
+      .whatsapp-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #25d366;
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 35px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+      .whatsapp-btn:hover {
+        background-color: #128c7e;
+        transform: scale(1.1);
+      }
+    </style>
   </head>
   <body>
     <div class="top-bar">
       <div class="container">
         <div class="info">
-          <i class="fas fa-phone-alt"></i> (+57) 321 792 7495 |
-          <i class="fas fa-envelope"></i> tuabogadolaboral@outlook.com
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
         </div>
       </div>
     </div>
-
     <header>
       <div class="container header-container">
         <div class="logo">
@@ -43,118 +369,447 @@
       </div>
     </header>
 
-    <section
-      class="bg-light"
-      style="
-        min-height: 60vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 40px 20px;
-      "
-    >
-      <div
-        class="container text-center"
-        style="
-          background: white;
-          padding: 50px;
-          border-radius: 10px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-          max-width: 600px;
-        "
-      >
-        <i
-          class="fas fa-hard-hat"
-          style="font-size: 4rem; color: #d7bd88; margin-bottom: 20px"
-        ></i>
-
-        <h1 style="color: #10214b; margin-bottom: 15px">
-          Herramienta en Calibración
-        </h1>
-
-        <p
-          style="
-            color: #666;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 30px;
-          "
-        >
-          Estamos ajustando las fórmulas matemáticas de esta calculadora para
-          garantizar que cumpla con la normativa laboral colombiana 2026.
-          <br /><br />
-          <strong>¡Pero no se quede sin su dato!</strong>
-        </p>
-
-        <div
-          style="
-            background: #e8f5e9;
-            padding: 20px;
-            border-radius: 6px;
-            margin-bottom: 30px;
-            border: 1px solid #c8e6c9;
-          "
-        >
-          <p style="margin-bottom: 15px; font-weight: bold; color: #2e7d32">
-            ¿Necesita este cálculo urgente?
+    <section class="bg-light">
+      <div class="calc-wrapper">
+        <div class="text-center mb-5" style="text-align: center">
+          <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
+            Calculadora de Indemnización
+          </h1>
+          <p style="color: #666">
+            Cálculo jurídico por Despido Sin Justa Causa (Art. 64 CST).
           </p>
-          <a
-            href="https://wa.me/573217927495?text=Hola%20Dra.%20Manga,%20la%20herramienta%20web%20está%20en%20mantenimiento%20y%20necesito%20ayuda%20con%20un%20cálculo."
-            class="btn"
-            target="_blank"
-            style="
-              background-color: #25d366;
-              color: white;
-              padding: 12px 25px;
-              border-radius: 50px;
-              text-decoration: none;
-              font-weight: bold;
-              display: inline-flex;
-              align-items: center;
-              gap: 10px;
-            "
-          >
-            <i class="fab fa-whatsapp" style="font-size: 1.2rem"></i> Pedir
-            Cálculo Manual
-          </a>
         </div>
 
-        <a href="blog.html" style="color: #10214b; text-decoration: underline"
-          >Regresar al menú principal</a
-        >
+        <div class="calc-card">
+          <form id="indemForm">
+            <div
+              style="
+                background: #eef2f6;
+                padding: 10px;
+                border-radius: 6px;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                border: 1px solid #dce4ec;
+              "
+            >
+              <small
+                style="
+                  margin: 0;
+                  background: none;
+                  font-weight: bold;
+                  color: #10214b;
+                "
+                >Parámetros 2026:</small
+              >
+              <div style="display: flex; align-items: center; gap: 5px">
+                <label style="margin: 0; font-size: 0.8rem">SMMLV</label>
+                <input
+                  type="number"
+                  id="confSalarioMin"
+                  value="1705905"
+                  style="
+                    border: 1px solid #ccc;
+                    padding: 3px;
+                    border-radius: 4px;
+                    width: 100px;
+                    color: #666;
+                  "
+                />
+              </div>
+            </div>
+
+            <h3
+              style="
+                color: #10214b;
+                border-bottom: 2px solid #eee;
+                padding-bottom: 10px;
+                margin-bottom: 25px;
+                font-size: 1.2rem;
+              "
+            >
+              <i class="fas fa-file-signature"></i> 1. Información del Contrato
+            </h3>
+
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label>Tipo de Contrato</label>
+                <div class="input-group">
+                  <i class="fas fa-file-contract input-icon"></i>
+                  <select id="tipoContrato" class="form-control">
+                    <option value="indefinido">Término Indefinido</option>
+                    <option value="fijo">Término Fijo</option>
+                    <option value="obra">Obra o Labor</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Fecha Inicio</label>
+                <input
+                  type="date"
+                  id="fechaInicio"
+                  class="form-control no-icon"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Fecha Despido</label>
+                <input
+                  type="date"
+                  id="fechaDespido"
+                  class="form-control no-icon"
+                  required
+                />
+              </div>
+            </div>
+
+            <div
+              id="panelFechaPactada"
+              style="
+                margin-top: 20px;
+                display: none;
+                background: #fff3e0;
+                padding: 15px;
+                border-radius: 8px;
+                border-left: 5px solid #ff9800;
+              "
+            >
+              <div class="form-group">
+                <label
+                  id="lblFechaPactada"
+                  style="color: #e65100; font-size: 1rem"
+                  >Fecha Vencimiento Pactada / Fin de Obra</label
+                >
+                <input
+                  type="date"
+                  id="fechaFinPactada"
+                  class="form-control no-icon"
+                />
+                <small style="color: #e65100; background: none"
+                  >* Necesario para calcular el lucro cesante.</small
+                >
+              </div>
+            </div>
+
+            <div
+              style="
+                margin-top: 30px;
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+                border: 1px solid #eee;
+              "
+            >
+              <h3
+                style="color: #10214b; margin-bottom: 20px; font-size: 1.2rem"
+              >
+                <i class="fas fa-money-bill-wave"></i> 2. Base Salarial
+              </h3>
+
+              <div class="form-group">
+                <label>Modalidad Salarial</label>
+                <div class="input-group">
+                  <i class="fas fa-exchange-alt input-icon"></i>
+                  <select id="modalidadSalarial" class="form-control">
+                    <option value="fijo">
+                      Salario Fijo (Incluye aumentos)
+                    </option>
+                    <option value="variable">
+                      Salario Variable (Comisiones/Destajo)
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="boxSalarioFijo" style="margin-top: 15px">
+                <div class="info-box">
+                  <i class="fas fa-info-circle"></i>
+                  <strong>Criterio Legal:</strong> Si su salario es fijo
+                  (incluso si tuvo aumentos), la indemnización se liquida con el
+                  <strong>Último Salario Devengado</strong>.
+                </div>
+                <div class="form-group">
+                  <label>Último Salario Mensual</label>
+                  <div class="input-group">
+                    <i class="fas fa-dollar-sign input-icon"></i>
+                    <input
+                      type="number"
+                      id="salarioFijoInput"
+                      class="form-control"
+                      placeholder="Ej: 2500000"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div id="boxSalarioVariable" class="period-manager">
+                <div class="info-box warn">
+                  <i class="fas fa-exclamation-circle"></i>
+                  <strong>Salario Variable:</strong> Ingrese el historial del
+                  último año. El sistema validará que los periodos cubran la
+                  ventana legal requerida.
+                </div>
+
+                <div class="period-row">
+                  <div class="form-group">
+                    <label style="font-size: 0.8rem">Desde</label
+                    ><input
+                      type="date"
+                      id="pInicio"
+                      class="form-control no-icon"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label style="font-size: 0.8rem">Hasta</label
+                    ><input
+                      type="date"
+                      id="pFin"
+                      class="form-control no-icon"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label style="font-size: 0.8rem">Salario Básico</label>
+                    <div class="input-group" style="margin: 0">
+                      <i
+                        class="fas fa-dollar-sign input-icon"
+                        style="font-size: 0.8rem; left: 10px"
+                      ></i>
+                      <input
+                        type="number"
+                        id="pSalario"
+                        class="form-control"
+                        placeholder="0"
+                        style="padding-left: 25px"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      class="btn-add"
+                      onclick="agregarPeriodo()"
+                      title="Agregar"
+                    >
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <table
+                  class="history-table"
+                  id="tablaPeriodos"
+                  style="display: none"
+                >
+                  <thead>
+                    <tr>
+                      <th>Periodo</th>
+                      <th>Días</th>
+                      <th>Salario</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+
+                <div
+                  style="
+                    text-align: right;
+                    margin-top: 10px;
+                    font-weight: bold;
+                    color: #10214b;
+                    display: none;
+                  "
+                  id="boxPromedio"
+                >
+                  Promedio Calculado: <span id="txtPromedio">$0</span>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" id="btnCalcular" class="btn-calculate">
+              <i class="fas fa-gavel"></i> Calcular Indemnización
+            </button>
+          </form>
+        </div>
+
+        <div id="resultsContainer">
+          <div class="result-container" id="printArea">
+            <div class="result-header">
+              <div>
+                <h3 style="margin: 0; font-size: 1.3rem">
+                  Liquidación de Indemnización
+                </h3>
+                <small style="opacity: 0.9"
+                  >Art. 64 Código Sustantivo del Trabajo</small
+                >
+              </div>
+              <div style="text-align: right">
+                <i
+                  class="fas fa-balance-scale"
+                  style="font-size: 2rem; opacity: 0.5"
+                ></i>
+              </div>
+            </div>
+
+            <div class="result-body">
+              <div class="input-summary-grid">
+                <div class="input-item">
+                  <label>Contrato:</label
+                  ><span id="rTipo" style="text-transform: capitalize">--</span>
+                </div>
+                <div class="input-item">
+                  <label>Fecha Inicio:</label><span id="rInicio">--</span>
+                </div>
+                <div class="input-item">
+                  <label>Fecha Despido:</label><span id="rFin">--</span>
+                </div>
+                <div class="input-item">
+                  <label>Días Laborados:</label
+                  ><span id="rDiasLaborados">--</span>
+                </div>
+                <div class="input-item">
+                  <label>Salario Base:</label><span id="rBase">$0</span>
+                </div>
+                <div
+                  class="input-item"
+                  style="
+                    grid-column: 1 / -1;
+                    border-top: 1px dashed #ddd;
+                    padding-top: 10px;
+                    margin-top: 5px;
+                  "
+                >
+                  <label>Criterio de Base:</label
+                  ><span
+                    id="rCriterioBase"
+                    style="font-size: 0.9rem; font-weight: normal; color: #666"
+                    >--</span
+                  >
+                </div>
+              </div>
+
+              <div id="detalleIndefinido" style="display: none">
+                <h4
+                  style="
+                    color: #10214b;
+                    border-bottom: 1px solid #eee;
+                    padding-bottom: 5px;
+                    margin-bottom: 15px;
+                  "
+                >
+                  Cálculo (Ley 789/2002)
+                </h4>
+                <table class="simple-table">
+                  <thead>
+                    <tr>
+                      <th>Concepto</th>
+                      <th>Días a Pagar</th>
+                      <th style="text-align: right">Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Primer Año</strong><br /><small
+                          style="color: #888"
+                          >Tarifa inicial según salario</small
+                        >
+                      </td>
+                      <td id="diasAnio1">0</td>
+                      <td id="valAnio1" style="text-align: right">$0</td>
+                    </tr>
+                    <tr id="rowAniosSub" style="display: none">
+                      <td>
+                        <strong>Años Subsiguientes</strong><br /><small
+                          style="color: #888"
+                          >Proporcional al tiempo restante</small
+                        >
+                      </td>
+                      <td id="diasAniosSub">0</td>
+                      <td id="valAniosSub" style="text-align: right">$0</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div id="detalleFijo" style="display: none">
+                <h4
+                  style="
+                    color: #10214b;
+                    border-bottom: 1px solid #eee;
+                    padding-bottom: 5px;
+                    margin-bottom: 15px;
+                  "
+                >
+                  Cálculo (Lucro Cesante)
+                </h4>
+                <table class="simple-table">
+                  <thead>
+                    <tr>
+                      <th>Concepto</th>
+                      <th>Detalle</th>
+                      <th style="text-align: right">Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Fecha Vencimiento / Fin Obra</strong></td>
+                      <td colspan="2" id="rFechaPactada">--</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Tiempo Faltante</strong></td>
+                      <td><span id="diasFaltantes">0</span> días</td>
+                      <td id="valFaltante" style="text-align: right">$0</td>
+                    </tr>
+                    <tr
+                      id="rowPisoObra"
+                      style="display: none; background: #fff3e0"
+                    >
+                      <td colspan="2" style="color: #e65100">
+                        <strong>Ajuste Mínimo Legal (15 días)</strong
+                        ><br /><small>Art. 64 CST para Obra o Labor</small>
+                      </td>
+                      <td
+                        id="valAjusteObra"
+                        style="
+                          text-align: right;
+                          font-weight: bold;
+                          color: #e65100;
+                        "
+                      >
+                        $0
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="total-final">
+              <span class="total-label">Total Indemnización:</span>
+              <span id="totalIndemnizacion" class="total-value">$0</span>
+            </div>
+
+            <p
+              style="
+                text-align: center;
+                margin-top: 20px;
+                font-size: 0.8rem;
+                color: #999;
+              "
+            >
+              * Documento informativo generado por Tu Abogado Laboral.
+            </p>
+          </div>
+
+          <button onclick="downloadPDF()" class="btn-pdf">
+            <i class="fas fa-file-pdf"></i> Descargar Informe PDF
+          </button>
+        </div>
       </div>
     </section>
 
-    <div class="container" style="max-width: 1000px; margin: 0 auto">
-      <div
-        style="
-          background-color: #fff;
-          border-top: 3px solid #d4af37;
-          padding: 20px;
-          margin: 40px 0 20px 0;
-          border-radius: 4px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-          text-align: center;
-          font-size: 0.85rem;
-          color: #666;
-          line-height: 1.5;
-        "
-      >
-        <p style="margin: 0">
-          <strong style="color: #10214b">Aviso Legal:</strong>
-          Esta herramienta realiza proyecciones basadas en la normativa laboral
-          vigente en Colombia. Los resultados son
-          <strong>aproximaciones ilustrativas</strong> y pueden variar según
-          convenciones colectivas o interpretaciones judiciales. El uso de este
-          simulador no crea una relación abogado-cliente ni sustituye una
-          liquidación oficial.
-          <span style="display: block; margin-top: 5px; font-style: italic">
-            Tu Abogado Laboral no se hace responsable por decisiones tomadas
-            basándose exclusivamente en estos datos.
-          </span>
-        </p>
-      </div>
-    </div>
     <footer>
       <div class="container">
         <div class="footer-grid">
@@ -182,7 +837,6 @@
               ></a>
             </div>
           </div>
-
           <div class="footer-col links-col">
             <h4>Enlaces Rápidos</h4>
             <ul>
@@ -193,21 +847,19 @@
               <li><a href="contacto.html">Agendar Cita</a></li>
             </ul>
           </div>
-
           <div class="footer-col">
             <h4>Contacto</h4>
             <ul class="contact-list">
               <li>
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Edificio Las Flores, Barranquilla</span>
+                <i class="fas fa-map-marker-alt"></i
+                ><span>Edificio Las Flores, Barranquilla</span>
               </li>
               <li>
-                <i class="fas fa-phone-alt"></i>
-                <span>+57 321 792 7495</span>
+                <i class="fas fa-phone-alt"></i><span>+57 321 792 7495</span>
               </li>
               <li>
-                <i class="fas fa-envelope"></i>
-                <span>tuabogadolaboral@outlook.com</span>
+                <i class="fas fa-envelope"></i
+                ><span>tuabogadolaboral@outlook.com</span>
               </li>
             </ul>
           </div>
@@ -215,20 +867,405 @@
       </div>
       <div class="footer-bottom">
         <div class="container">
-          <p>
-            &copy; 2026 Tu Abogado Laboral - Dra. Johana Manga. Todos los
-            derechos reservados.
-          </p>
+          <p>&copy; 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>
-    <a
-      href="https://wa.me/573217927495"
-      class="whatsapp-btn"
-      target="_blank"
-      title="Contáctanos por WhatsApp"
-    >
-      <i class="fab fa-whatsapp"></i>
-    </a>
+
+    <a href="https://wa.me/573217927495" class="whatsapp-btn" target="_blank"
+      ><i class="fab fa-whatsapp"></i
+    ></a>
+
+    <script>
+      const formatoPeso = new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+
+      function downloadPDF() {
+        const element = document.getElementById("printArea");
+        const opt = {
+          margin: [0.3, 0.3, 0.3, 0.3],
+          filename: "Indemnizacion_Despido.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+          jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+        };
+        html2pdf().set(opt).from(element).save();
+      }
+
+      function calcularDias360(f1Str, f2Str) {
+        if (!f1Str || !f2Str) return 0;
+        const f1 = new Date(f1Str + "T00:00:00");
+        const f2 = new Date(f2Str + "T00:00:00");
+        if (f2 < f1) return 0;
+        const Y1 = f1.getFullYear(),
+          M1 = f1.getMonth() + 1,
+          D1 = f1.getDate();
+        const Y2 = f2.getFullYear(),
+          M2 = f2.getMonth() + 1;
+        let D2 = f2.getDate();
+        const d1Adj = D1 === 31 ? 30 : D1;
+        const d2Adj = D2 === 31 ? 30 : D2;
+        return (Y2 - Y1) * 360 + (M2 - M1) * 30 + (d2Adj - d1Adj) + 1;
+      }
+
+      // --- VALIDACIÓN DE COBERTURA ---
+      function validarCoberturaSalarios(
+        fInicioContrato,
+        fFinContrato,
+        historial
+      ) {
+        const dateFin = new Date(fFinContrato + "T00:00:00");
+        const date1YearAgo = new Date(dateFin);
+        date1YearAgo.setFullYear(dateFin.getFullYear() - 1);
+
+        const dateInicioReal = new Date(fInicioContrato + "T00:00:00");
+        const dateCorte =
+          dateInicioReal > date1YearAgo ? dateInicioReal : date1YearAgo;
+
+        const strCorte = dateCorte.toISOString().split("T")[0];
+        const strFin = fFinContrato;
+
+        const diasRequeridos = calcularDias360(strCorte, strFin);
+        let diasCubiertos = 0;
+
+        historial.forEach((p) => {
+          const pIni = new Date(p.ini + "T00:00:00");
+          const pFin = new Date(p.fin + "T00:00:00");
+
+          if (pFin >= dateCorte && pIni <= dateFin) {
+            const overlapStart = pIni < dateCorte ? dateCorte : pIni;
+            const overlapEnd = pFin > dateFin ? dateFin : pFin;
+            const strStart = overlapStart.toISOString().split("T")[0];
+            const strEnd = overlapEnd.toISOString().split("T")[0];
+            diasCubiertos += calcularDias360(strStart, strEnd);
+          }
+        });
+
+        if (diasCubiertos < diasRequeridos - 5) {
+          return {
+            valido: false,
+            mensaje: `Historial incompleto. Debe cubrir desde ${strCorte} hasta ${strFin}.\nDías requeridos: ${diasRequeridos}, reportados: ${diasCubiertos}`,
+          };
+        }
+        return { valido: true };
+      }
+
+      // --- UI CONTROL ---
+      const tipoContrato = document.getElementById("tipoContrato");
+      const panelPactada = document.getElementById("panelFechaPactada");
+      const lblPactada = document.getElementById("lblFechaPactada");
+      const modalidad = document.getElementById("modalidadSalarial");
+      const boxFijo = document.getElementById("boxSalarioFijo");
+      const boxVariable = document.getElementById("boxSalarioVariable");
+
+      tipoContrato.addEventListener("change", function () {
+        if (this.value === "fijo" || this.value === "obra") {
+          panelPactada.style.display = "block";
+          lblPactada.textContent =
+            this.value === "obra"
+              ? "Fecha Estimada Fin Obra"
+              : "Fecha Vencimiento Contrato";
+        } else {
+          panelPactada.style.display = "none";
+        }
+      });
+
+      modalidad.addEventListener("change", function () {
+        if (this.value === "variable") {
+          boxFijo.style.display = "none";
+          boxVariable.style.display = "block";
+        } else {
+          boxFijo.style.display = "block";
+          boxVariable.style.display = "none";
+        }
+      });
+
+      // --- GESTIÓN DE SALARIOS ---
+      let periodos = [];
+
+      function agregarPeriodo() {
+        const ini = document.getElementById("pInicio").value;
+        const fin = document.getElementById("pFin").value;
+        const sal = parseFloat(document.getElementById("pSalario").value);
+
+        if (!ini) {
+          alert("Falta fecha Desde");
+          return false;
+        }
+        if (!fin) {
+          alert("Falta fecha Hasta");
+          return false;
+        }
+        const dateFinCheck = new Date(fin);
+        if (isNaN(dateFinCheck.getTime())) {
+          alert("Fecha Hasta inválida");
+          return false;
+        }
+
+        if (!sal) {
+          alert("Falta el Salario");
+          return false;
+        }
+        if (new Date(ini) > new Date(fin)) {
+          alert("Fecha Inicio mayor a Fin");
+          return false;
+        }
+
+        periodos.push({ ini, fin, sal });
+        periodos.sort((a, b) => new Date(a.ini) - new Date(b.ini));
+        renderPeriodos();
+
+        document.getElementById("pInicio").value = "";
+        document.getElementById("pFin").value = "";
+        document.getElementById("pSalario").value = "";
+        return true;
+      }
+
+      function eliminarPeriodo(idx) {
+        periodos.splice(idx, 1);
+        renderPeriodos();
+      }
+
+      function renderPeriodos() {
+        const tbody = document.querySelector("#tablaPeriodos tbody");
+        const boxPromedio = document.getElementById("boxPromedio");
+        const txtPromedio = document.getElementById("txtPromedio");
+
+        tbody.innerHTML = "";
+
+        if (periodos.length > 0) {
+          document.getElementById("tablaPeriodos").style.display = "table";
+          if (boxPromedio) boxPromedio.style.display = "block";
+
+          let sumaPonderada = 0;
+          let totalDias = 0;
+
+          periodos.forEach((p, i) => {
+            const dias = calcularDias360(p.ini, p.fin);
+            if (dias > 0) {
+              sumaPonderada += p.sal * dias;
+              totalDias += dias;
+            }
+            tbody.innerHTML += `<tr><td>${p.ini} a ${
+              p.fin
+            }</td><td>${dias}</td><td>${formatoPeso.format(
+              p.sal
+            )}</td><td><button type="button" class="btn-delete" onclick="eliminarPeriodo(${i})"><i class="fas fa-trash"></i></button></td></tr>`;
+          });
+
+          const promedio = totalDias > 0 ? sumaPonderada / totalDias : 0;
+          if (txtPromedio) {
+            txtPromedio.textContent = formatoPeso.format(promedio);
+            txtPromedio.dataset.value = promedio;
+          }
+        } else {
+          document.getElementById("tablaPeriodos").style.display = "none";
+          if (boxPromedio) boxPromedio.style.display = "none";
+        }
+      }
+
+      // --- CÁLCULO PRINCIPAL ---
+      document
+        .getElementById("indemForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const btn = document.getElementById("btnCalcular");
+
+          try {
+            // Auto-guardado
+            const pIni = document.getElementById("pInicio").value;
+            const pFin = document.getElementById("pFin").value;
+            const pSal = document.getElementById("pSalario").value;
+            const modSalarial =
+              document.getElementById("modalidadSalarial").value;
+
+            if (modSalarial === "variable" && pIni && pFin && pSal) {
+              if (!agregarPeriodo()) return;
+            }
+
+            if (modSalarial === "variable" && periodos.length === 0) {
+              throw new Error(
+                "Para salario variable, debe ingresar el historial del último año."
+              );
+            }
+
+            const fInicio = document.getElementById("fechaInicio").value;
+            const fDespido = document.getElementById("fechaDespido").value;
+
+            // Validación Cobertura
+            if (modSalarial === "variable") {
+              const validacion = validarCoberturaSalarios(
+                fInicio,
+                fDespido,
+                periodos
+              );
+              if (!validacion.valido) throw new Error(validacion.mensaje);
+            }
+
+            btn.innerHTML =
+              '<i class="fas fa-spinner fa-spin"></i> Calculando...';
+
+            const tipo = document.getElementById("tipoContrato").value;
+            const fPactada = document.getElementById("fechaFinPactada").value;
+            const smlv = parseFloat(
+              document.getElementById("confSalarioMin").value
+            );
+
+            let salarioBase = 0;
+            let criterioBase = "";
+
+            if (modSalarial === "fijo") {
+              salarioBase = parseFloat(
+                document.getElementById("salarioFijoInput").value
+              );
+              criterioBase = "Último Salario Devengado";
+              if (!salarioBase)
+                throw new Error("Ingrese el Último Salario Mensual.");
+            } else {
+              // RE-CÁLCULO EXACTO DEL PROMEDIO
+              const dateFin = new Date(fDespido + "T00:00:00");
+              const date1YearAgo = new Date(dateFin);
+              date1YearAgo.setFullYear(dateFin.getFullYear() - 1);
+
+              const dateIniContrato = new Date(fInicio + "T00:00:00");
+              const dateCorte =
+                dateIniContrato > date1YearAgo ? dateIniContrato : date1YearAgo;
+
+              let suma = 0;
+              let diasTotalProm = 0;
+
+              periodos.forEach((p) => {
+                const pIni = new Date(p.ini + "T00:00:00");
+                const pFin = new Date(p.fin + "T00:00:00");
+                if (pFin >= dateCorte && pIni <= dateFin) {
+                  const overlapStart = pIni < dateCorte ? dateCorte : pIni;
+                  const overlapEnd = pFin > dateFin ? dateFin : pFin;
+                  const strStart = overlapStart.toISOString().split("T")[0];
+                  const strEnd = overlapEnd.toISOString().split("T")[0];
+                  const dias = calcularDias360(strStart, strEnd);
+                  if (dias > 0) {
+                    suma += p.sal * dias;
+                    diasTotalProm += dias;
+                  }
+                }
+              });
+              salarioBase = diasTotalProm > 0 ? suma / diasTotalProm : 0;
+              criterioBase = "Promedio Ponderado (Último Año)";
+            }
+
+            const diasTrabajados = calcularDias360(fInicio, fDespido);
+            if (diasTrabajados <= 0)
+              throw new Error("Fechas incorrectas: Despido anterior a inicio.");
+
+            let valIndemnizacion = 0;
+            document.getElementById("detalleIndefinido").style.display = "none";
+            document.getElementById("detalleFijo").style.display = "none";
+            document.getElementById("rowPisoObra").style.display = "none";
+            document.getElementById("rowAniosSub").style.display = "none";
+
+            const setText = (id, val) => {
+              const el = document.getElementById(id);
+              if (el) el.textContent = val;
+            };
+
+            if (tipo === "fijo" || tipo === "obra") {
+              if (!fPactada)
+                throw new Error("Ingrese la fecha de vencimiento pactada.");
+              let diasFaltantes = calcularDias360(fDespido, fPactada) - 1;
+              if (diasFaltantes <= 0)
+                throw new Error("El contrato ya estaba vencido.");
+
+              let valor = (salarioBase / 30) * diasFaltantes;
+              if (tipo === "obra") {
+                const piso = (salarioBase / 30) * 15;
+                if (valor < piso) {
+                  valor = piso;
+                  document.getElementById("rowPisoObra").style.display =
+                    "table-row";
+                  setText("valAjusteObra", formatoPeso.format(valor));
+                }
+              }
+              valIndemnizacion = valor;
+              document.getElementById("detalleFijo").style.display = "block";
+              setText("rFechaPactada", fPactada);
+              setText("diasFaltantes", diasFaltantes);
+              setText("valFaltante", formatoPeso.format(valor));
+            } else {
+              document.getElementById("detalleIndefinido").style.display =
+                "block";
+              let diasAnio1 = 0;
+              let valorAnio1 = 0;
+              let diasSub = 0;
+              let valorSub = 0;
+              const esMasDeUnAnio = diasTrabajados > 360;
+
+              if (salarioBase < smlv * 10) {
+                if (!esMasDeUnAnio) {
+                  diasAnio1 = (30 * diasTrabajados) / 360;
+                  valorAnio1 = (salarioBase / 30) * diasAnio1;
+                } else {
+                  diasAnio1 = 30;
+                  valorAnio1 = salarioBase;
+                  const diasRestantes = diasTrabajados - 360;
+                  diasSub = (20 * diasRestantes) / 360;
+                  valorSub = (salarioBase / 30) * diasSub;
+                  document.getElementById("rowAniosSub").style.display =
+                    "table-row";
+                }
+              } else {
+                if (!esMasDeUnAnio) {
+                  diasAnio1 = (20 * diasTrabajados) / 360;
+                  valorAnio1 = (salarioBase / 30) * diasAnio1;
+                } else {
+                  diasAnio1 = 20;
+                  valorAnio1 = (salarioBase / 30) * 20;
+                  const diasRestantes = diasTrabajados - 360;
+                  diasSub = (15 * diasRestantes) / 360;
+                  valorSub = (salarioBase / 30) * diasSub;
+                  document.getElementById("rowAniosSub").style.display =
+                    "table-row";
+                }
+              }
+              valIndemnizacion = valorAnio1 + valorSub;
+              setText("diasAnio1", diasAnio1.toFixed(2));
+              setText("valAnio1", formatoPeso.format(valorAnio1));
+              setText("diasAniosSub", diasSub.toFixed(2));
+              setText("valAniosSub", formatoPeso.format(valorSub));
+            }
+
+            setText(
+              "rTipo",
+              tipo === "obra"
+                ? "Obra o Labor"
+                : tipo === "fijo"
+                ? "Término Fijo"
+                : "Término Indefinido"
+            );
+            setText("rInicio", fInicio);
+            setText("rFin", fDespido);
+            setText("rDiasLaborados", diasTrabajados + " días");
+            setText("rBase", formatoPeso.format(salarioBase));
+            setText("rCriterioBase", criterioBase);
+            setText("totalIndemnizacion", formatoPeso.format(valIndemnizacion));
+
+            const results = document.getElementById("resultsContainer");
+            results.style.display = "block";
+            results.scrollIntoView({ behavior: "smooth" });
+          } catch (e) {
+            alert(e.message);
+          } finally {
+            setTimeout(
+              () =>
+                (btn.innerHTML =
+                  '<i class="fas fa-gavel"></i> Calcular Indemnización'),
+              500
+            );
+          }
+        });
+    </script>
   </body>
 </html>
