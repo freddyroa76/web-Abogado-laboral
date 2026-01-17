@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Servicios Legales y Ley de Insolvencia | Tu Abogado Laboral</title>
+    <meta
+      name="description"
+      content="Especialistas en Derecho Laboral, Pensiones y Ley de Insolvencia en Barranquilla. Detenemos embargos y negociamos deudas. Asesoría integral."
+    />
+    <link rel="icon" type="image/webp" href="img/favicon.webp" />
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      /* --- ESTILOS MEJORADOS SERVICIOS --- */
+      .services-hero {
+        background: linear-gradient(
+            rgba(16, 33, 75, 0.9),
+            rgba(16, 33, 75, 0.75)
+          ),
+          url("img/header-servicios-juridicos.webp");
+        background-size: cover;
+        background-position: center;
+        padding: 120px 0;
+        text-align: center;
+        /* El color base se mantiene, pero se fuerza en los hijos */
+        color: white;
+      }
+      .services-hero h1 {
+        /* CORRECCIÓN: Se fuerza el color blanco para asegurar contraste */
+        color: #ffffff !important;
+        font-family: "Montserrat", sans-serif;
+        font-size: 3rem;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+      }
+      .services-hero p {
+        font-size: 1.2rem;
+        /* CORRECCIÓN: Se asegura el color claro con !important */
+        color: #e0e0e0 !important;
+        max-width: 800px;
+        margin: 0 auto;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+      }
+
+      /* SECCIONES INDIVIDUALES (ANCHORS) */
+      .practice-area {
+        padding: 80px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .area-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+      }
+      .area-icon-box {
+        background: #10214b;
+        color: #d4af37;
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        border-radius: 10px;
+        margin-right: 20px;
+        box-shadow: 0 5px 15px rgba(16, 33, 75, 0.2);
+      }
+      .area-title h2 {
+        font-family: "Montserrat", sans-serif;
+        color: #10214b;
+        font-size: 2rem;
+        margin: 0;
+      }
+      .area-title span {
+        display: block;
+        color: #666;
+        font-size: 1rem;
+        margin-top: 5px;
+      }
+
+      /* GRILLA DE LISTAS */
+      .services-list-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 40px;
+      }
+      .service-column h3 {
+        color: #d4af37;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 10px;
+      }
+      .service-ul {
+        list-style: none;
+        padding: 0;
+      }
+      .service-ul li {
+        position: relative;
+        padding-left: 25px;
+        margin-bottom: 12px;
+        color: #555;
+        line-height: 1.6;
+      }
+      .service-ul li::before {
+        content: "\f00c"; /* Icono Check */
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        color: #10214b;
+        font-size: 0.9rem;
+      }
+
+      /* DESTAQUE INSOLVENCIA */
+      .highlight-service {
+        background: #fff8e1; /* Fondo dorado suave */
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #d4af37;
+      }
+      .highlight-service h3 {
+        color: #10214b;
+        border-bottom-color: #d4af37;
+      }
+
+      /* CTA BOX INTERNO */
+      .inner-cta {
+        margin-top: 40px;
+        background: #f4f8fb;
+        padding: 20px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .inner-cta p {
+        margin: 0;
+        color: #10214b;
+        font-weight: bold;
+      }
+      .btn-small {
+        background: #10214b;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+      .btn-small:hover {
+        background: #d4af37;
+        color: #10214b;
+      }
+
+      @media (max-width: 768px) {
+        .inner-cta {
+          flex-direction: column;
+          text-align: center;
+          gap: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="container">
+        <div class="info">
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+        </div>
+      </div>
+    </div>
+    <header>
+      <div class="container header-container">
+        <div class="logo">
+          <a href="index.html"
+            ><img src="img/logo-principal.webp" alt="Logo" class="logo-img"
+          /></a>
+        </div>
+        <nav>
+          <ul class="nav-menu">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="nosotros.html">Sobre Nosotros</a></li>
+            <li>
+              <a href="servicios.html" class="active">Áreas de Práctica</a>
+            </li>
+            <li><a href="blog.html">Herramientas</a></li>
+            <li><a href="contacto.html" class="btn-nav">Agendar Cita</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section class="services-hero">
+      <div class="container">
+        <h1>Portafolio de Servicios Jurídicos</h1>
+        <p>
+          Una visión integral del Derecho: Laboral, Pensional y Ley de
+          Insolvencia. Recuperamos su tranquilidad financiera y jurídica.
+        </p>
+      </div>
+    </section>
+
+    <section id="laboral" class="practice-area">
+      <div class="container">
+        <div class="area-header">
+          <div class="area-icon-box"><i class="fas fa-gavel"></i></div>
+          <div class="area-title">
+            <h2>Derecho Laboral Individual</h2>
+            <span
+              >Defensa de derechos y equilibrio en las relaciones de
+              trabajo.</span
+            >
+          </div>
+        </div>
+        <div class="services-list-grid">
+          <div class="service-column">
+            <h3>Terminación de Contratos</h3>
+            <ul class="service-ul">
+              <li>Demandas por despido injustificado (Indemnizaciones).</li>
+              <li>Reintegros por Fuero de Salud, Maternidad o Sindical.</li>
+              <li>Liquidación de acreencias laborales y moratorias.</li>
+              <li>Gestión de despidos por Justa Causa (Asesoría Empleador).</li>
+            </ul>
+          </div>
+          <div class="service-column">
+            <h3>Relaciones Laborales</h3>
+            <ul class="service-ul">
+              <li>Declaratoria de Contrato Realidad (OPS vs Laboral).</li>
+              <li>Procesos de Acoso Laboral y Comités de Convivencia.</li>
+              <li>Negociación de acuerdos transaccionales y conciliaciones.</li>
+              <li>Reclamación de horas extras y recargos no pagados.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="inner-cta">
+          <p>¿Necesitas calcular liquidaciones, nóminas o intereses?</p>
+          <a href="blog.html" class="btn-small">Ver Herramientas Gratuitas</a>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="seguridad-social"
+      class="practice-area"
+      style="background-color: #fcfcfc"
+    >
+      <div class="container">
+        <div class="area-header">
+          <div class="area-icon-box"><i class="fas fa-shield-alt"></i></div>
+          <div class="area-title">
+            <h2>Seguridad Social Integral</h2>
+            <span>Protección ante Colpensiones, Fondos Privados y ARL.</span>
+          </div>
+        </div>
+        <div class="services-list-grid">
+          <div class="service-column">
+            <h3>Pensiones</h3>
+            <ul class="service-ul">
+              <li>Nulidad de Traslado de Régimen (Retorno a Colpensiones).</li>
+              <li>
+                Reconocimiento de Pensión de Vejez, Invalidez y Sobrevivientes.
+              </li>
+              <li>Reliquidación Pensional (Corrección de IBL y semanas).</li>
+              <li>
+                Recurso de apelación ante dictámenes de Juntas de Calificación.
+              </li>
+            </ul>
+          </div>
+          <div class="service-column">
+            <h3>Riesgos y Salud</h3>
+            <ul class="service-ul">
+              <li>Demandas por culpa patronal en Accidentes de Trabajo.</li>
+              <li>Reclamación de pago de incapacidades (EPS/ARL).</li>
+              <li>Corrección de Historia Laboral unificada.</li>
+              <li>Asesoría en cálculo actuarial por omisión de aportes.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="corporativo" class="practice-area">
+      <div class="container">
+        <div class="area-header">
+          <div class="area-icon-box"><i class="fas fa-building"></i></div>
+          <div class="area-title">
+            <h2>Derecho Corporativo Laboral</h2>
+            <span>Blindaje jurídico preventivo y gestión empresarial.</span>
+          </div>
+        </div>
+        <div class="services-list-grid">
+          <div class="service-column">
+            <h3>Consultoría Preventiva</h3>
+            <ul class="service-ul">
+              <li>Diseño de Contratos de Trabajo a la medida y Cláusulas.</li>
+              <li>Elaboración de Reglamento Interno de Trabajo (RIT).</li>
+              <li>Esquemas de remuneración flexible y salarización.</li>
+              <li>Auditoría de cumplimiento normativo (Due Diligence).</li>
+            </ul>
+          </div>
+          <div class="service-column">
+            <h3>Reorganización Empresarial</h3>
+            <ul class="service-ul">
+              <li>
+                <strong>Ley de Insolvencia Empresarial (Ley 1116):</strong>
+                Protección del patrimonio y negociación de pasivos.
+              </li>
+              <li>Acuerdos de Reorganización para salvar la empresa.</li>
+              <li>Defensa ante procesos de cobro coactivo (UGPP).</li>
+              <li>Planes de retiro voluntario y reestructuración.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="litigio"
+      class="practice-area"
+      style="background-color: #fcfcfc"
+    >
+      <div class="container">
+        <div class="area-header">
+          <div class="area-icon-box"><i class="fas fa-balance-scale"></i></div>
+          <div class="area-title">
+            <h2>Litigio y Resolución de Deudas</h2>
+            <span
+              >Defensa judicial y mecanismos de segunda oportunidad
+              financiera.</span
+            >
+          </div>
+        </div>
+        <div class="services-list-grid">
+          <div class="service-column">
+            <h3>Representación Judicial</h3>
+            <ul class="service-ul">
+              <li>Defensa en Juicios Laborales (Demandante o Demandado).</li>
+              <li>Actuación ante Tribunales Superiores (Segunda Instancia).</li>
+              <li>Acciones de Tutela para protección de derechos.</li>
+            </ul>
+          </div>
+          <div class="service-column highlight-service">
+            <h3>
+              <i class="fas fa-life-ring"></i> Ley de Insolvencia (Persona
+              Natural)
+            </h3>
+            <p style="font-size: 0.9rem; margin-bottom: 15px">
+              ¿Deudas impagables? Acójase a la
+              <strong>Ley 1564 de 2012</strong>.
+            </p>
+            <ul class="service-ul">
+              <li>Suspensión inmediata de embargos de salario y bienes.</li>
+              <li>Negociación de todas sus deudas en una sola audiencia.</li>
+              <li>Protección del patrimonio familiar.</li>
+              <li>Borrón y cuenta nueva (Segunda oportunidad financiera).</li>
+            </ul>
+          </div>
+        </div>
+        <div class="inner-cta">
+          <p>
+            ¿Tiene embargos activos o deudas en mora? Evaluamos su insolvencia
+            hoy.
+          </p>
+          <a href="contacto.html" class="btn-small"
+            >Solicitar Evaluación Financiera</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-col">
+            <div class="footer-logo">Tu Abogado <span>Laboral</span></div>
+            <p style="color: #ccc; margin-bottom: 20px; font-size: 0.9rem">
+              Defensa experta y estratégica en Derecho Laboral y Pensional.
+              Barranquilla, Colombia.
+            </p>
+            <div class="social-icons-footer">
+              <a
+                href="https://web.facebook.com/profile.php?id=100064878228146"
+                target="_blank"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a
+                href="https://www.instagram.com/tuabogadolaboralbq/"
+                target="_blank"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a
+                href="https://www.linkedin.com/in/dra-johana-manga-padilla-5745b542/"
+                target="_blank"
+                ><i class="fab fa-linkedin-in"></i
+              ></a>
+            </div>
+          </div>
+
+          <div class="footer-col links-col">
+            <h4>Enlaces Rápidos</h4>
+            <ul>
+              <li><a href="index.html">Inicio</a></li>
+              <li><a href="nosotros.html">Sobre Nosotros</a></li>
+              <li><a href="servicios.html">Áreas de Práctica</a></li>
+              <li><a href="blog.html">Herramientas</a></li>
+              <li><a href="contacto.html">Agendar Cita</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Contacto</h4>
+            <ul class="contact-list">
+              <li>
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Edificio Las Flores, Barranquilla</span>
+              </li>
+              <li>
+                <i class="fas fa-phone-alt"></i>
+                <span>+57 321 792 7495</span>
+              </li>
+              <li>
+                <i class="fas fa-envelope"></i>
+                <span>tuabogadolaboral@outlook.com</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div
+          class="container"
+          style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          "
+        >
+          <p style="margin: 0">
+            &copy; 2026 Tu Abogado Laboral - Todos los derechos reservados.
+          </p>
+          <a
+            href="politica-privacidad.html"
+            style="
+              color: #ccc;
+              text-decoration: none;
+              font-size: 0.85rem;
+              margin-top: 5px;
+            "
+            >Política de Privacidad</a
+          >
+        </div>
+      </div>
+    </footer>
+    <a href="https://wa.me/573217927495" class="whatsapp-btn" target="_blank"
+      ><i class="fab fa-whatsapp"></i
+    ></a>
+  </body>
+</html>
