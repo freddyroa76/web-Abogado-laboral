@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -21,156 +21,157 @@
     />
 
     <style>
-            /* --- ESTILOS MEJORADOS SERVICIOS --- */
-            .services-hero {
-              background: linear-gradient(
-                  rgba(16, 33, 75, 0.9),
-                  rgba(16, 33, 75, 0.75)
-                ),
-                url("img/header-servicios-juridicos.webp");
-              background-size: cover;
-              background-position: center;
-              padding: 120px 0;
-              text-align: center;
-              color: white;
-              border-bottom: 5px solid #d4af37;
+      /* --- ESTILOS MEJORADOS SERVICIOS --- */
+      .services-hero {
+        background:
+          linear-gradient(rgba(16, 33, 75, 0.9), rgba(16, 33, 75, 0.75)),
+          url("img/header-servicios-juridicos.webp");
+        background-size: cover;
+        background-position: center;
+        padding: 140px 0 100px;
+        text-align: center;
+        color: white;
       }
-            }
-            .services-hero h1 {
-              /* CORRECCIÓN: Se fuerza el color blanco para asegurar contraste */
-              color: #ffffff !important;
-              font-family: "Montserrat", sans-serif;
-              font-size: 3rem;
-              margin-bottom: 15px;
-              text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
-            }
-            .services-hero p {
-              font-size: 1.2rem;
-              /* CORRECCIÓN: Se asegura el color claro con !important */
-              color: #e0e0e0 !important;
-              max-width: 800px;
-              margin: 0 auto;
-              text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
-            }
 
-            /* SECCIONES INDIVIDUALES (ANCHORS) */
-            .practice-area {
-              padding: 80px 0;
-              border-bottom: 1px solid #eee;
-            }
-            .area-header {
-              display: flex;
-              align-items: center;
-              margin-bottom: 40px;
-              flex-wrap: wrap;
-            }
-            .area-icon-box {
-              background: #10214b;
-              color: #d4af37;
-              width: 70px;
-              height: 70px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 2rem;
-              border-radius: 10px;
-              margin-right: 20px;
-              box-shadow: 0 5px 15px rgba(16, 33, 75, 0.2);
-            }
-            .area-title h2 {
-              font-family: "Montserrat", sans-serif;
-              color: #10214b;
-              font-size: 2rem;
-              margin: 0;
-            }
-            .area-title span {
-              display: block;
-              color: #666;
-              font-size: 1rem;
-              margin-top: 5px;
-            }
+      .services-hero h1 {
+        font-family: "Montserrat", sans-serif;
+        font-size: 3rem;
+        margin-bottom: 20px;
+        /* CORRECCIÓN: Color blanco forzado y sombra fuerte */
+        color: #ffffff !important;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+        line-height: 1.2;
+        text-transform: none; /* Evita que se fuerce a minúsculas */
+      }
 
-            /* GRILLA DE LISTAS */
-            .services-list-grid {
-              display: grid;
-              grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-              gap: 40px;
-            }
-            .service-column h3 {
-              color: #d4af37;
-              font-size: 1.2rem;
-              margin-bottom: 20px;
-              border-bottom: 2px solid #f0f0f0;
-              padding-bottom: 10px;
-            }
-            .service-ul {
-              list-style: none;
-              padding: 0;
-            }
-            .service-ul li {
-              position: relative;
-              padding-left: 25px;
-              margin-bottom: 12px;
-              color: #555;
-              line-height: 1.6;
-            }
-            .service-ul li::before {
-              content: "\f00c"; /* Icono Check */
-              font-family: "Font Awesome 5 Free";
-              font-weight: 900;
-              position: absolute;
-              left: 0;
-              color: #10214b;
-              font-size: 0.9rem;
-            }
+      .services-hero p {
+        font-size: 1.2rem;
+        /* CORRECCIÓN: Color blanco forzado para el párrafo también */
+        color: #f0f0f0 !important;
+        max-width: 800px;
+        margin: 0 auto;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+        font-weight: 400;
+      }
 
-            /* DESTAQUE INSOLVENCIA */
-            .highlight-service {
-              background: #fff8e1; /* Fondo dorado suave */
-              padding: 20px;
-              border-radius: 8px;
-              border-left: 4px solid #d4af37;
-            }
-            .highlight-service h3 {
-              color: #10214b;
-              border-bottom-color: #d4af37;
-            }
+      /* SECCIONES INDIVIDUALES (ANCHORS) */
+      .practice-area {
+        padding: 80px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .area-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+      }
+      .area-icon-box {
+        background: #10214b;
+        color: #d4af37;
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        border-radius: 10px;
+        margin-right: 20px;
+        box-shadow: 0 5px 15px rgba(16, 33, 75, 0.2);
+      }
+      .area-title h2 {
+        font-family: "Montserrat", sans-serif;
+        color: #10214b;
+        font-size: 2rem;
+        margin: 0;
+      }
+      .area-title span {
+        display: block;
+        color: #666;
+        font-size: 1rem;
+        margin-top: 5px;
+      }
 
-            /* CTA BOX INTERNO */
-            .inner-cta {
-              margin-top: 40px;
-              background: #f4f8fb;
-              padding: 20px;
-              border-radius: 8px;
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-            }
-            .inner-cta p {
-              margin: 0;
-              color: #10214b;
-              font-weight: bold;
-            }
-            .btn-small {
-              background: #10214b;
-              color: white;
-              padding: 8px 20px;
-              border-radius: 5px;
-              text-decoration: none;
-              font-size: 0.9rem;
-            }
-            .btn-small:hover {
-              background: #d4af37;
-              color: #10214b;
-            }
+      /* GRILLA DE LISTAS */
+      .services-list-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 40px;
+      }
+      .service-column h3 {
+        color: #d4af37;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 10px;
+      }
+      .service-ul {
+        list-style: none;
+        padding: 0;
+      }
+      .service-ul li {
+        position: relative;
+        padding-left: 25px;
+        margin-bottom: 12px;
+        color: #555;
+        line-height: 1.6;
+      }
+      .service-ul li::before {
+        content: "\f00c"; /* Icono Check */
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        color: #10214b;
+        font-size: 0.9rem;
+      }
 
-            @media (max-width: 768px) {
-              .inner-cta {
-                flex-direction: column;
-                text-align: center;
-                gap: 15px;
-              }
-            }
+      /* DESTAQUE INSOLVENCIA */
+      .highlight-service {
+        background: #fff8e1; /* Fondo dorado suave */
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #d4af37;
+      }
+      .highlight-service h3 {
+        color: #10214b;
+        border-bottom-color: #d4af37;
+      }
+
+      /* CTA BOX INTERNO */
+      .inner-cta {
+        margin-top: 40px;
+        background: #f4f8fb;
+        padding: 20px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .inner-cta p {
+        margin: 0;
+        color: #10214b;
+        font-weight: bold;
+      }
+      .btn-small {
+        background: #10214b;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+      .btn-small:hover {
+        background: #d4af37;
+        color: #10214b;
+      }
+
+      @media (max-width: 768px) {
+        .inner-cta {
+          flex-direction: column;
+          text-align: center;
+          gap: 15px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -188,9 +189,6 @@
             ><img src="img/logo-principal.webp" alt="Logo" class="logo-img"
           /></a>
         </div>
-        <div class="menu-toggle" id="mobile-menu">
-          <i class="fas fa-bars"></i>
-        </div>
         <nav>
           <ul class="nav-menu">
             <li><a href="index.html">Inicio</a></li>
@@ -205,7 +203,7 @@
 
     <section class="services-hero">
       <div class="container">
-        <h1>Portafolio de Servicios Jurídicos</h1>
+        <h1>PORTAFOLIO DE SERVICIOS JURÍDICOS</h1>
         <p>
           Una visión integral del Derecho: Laboral, Pensional y Ley de
           Insolvencia. Recuperamos su tranquilidad financiera y jurídica.
@@ -425,15 +423,11 @@
             <ul class="contact-list">
               <li>
                 <i class="fas fa-map-marker-alt"></i>
-                <span>Edificio Las Flores, Barranquilla</span>
+                <span>Edificio Las Flores, Calle 39 #43-123, Barranquilla</span>
               </li>
               <li>
                 <i class="fas fa-phone-alt"></i>
                 <span>+57 321 792 7495</span>
-              </li>
-              <li>
-                <i class="fas fa-envelope"></i>
-                <span>tuabogadolaboral@outlook.com</span>
               </li>
             </ul>
           </div>
