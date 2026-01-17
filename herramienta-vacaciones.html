@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Calculadora de Cesantías e Intereses | Tu Abogado Laboral</title>
+    <title>Calculadora de Vacaciones | Tu Abogado Laboral</title>
+    <link rel="icon" href="img/favicon.webp" type="image/webp" />
     <link rel="stylesheet" href="css/style.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
@@ -14,14 +15,12 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <style>
-      /* ESTILOS DE LA CALCULADORA */
+      /* REUTILIZANDO TUS ESTILOS EXISTENTES */
       .calc-wrapper {
         max-width: 900px;
         margin: 0 auto;
         padding: 20px;
       }
-
-      /* TARJETA DEL FORMULARIO */
       .calc-card {
         background: white;
         padding: 40px;
@@ -30,13 +29,11 @@
         border: 1px solid #eee;
         margin-bottom: 30px;
       }
-
       .calc-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 25px;
       }
-
       @media (max-width: 768px) {
         .calc-grid {
           grid-template-columns: 1fr;
@@ -53,7 +50,6 @@
         margin-bottom: 8px;
         font-size: 0.95rem;
       }
-
       .form-group small {
         display: block;
         color: #888;
@@ -66,42 +62,37 @@
         display: flex;
         align-items: center;
       }
-
       .input-icon {
         position: absolute;
         left: 15px;
         color: #10214b;
       }
-
       .form-control {
         width: 100%;
-        padding: 12px 15px 12px 40px; /* Espacio para icono */
+        padding: 12px 15px 12px 40px;
         border: 1px solid #ddd;
         border-radius: 8px;
         font-size: 1rem;
         transition: border-color 0.3s;
         background: #f9f9f9;
       }
-
       .form-control:focus {
         border-color: #10214b;
         background: #fff;
         outline: none;
       }
 
-      /* Checkbox Auxilio */
+      /* Checkbox Wrapper (Estilo Consistente) */
       .checkbox-wrapper {
         background: #f8f9fa;
         padding: 15px;
         border-radius: 8px;
         border: 1px solid #eee;
       }
-
       .checkbox-header {
         display: flex;
         align-items: center;
         gap: 10px;
-        margin-bottom: 10px;
       }
 
       .btn-calculate {
@@ -119,16 +110,15 @@
         text-transform: uppercase;
         letter-spacing: 1px;
       }
-
       .btn-calculate:hover {
-        background-color: #25d366; /* Verde Acción */
+        background-color: #25d366;
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
       }
 
       /* RESULTADOS */
       .result-container {
-        display: none; /* Oculto por defecto */
+        display: none;
         background: #fff;
         border-radius: 12px;
         overflow: hidden;
@@ -136,7 +126,6 @@
         border: 1px solid #eee;
         animation: slideDown 0.5s ease;
       }
-
       @keyframes slideDown {
         from {
           opacity: 0;
@@ -156,7 +145,6 @@
         justify-content: space-between;
         align-items: center;
       }
-
       .result-body {
         padding: 30px;
         display: grid;
@@ -164,7 +152,6 @@
         gap: 30px;
         border-bottom: 1px solid #eee;
       }
-
       @media (max-width: 600px) {
         .result-body {
           grid-template-columns: 1fr;
@@ -192,7 +179,6 @@
         justify-content: space-between;
         align-items: center;
       }
-
       .total-label {
         font-size: 1.2rem;
         color: #10214b;
@@ -253,16 +239,17 @@
       <div class="container">
         <div class="text-center mb-5">
           <h1 style="color: #10214b; font-size: 2.2rem">
-            Calculadora de Cesantías e Intereses
+            Calculadora de Vacaciones
           </h1>
           <p style="color: #666; max-width: 600px; margin: 0 auto">
-            Cálculo ajustado a la Ley 50 de 1990.
+            Calcule el valor de su descanso remunerado según la normativa
+            colombiana (CST).
           </p>
         </div>
 
         <div class="calc-wrapper">
           <div class="calc-card">
-            <form id="cesantiasForm">
+            <form id="vacacionesForm">
               <div class="calc-grid">
                 <div>
                   <div class="form-group">
@@ -282,7 +269,10 @@
 
                   <div class="form-group" style="margin-top: 20px">
                     <label>Otros Ingresos Mensuales</label>
-                    <small>Promedio de comisiones, horas extras, etc.</small>
+                    <small
+                      >Promedio de comisiones, recargos (Sin Aux.
+                      Transporte)</small
+                    >
                     <div class="input-group">
                       <i class="fas fa-coins input-icon"></i>
                       <input
@@ -299,7 +289,7 @@
                 <div>
                   <div class="form-group">
                     <label>Periodo de Cálculo</label>
-                    <small>Fechas de inicio y fin para liquidar</small>
+                    <small>Fechas para determinar tiempo trabajado</small>
                     <div style="display: flex; gap: 10px">
                       <input
                         type="date"
@@ -319,44 +309,37 @@
                   </div>
 
                   <div class="form-group" style="margin-top: 20px">
-                    <label>Auxilio de Transporte</label>
-                    <div class="checkbox-wrapper">
+                    <label>Días de Vacaciones a Pagar</label>
+                    <div class="input-group">
+                      <i class="fas fa-calendar-day input-icon"></i>
+                      <input
+                        type="number"
+                        id="diasVacaciones"
+                        class="form-control"
+                        placeholder="Ej: 15"
+                        disabled
+                        style="background-color: #e9ecef"
+                      />
+                    </div>
+
+                    <div
+                      class="checkbox-wrapper"
+                      style="margin-top: 10px; padding: 10px"
+                    >
                       <div class="checkbox-header">
                         <input
                           type="checkbox"
-                          id="checkAuxilio"
+                          id="checkAutomatico"
+                          checked
                           style="
-                            width: 20px;
-                            height: 20px;
+                            width: 18px;
+                            height: 18px;
                             accent-color: #10214b;
                           "
                         />
-                        <span
-                          style="
-                            font-size: 0.95rem;
-                            font-weight: bold;
-                            color: #333;
-                          "
-                          >Incluir Auxilio de Transporte</span
-                        >
-                      </div>
-
-                      <div
-                        id="boxValorAuxilio"
-                        style="display: none; margin-top: 10px"
-                      >
-                        <small
-                          >Ingrese el valor del Auxilio del año a
-                          liquidar:</small
-                        >
-                        <div class="input-group">
-                          <i class="fas fa-bus input-icon"></i>
-                          <input
-                            type="number"
-                            id="valorAuxilioInput"
-                            class="form-control"
-                          />
-                        </div>
+                        <span style="font-size: 0.85rem; color: #333">
+                          Calcular automáticamente (15 días por año)
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -364,7 +347,7 @@
               </div>
 
               <button type="submit" class="btn-calculate">
-                <i class="fas fa-calculator"></i> Calcular Liquidación
+                <i class="fas fa-calculator"></i> Calcular Vacaciones
               </button>
             </form>
           </div>
@@ -373,7 +356,7 @@
             <div class="result-header">
               <div>
                 <h3 style="margin: 0; font-size: 1.2rem">
-                  Resumen de Liquidación
+                  Resultado de la Liquidación
                 </h3>
                 <small id="periodoTexto" style="opacity: 0.8"
                   >Periodo: -- a --</small
@@ -381,7 +364,7 @@
               </div>
               <div style="text-align: right">
                 <i
-                  class="fas fa-file-invoice-dollar"
+                  class="fas fa-umbrella-beach"
                   style="font-size: 2rem; opacity: 0.5"
                 ></i>
               </div>
@@ -401,16 +384,14 @@
                 </h4>
 
                 <div class="result-item" style="margin-bottom: 15px">
-                  <label>Salario Base + Otros</label>
-                  <span id="resSalario">$0</span>
-                </div>
-                <div class="result-item" style="margin-bottom: 15px">
-                  <label>Auxilio Transporte</label>
-                  <span id="resAuxilio">$0</span>
+                  <label>Base Salarial (Sin Aux. Transporte)</label>
+                  <span id="resBase">$0</span>
                 </div>
                 <div class="result-item">
-                  <label>Días Liquidados (Base 360)</label>
-                  <span id="resDias" style="color: #10214b">0 días</span>
+                  <label>Días Trabajados en el Periodo</label>
+                  <span id="resDiasTrabajados" style="color: #10214b"
+                    >0 días</span
+                  >
                 </div>
               </div>
 
@@ -423,31 +404,34 @@
                     margin-bottom: 15px;
                   "
                 >
-                  Prestaciones
+                  Liquidación
                 </h4>
 
                 <div class="result-item" style="margin-bottom: 15px">
-                  <label>Cesantías</label>
-                  <span id="valCesantias" style="color: #10214b">$0</span>
+                  <label>Días de Vacaciones Calculados</label>
+                  <span id="resDiasVacaciones" style="font-weight: bold"
+                    >0</span
+                  >
                 </div>
-                <div class="result-item">
-                  <label>Intereses de Cesantías (12%)</label>
-                  <span id="valIntereses" style="color: #10214b">$0</span>
-                </div>
+
+                <p style="font-size: 0.8rem; color: #888; line-height: 1.3">
+                  Fórmula: (Base ÷ 30) × Días de Vacaciones
+                </p>
               </div>
             </div>
 
             <div class="result-total">
-              <span class="total-label">Total a Recibir:</span>
+              <span class="total-label">Total a Pagar:</span>
               <span id="valTotal" class="total-value">$0</span>
             </div>
 
             <a
-              href="https://wa.me/573217927495?text=Hola%20Tu%20Abogado%20Laboral,%20hice%20el%20cálculo%20de%20mis%20cesantías%20y%20tengo%20dudas%20sobre%20el%20pago."
+              href="https://wa.me/573217927495?text=Hola%20Tu%20Abogado%20Laboral,%20tengo%20dudas%20con%20el%20pago%20de%20mis%20vacaciones."
               target="_blank"
               class="cta-whatsapp"
             >
-              <i class="fab fa-whatsapp"></i> Contactar a Tu Abogado Laboral
+              <i class="fab fa-whatsapp"></i> ¿Dudas con el pago? Contactar
+              Abogado
             </a>
           </div>
 
@@ -459,9 +443,8 @@
               margin-top: 20px;
             "
           >
-            * Esta herramienta realiza una estimación basada en los datos
-            ingresados. No reemplaza una liquidación oficial ni constituye
-            asesoría legal formal.
+            * Nota: Las vacaciones no incluyen Auxilio de Transporte en su base
+            de liquidación (Art. 192 CST).
           </p>
         </div>
       </div>
@@ -563,32 +546,34 @@
     </footer>
 
     <script>
-      // CONTROL DE VISIBILIDAD DEL INPUT AUXILIO
-      const checkAuxilio = document.getElementById("checkAuxilio");
-      const boxValorAuxilio = document.getElementById("boxValorAuxilio");
+      // CONFIGURACIÓN DE ELEMENTOS
+      const checkAutomatico = document.getElementById("checkAutomatico");
+      const inputDiasVacaciones = document.getElementById("diasVacaciones");
 
-      checkAuxilio.addEventListener("change", function () {
+      // Lógica Checkbox Automático
+      checkAutomatico.addEventListener("change", function () {
         if (this.checked) {
-          boxValorAuxilio.style.display = "block";
+          inputDiasVacaciones.disabled = true;
+          inputDiasVacaciones.style.backgroundColor = "#e9ecef";
+          inputDiasVacaciones.value = ""; // Se limpia para mostrar que es automático
         } else {
-          boxValorAuxilio.style.display = "none";
-          document.getElementById("valorAuxilioInput").value = ""; // Limpiar si se desmarca
+          inputDiasVacaciones.disabled = false;
+          inputDiasVacaciones.style.backgroundColor = "#fff";
+          inputDiasVacaciones.focus();
         }
       });
 
-      // Función para formato moneda
       const formatoPeso = new Intl.NumberFormat("es-CO", {
         style: "currency",
         currency: "COP",
         minimumFractionDigits: 0,
       });
 
-      // CALCULAR DÍAS (Lógica 360 - Contable Laboral Colombiana)
+      // CALCULAR DÍAS (Lógica 360)
       function calcularDias360(fechaInicio, fechaFin) {
         let inicio = new Date(fechaInicio);
         let fin = new Date(fechaFin);
 
-        // Ajuste Zona Horaria
         inicio.setMinutes(inicio.getMinutes() + inicio.getTimezoneOffset());
         fin.setMinutes(fin.getMinutes() + fin.getTimezoneOffset());
 
@@ -602,23 +587,20 @@
         let month2 = fin.getMonth() + 1;
         let year2 = fin.getFullYear();
 
-        // Ajuste 360: Si el día es 31, se cuenta como 30
         if (day1 === 31) day1 = 30;
         if (day2 === 31) day2 = 30;
 
-        let dias =
-          (year2 - year1) * 360 + (month2 - month1) * 30 + (day2 - day1) + 1; // +1 inclusivo
-
-        return dias;
+        return (
+          (year2 - year1) * 360 + (month2 - month1) * 30 + (day2 - day1) + 1
+        );
       }
 
-      // CALCULAR TODO AL ENVIAR
+      // SUBMIT EVENT
       document
-        .getElementById("cesantiasForm")
+        .getElementById("vacacionesForm")
         .addEventListener("submit", function (e) {
-          e.preventDefault(); // DETIENE EL REFRESCO DE LA PÁGINA
+          e.preventDefault();
 
-          // 1. OBTENER VALORES
           let salario =
             parseFloat(document.getElementById("salario").value) || 0;
           let otros =
@@ -626,52 +608,46 @@
           let fechaInicio = document.getElementById("fechaInicio").value;
           let fechaFin = document.getElementById("fechaFin").value;
 
-          // Lógica del Auxilio Manual
-          let incluyeAuxilio = checkAuxilio.checked;
-          let valorAuxilioDigitado = 0;
-
-          if (incluyeAuxilio) {
-            // Si el usuario marcó el check, tomamos el valor que escribió. Si lo dejó vacío, es 0.
-            valorAuxilioDigitado =
-              parseFloat(document.getElementById("valorAuxilioInput").value) ||
-              0;
-          }
-
-          // Validaciones
           if (!fechaInicio || !fechaFin) {
             alert("Por favor ingrese las fechas.");
             return;
           }
 
-          // 2. CÁLCULOS
+          // 1. Calcular tiempo trabajado
           let diasTrabajados = calcularDias360(fechaInicio, fechaFin);
 
-          // Base = Salario + Otros + Auxilio (si el usuario lo indicó)
-          let baseLiquidacion = salario + otros + valorAuxilioDigitado;
+          // 2. Definir Días de Vacaciones a pagar
+          let diasVacacionesAPagar = 0;
 
-          // Ecuaciones de Ley
-          let cesantias = (baseLiquidacion * diasTrabajados) / 360;
-          let intereses = (cesantias * diasTrabajados * 0.12) / 360;
-          let total = cesantias + intereses;
+          if (checkAutomatico.checked) {
+            // Regla: 15 días por cada 360 trabajados
+            diasVacacionesAPagar = (diasTrabajados * 15) / 360;
+          } else {
+            // Valor manual del usuario
+            diasVacacionesAPagar = parseFloat(inputDiasVacaciones.value) || 0;
+          }
 
-          // 3. MOSTRAR RESULTADOS
-          document.getElementById("resSalario").textContent =
-            formatoPeso.format(salario + otros);
-          document.getElementById("resAuxilio").textContent =
-            formatoPeso.format(valorAuxilioDigitado);
-          document.getElementById("resDias").textContent =
+          // 3. Definir Base (Salario + Otros, SIN Aux Transporte)
+          let baseLiquidacion = salario + otros;
+
+          // 4. Fórmula Matemática: (Base / 30) * DíasVacaciones
+          // Esta es equivalente a (Base * DiasTrabajados) / 720 si es automático
+          let totalVacaciones = (baseLiquidacion / 30) * diasVacacionesAPagar;
+
+          // MOSTRAR RESULTADOS
+          document.getElementById("resBase").textContent =
+            formatoPeso.format(baseLiquidacion);
+          document.getElementById("resDiasTrabajados").textContent =
             diasTrabajados + " días";
+          document.getElementById("resDiasVacaciones").textContent =
+            diasVacacionesAPagar.toFixed(2) + " días";
           document.getElementById("periodoTexto").textContent =
             "Periodo: " + fechaInicio + " a " + fechaFin;
 
-          document.getElementById("valCesantias").textContent =
-            formatoPeso.format(cesantias);
-          document.getElementById("valIntereses").textContent =
-            formatoPeso.format(intereses);
           document.getElementById("valTotal").textContent =
-            formatoPeso.format(total);
+            formatoPeso.format(totalVacaciones);
 
-          // 4. MOSTRAR TARJETA (ANIMACIÓN)
+          // Animación
           let resultCard = document.getElementById("resultCard");
           resultCard.style.display = "block";
           resultCard.scrollIntoView({ behavior: "smooth" });
