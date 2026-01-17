@@ -112,6 +112,13 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 15px 20px;
+  background: white;
+  position: relative;
+}
+
+.menu-toggle {
+  display: none; /* En computadora, el botón no se ve */
 }
 
 .logo-img {
@@ -571,31 +578,72 @@ footer {
    RESPONSIVE
    ========================================= */
 @media (max-width: 768px) {
+  /* 1. Encabezado: Mantener logo y botón en línea */
   .header-container {
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 20px;
   }
+
+  /* 2. Botón Hamburguesa: Hacerlo visible */
+  .menu-toggle {
+    display: block; /* Visible solo en móvil */
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: var(--primary);
+    z-index: 1001;
+  }
+
+  /* 3. Menú Cajón (Drawer): Oculto a la derecha */
   .nav-menu {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
+    position: fixed;
+    top: 0;
+    right: -100%; /* Escondido a la derecha */
+    width: 80%;
+    height: 100vh;
+    background: var(--white);
+    flex-direction: column; /* Lista vertical */
+    justify-content: flex-start;
+    align-items: flex-start; /* Alineado a la izquierda */
+    padding-top: 80px;
+    padding-left: 30px;
+    transition: right 0.4s ease; /* Animación suave */
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
   }
+
+  /* 4. Clase para abrir el menú (JS la activa) */
+  .nav-menu.active {
+    right: 0; /* Trae el menú a la pantalla */
+  }
+
+  /* 5. Ajustes de los enlaces */
   .nav-menu li {
-    margin: 5px 10px;
+    margin: 15px 0;
+    width: 100%;
   }
+  .nav-menu li a {
+    display: block;
+    font-size: 1.1rem;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  /* Ajustes visuales extra para móvil */
   .hero h1 {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
+  }
+  .top-bar {
+    display: none;
   }
   .galeria-acordeon {
     flex-direction: column;
     height: auto;
   }
   .panel-servicio {
-    height: 300px;
-    flex: none;
+    height: 200px;
+    width: 100%;
     border-bottom: 1px solid white;
-  }
-  .panel-servicio:hover {
-    flex: none;
   }
   .contenido-oculto {
     opacity: 1;
@@ -605,10 +653,8 @@ footer {
   .footer-grid {
     grid-template-columns: 1fr;
   }
-  .top-bar {
-    display: none;
-  }
 }
+
 /* =========================================
    MEJORAS SEO Y ACCESIBILIDAD (PASO 2D)
    ========================================= */
@@ -807,5 +853,51 @@ textarea:focus {
   }
   .article-header h1 {
     font-size: 2rem;
+  }
+}
+/* ================
+   ESTILOS CONTACTO
+   ================*/
+
+/* Asegurar que los inputs con icono funcionen bien */
+.input-with-icon input:focus,
+.input-with-icon select:focus,
+textarea:focus {
+  outline: none !important;
+  border-color: var(--dorado) !important;
+  background-color: white !important;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1) !important;
+}
+
+/* Responsive para la cuadrícula de contacto */
+@media (max-width: 992px) {
+  .contact-grid-layout {
+    grid-template-columns: 1fr !important; /* Pila vertical en tablets y móviles */
+    gap: 40px !important;
+  }
+  .info-column-left {
+    order: 2; /* Formulario primero en móvil (opcional, puedes quitarlo) */
+  }
+  .form-column-right {
+    order: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-row-dbl {
+    grid-template-columns: 1fr !important; /* Inputs a una columna en móviles */
+    gap: 0 !important;
+  }
+  .form-row-dbl .form-group {
+    margin-bottom: 20px;
+  }
+  .hero-interno {
+    padding: 100px 0 80px !important;
+  }
+  .hero-interno h1 {
+    font-size: 2.2rem !important;
+  }
+  .form-column-right {
+    padding: 25px !important;
   }
 }
