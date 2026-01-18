@@ -25,11 +25,23 @@
         --secondary: #d4af37; /* Dorado Corporativo */
       }
 
+      /* CORRECCIÓN 1: Evitar el scroll horizontal (Margen blanco a la derecha) */
+      html,
+      body {
+        overflow-x: hidden;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* --- ESTILOS DE LA GRILLA DE HERRAMIENTAS --- */
       .tools-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        /* Ajusté el minmax a 260px para que sea más flexible en móviles pequeños */
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 25px;
         margin-bottom: 50px;
+        width: 100%; /* Asegura que no exceda el contenedor */
       }
 
       .tool-card {
@@ -85,7 +97,7 @@
         gap: 8px;
         width: 100%;
         padding: 12px;
-        background-color: var(--primary); /* Azul por defecto */
+        background-color: var(--primary);
         color: #fff;
         text-decoration: none;
         font-weight: 700;
@@ -97,7 +109,6 @@
         margin-top: 15px;
       }
 
-      /* HOVER DORADO CON LETRA AZUL */
       .btn-tool:hover {
         background-color: var(--secondary);
         border-color: var(--secondary);
@@ -111,31 +122,69 @@
         align-items: center;
         justify-content: center;
         gap: 10px;
-        background-color: var(--primary); /* Azul Base */
-        color: #fff; /* Letra Blanca */
+        background-color: var(--primary);
+        color: #fff;
         padding: 12px 30px;
         border-radius: 50px;
         font-weight: bold;
         text-decoration: none;
         transition: all 0.3s ease;
-        border: 2px solid var(--primary); /* Borde Azul */
+        border: 2px solid var(--primary);
         box-shadow: 0 4px 10px rgba(16, 33, 75, 0.2);
       }
 
-      /* HOVER PARA EL BOTÓN FINAL (Igual al de herramientas) */
       .btn-contact-final:hover {
-        background-color: var(--secondary); /* Fondo Dorado */
-        border-color: var(--secondary); /* Borde Dorado */
-        color: var(--primary); /* Letra Azul */
-        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4); /* Sombra Dorada */
+        background-color: var(--secondary);
+        border-color: var(--secondary);
+        color: var(--primary);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
         transform: translateY(-2px);
       }
 
+      /* CORRECCIÓN 2: MEJORA DEL TÍTULO "CATÁLOGO" */
+      .section-title h2 {
+        color: var(--primary);
+        font-family: "Montserrat", sans-serif;
+        font-weight: 800; /* Más grueso */
+        text-transform: uppercase; /* Mayúsculas imponentes */
+        letter-spacing: 1px;
+        font-size: 2rem;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 15px;
+        margin-bottom: 10px;
+      }
+
+      /* Línea dorada debajo del título */
+      .section-title h2::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background-color: var(--secondary);
+        border-radius: 2px;
+      }
+
       /* ==========================================================================
-         CORRECCIÓN DEL MENÚ HAMBURGUESA EN MÓVILES (Agregado)
+         CORRECCIONES MÓVILES (Menú y Grilla)
          ========================================================================== */
       @media (max-width: 768px) {
-        /* 1. Muestra el botón de hamburguesa y lo posiciona */
+        /* Ajuste Título en Móvil */
+        .section-title h2 {
+          font-size: 1.5rem; /* Un poco más pequeño en celular */
+        }
+
+        /* Ajuste Grilla en Móvil para evitar desbordes */
+        .tools-grid {
+          gap: 20px;
+          /* En pantallas muy angostas, asegura 1 sola columna */
+          grid-template-columns: 1fr;
+        }
+
+        /* Menú Hamburguesa */
         header .menu-toggle {
           display: block !important;
           cursor: pointer;
@@ -146,7 +195,6 @@
           z-index: 1001;
         }
 
-        /* 2. Estilo de las barras (Azul Oscuro para contraste en fondo blanco) */
         header .menu-toggle .bar {
           display: block;
           width: 25px;
@@ -156,9 +204,8 @@
           transition: all 0.3s ease-in-out;
         }
 
-        /* 3. Oculta el menú normal y lo prepara para desplegarse */
         header nav ul.nav-menu {
-          display: none; /* Se oculta inicialmente */
+          display: none;
           flex-direction: column;
           width: 100%;
           position: absolute;
@@ -170,12 +217,10 @@
           text-align: center;
         }
 
-        /* 4. Muestra el menú cuando JS añade la clase 'active' */
         header nav ul.nav-menu.active {
           display: flex !important;
         }
 
-        /* Espaciado para los enlaces en móvil */
         header nav ul.nav-menu li {
           margin: 15px 0;
         }
@@ -245,9 +290,8 @@
 
     <section class="bg-light" style="padding: 60px 0">
       <div class="container">
-        <div class="section-title text-center" style="margin-bottom: 40px">
+        <div class="section-title text-center" style="margin-bottom: 50px">
           <h2>Catálogo de Herramientas Gratis</h2>
-          <div class="divider mx-auto"></div>
         </div>
 
         <div class="tools-grid">
