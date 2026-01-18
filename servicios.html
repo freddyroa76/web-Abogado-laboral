@@ -172,6 +172,56 @@
           gap: 15px;
         }
       }
+
+      /* ==========================================================================
+         CORRECCIÓN DEL MENÚ HAMBURGUESA EN MÓVILES (Agregado)
+         ========================================================================== */
+      @media (max-width: 768px) {
+        /* 1. Muestra el botón de hamburguesa y lo posiciona */
+        header .menu-toggle {
+          display: block !important;
+          cursor: pointer;
+          position: absolute;
+          right: 20px;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 1001;
+        }
+
+        /* 2. Estilo de las barras (Azul Oscuro para contraste en fondo blanco) */
+        header .menu-toggle .bar {
+          display: block;
+          width: 25px;
+          height: 3px;
+          margin: 5px auto;
+          background-color: #10214b !important;
+          transition: all 0.3s ease-in-out;
+        }
+
+        /* 3. Oculta el menú normal y lo prepara para desplegarse */
+        header nav ul.nav-menu {
+          display: none; /* Se oculta inicialmente */
+          flex-direction: column;
+          width: 100%;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background-color: white;
+          padding: 20px 0;
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+          text-align: center;
+        }
+
+        /* 4. Muestra el menú cuando JS añade la clase 'active' */
+        header nav ul.nav-menu.active {
+          display: flex !important;
+        }
+
+        /* Espaciado para los enlaces en móvil */
+        header nav ul.nav-menu li {
+          margin: 15px 0;
+        }
+      }
     </style>
   </head>
   <body>
@@ -182,19 +232,27 @@
         </div>
       </div>
     </div>
-    <header>
+
+    <header style="position: relative">
       <div class="container header-container">
         <div class="logo">
           <a href="index.html"
             ><img src="img/logo-principal.webp" alt="Logo" class="logo-img"
           /></a>
         </div>
+
+        <div class="menu-toggle" id="mobile-menu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+
         <nav>
           <ul class="nav-menu">
             <li><a href="index.html">Inicio</a></li>
             <li><a href="nosotros.html">Nosotros</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="blog.html" class="active">Herramientas</a></li>
+            <li><a href="servicios.html" class="active">Servicios</a></li>
+            <li><a href="blog.html">Herramientas</a></li>
             <li><a href="contacto.html" class="btn-nav">Contacto</a></li>
           </ul>
         </nav>
@@ -463,5 +521,7 @@
     <a href="https://wa.me/573217927495" class="whatsapp-btn" target="_blank"
       ><i class="fab fa-whatsapp"></i
     ></a>
+
+    <script src="js/main.js"></script>
   </body>
 </html>

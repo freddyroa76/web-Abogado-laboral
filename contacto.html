@@ -25,6 +25,49 @@
         display: none; /* Oculto por defecto */
         margin-top: 15px;
       }
+
+      /* CORRECCIÓN CRÍTICA PARA EL MENÚ EN MÓVILES */
+      @media (max-width: 768px) {
+        /* Fuerza al botón a mostrarse y lo posiciona correctamente */
+        header .menu-toggle {
+          display: block !important;
+          cursor: pointer;
+          position: absolute;
+          right: 20px;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 1001;
+        }
+
+        /* Asegura que las barras tengan color visible */
+        header .menu-toggle .bar {
+          display: block;
+          width: 25px;
+          height: 3px;
+          margin: 5px auto;
+          background-color: #10214b !important; /* Azul oscuro forzado */
+          transition: all 0.3s ease-in-out;
+        }
+
+        /* Oculta el menú normal en móviles */
+        header nav ul.nav-menu {
+          display: none;
+          /* El JS se encarga de cambiar esto a flex o block cuando se active */
+          flex-direction: column;
+          width: 100%;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background-color: white;
+          padding: 20px 0;
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Clase que añade JS para mostrar el menú */
+        header nav ul.nav-menu.active {
+          display: flex !important;
+        }
+      }
     </style>
   </head>
   <body>
@@ -35,13 +78,27 @@
         </div>
       </div>
     </div>
-    <header>
-      <div class="container header-container">
+    <header style="position: relative">
+      <div
+        class="container header-container"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
         <div class="logo">
           <a href="index.html"
             ><img src="img/logo-principal.webp" alt="Logo" class="logo-img"
           /></a>
         </div>
+
+        <div class="menu-toggle" id="mobile-menu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+
         <nav>
           <ul class="nav-menu">
             <li><a href="index.html">Inicio</a></li>
@@ -51,7 +108,6 @@
             <li><a href="contacto.html" class="btn-nav">Contacto</a></li>
           </ul>
         </nav>
-      </div>
     </header>
 
     <section
@@ -64,6 +120,7 @@
         background-position: center;
         text-align: center;
         padding: 140px 0 100px;
+        border-bottom: 5px solid #d4af37;
       "
     >
       <div class="container">
@@ -743,12 +800,13 @@
             <h4>Contacto</h4>
             <ul class="contact-list">
               <li>
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Edificio Las Flores, Calle 39 #43-123, Barranquilla</span>
+                <i class="fas fa-map-marker-alt"></i
+                ><span
+                  >Edificio Las Flores, Calle 39 #43-123, Barranquilla</span
+                >
               </li>
               <li>
-                <i class="fas fa-phone-alt"></i>
-                <span>+57 321 792 7495</span>
+                <i class="fas fa-phone-alt"></i><span>+57 321 792 7495</span>
               </li>
             </ul>
           </div>
@@ -763,27 +821,33 @@
         </div>
       </div>
     </footer>
+    
     <a href="https://wa.me/573217927495" class="whatsapp-btn" target="_blank"
       ><i class="fab fa-whatsapp"></i
     ></a>
 
     <script>
+      // Script para el campo "Otro"
       document.addEventListener("DOMContentLoaded", function () {
         const selectAsunto = document.getElementById("asunto");
         const campoOtro = document.getElementById("campo-otro-asunto");
         const inputOtro = document.getElementById("otro_asunto_detalle");
 
-        selectAsunto.addEventListener("change", function () {
-          if (this.value === "Otro") {
-            campoOtro.style.display = "block";
-            inputOtro.setAttribute("required", "required"); // Hace el campo obligatorio
-          } else {
-            campoOtro.style.display = "none";
-            inputOtro.removeAttribute("required"); // Quita la obligatoriedad
-            inputOtro.value = ""; // Limpia el campo
-          }
-        });
+        if (selectAsunto) {
+          selectAsunto.addEventListener("change", function () {
+            if (this.value === "Otro") {
+              campoOtro.style.display = "block";
+              inputOtro.setAttribute("required", "required");
+            } else {
+              campoOtro.style.display = "none";
+              inputOtro.removeAttribute("required");
+              inputOtro.value = "";
+            }
+          });
+        }
       });
     </script>
+
+    <script src="js/main.js"></script>
   </body>
 </html>

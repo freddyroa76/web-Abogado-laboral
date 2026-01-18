@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -78,6 +78,48 @@
         ]
       }
     </script>
+
+    <style>
+      @media (max-width: 768px) {
+        header .header-container {
+          position: relative; /* Referencia para el botón */
+        }
+        /* Fuerza la posición al extremo derecho y color visible */
+        header .menu-toggle {
+          position: absolute !important;
+          right: 20px !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          display: block !important;
+          z-index: 9999;
+          color: #10214b !important; /* Azul oscuro para que se vea */
+          font-size: 1.5rem;
+        }
+
+        /* Oculta menú normal y prepara el desplegable */
+        header nav ul.nav-menu {
+          display: none;
+          flex-direction: column;
+          width: 100%;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background-color: white;
+          padding: 20px 0;
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+          text-align: center;
+        }
+
+        header nav ul.nav-menu.active {
+          display: flex !important;
+        }
+
+        /* Color de enlaces en móvil */
+        header nav ul.nav-menu li a {
+          color: #10214b !important;
+        }
+      }
+    </style>
   </head>
 
   <body>
@@ -124,9 +166,11 @@
             />
           </a>
         </div>
-<div class="menu-toggle" id="mobile-menu">
-    <i class="fas fa-bars"></i>
-</div>
+
+        <div class="menu-toggle" id="mobile-menu">
+          <i class="fas fa-bars"></i>
+        </div>
+
         <nav>
           <ul class="nav-menu">
             <li><a href="index.html">Inicio</a></li>
@@ -174,12 +218,14 @@
       <h2>Nuestros Servicios</h2>
     </div>
 
-<section id="servicios-acordeon" class="galeria-acordeon">
+    <section id="servicios-acordeon" class="galeria-acordeon">
       <div class="panel-servicio">
         <div class="overlay-info">
           <h3>Derecho Laboral</h3>
           <div class="contenido-oculto">
-            <p>Defensa en despidos injustificados, liquidaciones y contratos.</p>
+            <p>
+              Defensa en despidos injustificados, liquidaciones y contratos.
+            </p>
             <a href="servicios.html#laboral" class="btn-ver-mas">Ver Más</a>
           </div>
         </div>
@@ -190,7 +236,9 @@
           <h3>Seguridad Social</h3>
           <div class="contenido-oculto">
             <p>Pensiones de vejez, invalidez y reclamaciones ante ARL.</p>
-            <a href="servicios.html#seguridad-social" class="btn-ver-mas">Ver Más</a>
+            <a href="servicios.html#seguridad-social" class="btn-ver-mas"
+              >Ver Más</a
+            >
           </div>
         </div>
       </div>
@@ -278,6 +326,7 @@
         </div>
       </div>
     </section>
+
     <footer>
       <div class="container">
         <div class="footer-grid">
@@ -313,7 +362,9 @@
               <li><a href="nosotros.html">Sobre Nosotros</a></li>
               <li><a href="servicios.html">Áreas de Práctica</a></li>
               <li><a href="blog.html">Herramientas</a></li>
-              <li><a href="contacto.html">Agendar Cita</a></li>
+              <li>
+                <a href="contacto.html" class="active-footer">Agendar Cita</a>
+              </li>
             </ul>
           </div>
 
@@ -321,29 +372,28 @@
             <h4>Contacto</h4>
             <ul class="contact-list">
               <li>
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Edificio Las Flores, Barranquilla</span>
+                <i class="fas fa-map-marker-alt"></i
+                ><span
+                  >Edificio Las Flores, Calle 39 #43-123, Barranquilla</span
+                >
               </li>
               <li>
-                <i class="fas fa-phone-alt"></i>
-                <span>+57 321 792 7495</span>
-              </li>
-              <li>
-                <i class="fas fa-envelope"></i>
-                <span>tuabogadolaboral@outlook.com</span>
+                <i class="fas fa-phone-alt"></i><span>+57 321 792 7495</span>
               </li>
             </ul>
           </div>
         </div>
       </div>
       <div class="footer-bottom">
-        <div class="footer-bottom">
-        <div class="container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-          <p style="margin: 0;">&copy; 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
-          <a href="politica-privacidad.html" style="color: #ccc; text-decoration: none; font-size: 0.85rem; margin-top: 5px;">Política de Privacidad</a>
+        <div class="container copyright-flex">
+          <p>© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
+          <a href="politica-privacidad.html" class="privacy-link"
+            >Política de Privacidad</a
+          >
         </div>
       </div>
     </footer>
+
     <a href="https://wa.me/573217927495" class="whatsapp-btn" target="_blank">
       <i class="fab fa-whatsapp"></i>
     </a>

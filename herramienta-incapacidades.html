@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -298,8 +298,8 @@
           /></a>
         </div>
         <div class="menu-toggle" id="mobile-menu">
-    <i class="fas fa-bars"></i>
-</div>
+          <i class="fas fa-bars"></i>
+        </div>
         <nav>
           <ul class="nav-menu">
             <li>
@@ -592,7 +592,9 @@
               <li><a href="nosotros.html">Sobre Nosotros</a></li>
               <li><a href="servicios.html">Áreas de Práctica</a></li>
               <li><a href="blog.html">Herramientas</a></li>
-              <li><a href="contacto.html">Agendar Cita</a></li>
+              <li>
+                <a href="contacto.html" class="active-footer">Agendar Cita</a>
+              </li>
             </ul>
           </div>
 
@@ -600,26 +602,24 @@
             <h4>Contacto</h4>
             <ul class="contact-list">
               <li>
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Edificio Las Flores, Barranquilla</span>
+                <i class="fas fa-map-marker-alt"></i
+                ><span
+                  >Edificio Las Flores, Calle 39 #43-123, Barranquilla</span
+                >
               </li>
               <li>
-                <i class="fas fa-phone-alt"></i>
-                <span>+57 321 792 7495</span>
-              </li>
-              <li>
-                <i class="fas fa-envelope"></i>
-                <span>tuabogadolaboral@outlook.com</span>
+                <i class="fas fa-phone-alt"></i><span>+57 321 792 7495</span>
               </li>
             </ul>
           </div>
         </div>
       </div>
       <div class="footer-bottom">
-        <div class="footer-bottom">
-        <div class="container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-          <p style="margin: 0;">&copy; 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
-          <a href="politica-privacidad.html" style="color: #ccc; text-decoration: none; font-size: 0.85rem; margin-top: 5px;">Política de Privacidad</a>
+        <div class="container copyright-flex">
+          <p>© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
+          <a href="politica-privacidad.html" class="privacy-link"
+            >Política de Privacidad</a
+          >
         </div>
       </div>
     </footer>
@@ -669,7 +669,7 @@
               parseInt(document.getElementById("diasAcumulados").value) || 0;
             const tipoOrigen = document.getElementById("tipoIncapacidad").value;
             const smlv = parseFloat(
-              document.getElementById("confSalarioMin").value
+              document.getElementById("confSalarioMin").value,
             );
 
             if (diasSolicitados <= 0)
@@ -774,34 +774,34 @@
               htmlTabla += `<tr><td><strong>Empresa</strong></td><td style="text-align:center;">${
                 totales.diasEmpresa
               }</td><td>Días 1-2 (66.67%*)</td><td style="text-align:right;">${formatoPeso.format(
-                totales.empresa
+                totales.empresa,
               )}</td></tr>`;
             }
             if (totales.diasEps > 0) {
               htmlTabla += `<tr><td><strong>EPS</strong></td><td style="text-align:center;">${
                 totales.diasEps
               }</td><td>Incapacidad (66.67% / 50%)</td><td style="text-align:right;">${formatoPeso.format(
-                totales.eps
+                totales.eps,
               )}</td></tr>`;
             }
             if (totales.diasArl > 0) {
               htmlTabla += `<tr><td><strong>ARL</strong></td><td style="text-align:center;">${
                 totales.diasArl
               }</td><td>Riesgo Laboral (100%)</td><td style="text-align:right;">${formatoPeso.format(
-                totales.arl
+                totales.arl,
               )}</td></tr>`;
             }
             if (totales.diasAfp > 0) {
               htmlTabla += `<tr><td><strong>Fondo Pensiones</strong></td><td style="text-align:center;">${
                 totales.diasAfp
               }</td><td>Rehabilitación (>180 días)</td><td style="text-align:right;">${formatoPeso.format(
-                totales.afp
+                totales.afp,
               )}</td></tr>`;
             }
 
             // Fila Total Bruto
             htmlTabla += `<tr class="highlight-row"><td><strong>TOTAL BRUTO</strong></td><td></td><td></td><td style="text-align:right;"><strong>${formatoPeso.format(
-              totales.totalBruto
+              totales.totalBruto,
             )}</strong></td></tr>`;
 
             document.getElementById("tablaResultados").innerHTML = htmlTabla;
@@ -824,7 +824,7 @@
               () =>
                 (btn.innerHTML =
                   '<i class="fas fa-calculator"></i> Calcular Prestación'),
-              500
+              500,
             );
           }
         });

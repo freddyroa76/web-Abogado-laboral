@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -94,7 +94,7 @@
         width: fit-content;
       }
 
-      /* RESPONSIVE */
+      /* RESPONSIVE GENERAL */
       @media (max-width: 900px) {
         .profile-card {
           flex-direction: column;
@@ -104,6 +104,44 @@
         }
         .profile-content {
           padding: 30px;
+        }
+      }
+
+      /* --- CORRECCIÓN MENÚ HAMBURGUESA (POSICIÓN Y VISIBILIDAD) --- */
+      @media (max-width: 768px) {
+        header .header-container {
+          position: relative;
+        }
+        /* Fuerza posición a la derecha y color visible */
+        header .menu-toggle {
+          position: absolute !important;
+          right: 20px !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          display: block !important;
+          z-index: 9999;
+          font-size: 1.5rem;
+          color: #10214b !important; /* Azul oscuro para que se vea */
+        }
+
+        /* Ajustes del desplegable */
+        header nav ul.nav-menu {
+          display: none;
+          flex-direction: column;
+          width: 100%;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background-color: white;
+          padding: 20px 0;
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+          text-align: center;
+        }
+        header nav ul.nav-menu.active {
+          display: flex !important;
+        }
+        header nav ul.nav-menu li a {
+          color: #10214b !important;
         }
       }
     </style>
@@ -123,9 +161,11 @@
             ><img src="img/logo-principal.webp" alt="Logo" class="logo-img"
           /></a>
         </div>
+
         <div class="menu-toggle" id="mobile-menu">
           <i class="fas fa-bars"></i>
         </div>
+
         <nav>
           <ul class="nav-menu">
             <li><a href="index.html">Inicio</a></li>
@@ -141,11 +181,9 @@
     <section
       class="hero"
       style="
-        background: linear-gradient(
-            rgba(16, 33, 75, 0.9),
-            rgba(16, 33, 75, 0.75)
-          ),
-          url('img/header-firma-legal.webp');
+        background:
+          linear-gradient(rgba(16, 33, 75, 0.9), rgba(16, 33, 75, 0.75)),
+          url(&quot;img/header-firma-legal.webp&quot;);
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -174,7 +212,12 @@
     <section class="history-section">
       <div class="container">
         <div style="max-width: 800px; margin: 0 auto">
-          <h2 style="color: #10214b; font-family: 'Montserrat', sans-serif">
+          <h2
+            style="
+              color: #10214b;
+              font-family: &quot;Montserrat&quot;, sans-serif;
+            "
+          >
             Más que abogados, somos estrategas
           </h2>
 
@@ -246,7 +289,7 @@
             <span class="profile-badge">Directora Jurídica</span>
             <h2
               style="
-                font-family: 'Montserrat', sans-serif;
+                font-family: &quot;Montserrat&quot;, sans-serif;
                 font-size: 2.2rem;
                 color: #10214b;
                 margin: 10px 0;
@@ -328,7 +371,9 @@
               <li><a href="nosotros.html">Sobre Nosotros</a></li>
               <li><a href="servicios.html">Áreas de Práctica</a></li>
               <li><a href="blog.html">Herramientas</a></li>
-              <li><a href="contacto.html">Agendar Cita</a></li>
+              <li>
+                <a href="contacto.html" class="active-footer">Agendar Cita</a>
+              </li>
             </ul>
           </div>
 
@@ -336,48 +381,28 @@
             <h4>Contacto</h4>
             <ul class="contact-list">
               <li>
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Edificio Las Flores, Barranquilla</span>
+                <i class="fas fa-map-marker-alt"></i
+                ><span
+                  >Edificio Las Flores, Calle 39 #43-123, Barranquilla</span
+                >
               </li>
               <li>
-                <i class="fas fa-phone-alt"></i>
-                <span>+57 321 792 7495</span>
-              </li>
-              <li>
-                <i class="fas fa-envelope"></i>
-                <span>tuabogadolaboral@outlook.com</span>
+                <i class="fas fa-phone-alt"></i><span>+57 321 792 7495</span>
               </li>
             </ul>
           </div>
         </div>
       </div>
       <div class="footer-bottom">
-        <div
-          class="container"
-          style="
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-          "
-        >
-          <p style="margin: 0">
-            &copy; 2026 Tu Abogado Laboral - Todos los derechos reservados.
-          </p>
-          <a
-            href="politica-privacidad.html"
-            style="
-              color: #ccc;
-              text-decoration: none;
-              font-size: 0.85rem;
-              margin-top: 5px;
-            "
+        <div class="container copyright-flex">
+          <p>© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
+          <a href="politica-privacidad.html" class="privacy-link"
             >Política de Privacidad</a
           >
         </div>
       </div>
     </footer>
+
     <a href="https://wa.me/573217927495" class="whatsapp-btn" target="_blank"
       ><i class="fab fa-whatsapp"></i
     ></a>
