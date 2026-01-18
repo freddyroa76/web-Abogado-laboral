@@ -341,6 +341,47 @@
         background-color: #128c7e;
         transform: scale(1.1);
       }
+      /* --- CORRECCIÓN MENÚ QUIRÚRGICA PARA MÓVILES --- */
+      @media (max-width: 768px) {
+        header .header-container {
+          position: relative; /* Referencia de posición */
+        }
+        /* 1. Posición Extrema Derecha y Color Azul */
+        header .menu-toggle {
+          position: absolute !important;
+          right: 20px !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          display: block !important;
+          z-index: 9999;
+          font-size: 1.5rem;
+          color: #10214b !important; /* Azul oscuro obligatorio */
+          cursor: pointer;
+        }
+
+        /* 2. Menú Desplegable (Fondo Blanco) */
+        header nav ul.nav-menu {
+          display: none;
+          flex-direction: column;
+          width: 100%;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background-color: white;
+          padding: 20px 0;
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+          text-align: center;
+        }
+
+        header nav ul.nav-menu.active {
+          display: flex !important;
+        }
+
+        /* 3. Color de los enlaces */
+        header nav ul.nav-menu li a {
+          color: #10214b !important;
+        }
+      }
     </style>
   </head>
   <body>
