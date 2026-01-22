@@ -3,12 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Seguridad: CSP Básico -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;"
+    />
+
     <meta
       name="description"
       content="Centro de Herramientas Laborales Gratuitas: Calculadoras de nómina, liquidación, horas extras y prestaciones sociales en Colombia."
     />
     <link rel="icon" type="image/webp" href="img/favicon.webp" />
     <title>Centro de Herramientas | Tu Abogado Laboral</title>
+
+    <!-- Performance: Preload Hero Image (LCP) -->
+    <link rel="preload" as="image" href="img/hero-bg.jpg" />
+
     <link rel="stylesheet" href="css/style.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
@@ -246,11 +256,19 @@
               src="img/logo-principal.webp"
               alt="Logo"
               class="logo-img"
+              width="200"
+              height="55"
             />
           </a>
         </div>
 
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+        <div
+          class="menu-toggle"
+          id="mobile-menu"
+          aria-label="Menú principal"
+          role="button"
+          tabindex="0"
+        >
           <span class="bar"></span>
           <span class="bar"></span>
           <span class="bar"></span>
@@ -268,221 +286,224 @@
       </div>
     </header>
 
-    <section
-      class="hero"
-      style="
-        height: 35vh;
-        min-height: 250px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background:
-          linear-gradient(rgba(16, 33, 75, 0.95), rgba(16, 33, 75, 0.9)),
-          url(&quot;img/hero-bg.jpg&quot;);
-        background-size: cover;
-        background-position: center;
-      "
-    >
-      <div class="container hero-content text-center">
-        <h1 style="color: white">CALCULOS PARA CLIENTES</h1>
-        <p style="margin: 0 auto; max-width: 600px; color: #ddd">
-          Seleccione la herramienta que necesita. Cálculos rápidos y gratuitos
-          ajustados a la normativa colombiana 2026.
-        </p>
-      </div>
-    </section>
-
-    <section class="bg-light" style="padding: 60px 0">
-      <div class="container">
-        <div class="section-title text-center" style="margin-bottom: 50px">
-          <h2>Catálogo de Herramientas Gratis</h2>
-        </div>
-
-        <div class="tools-grid">
-          <div class="tool-card">
-            <div class="tool-icon"><i class="fas fa-coins"></i></div>
-            <div class="tool-title">Cesantías e Intereses</div>
-            <a href="herramienta-cesantias.html" class="btn-tool"
-              >Usar Herramienta</a
-            >
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><i class="fas fa-gift"></i></div>
-            <div class="tool-title">Prima de Servicios</div>
-            <a href="herramienta-prima.html" class="btn-tool"
-              >Usar Herramienta</a
-            >
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><i class="fas fa-umbrella-beach"></i></div>
-            <div class="tool-title">Liquidación Vacaciones</div>
-            <a href="herramienta-vacaciones.html" class="btn-tool"
-              >Usar Herramienta</a
-            >
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><i class="fas fa-clock"></i></div>
-            <div class="tool-title">Horas Extras y Recargos</div>
-            <a href="herramienta-horas-extras.html" class="btn-tool"
-              >Usar Herramienta</a
-            >
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><i class="fas fa-file-signature"></i></div>
-            <div class="tool-title">
-              Liquidación de contrato e indemnización
-            </div>
-            <a href="herramienta-liquidacion-contrato.html" class="btn-tool"
-              >Usar Herramienta</a
-            >
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon">
-              <i class="fas fa-file-invoice-dollar"></i>
-            </div>
-            <div class="tool-title">Calculadora Retefuente</div>
-            <a href="herramienta-retefuente.html" class="btn-tool"
-              >Usar Herramienta</a
-            >
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><i class="fas fa-hand-holding-usd"></i></div>
-            <div class="tool-title">Calculador Pago a Trabajador</div>
-            <a href="herramienta-nomina-empleado.html" class="btn-tool"
-              >Usar Herramienta</a
-            >
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><i class="fas fa-building"></i></div>
-            <div class="tool-title">
-              Costos mensual del trajador para la Empresa
-            </div>
-            <a href="herramienta-nomina-empleador.html" class="btn-tool"
-              >Usar Herramienta</a
-            >
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><i class="fas fa-calculator"></i></div>
-            <div class="tool-title">Calculadora de nomina maestra</div>
-            <a
-              href="herramienta-calculadora-nomina-maestra.html"
-              class="btn-tool"
-              >Usar Herramienta</a
-            >
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><i class="fas fa-gavel"></i></div>
-            <div class="tool-title">Indemnización Despido</div>
-            <a href="herramienta-indemnizacion.html" class="btn-tool"
-              >Usar Herramienta</a
-            >
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><i class="fas fa-baby"></i></div>
-            <div class="tool-title">Licencias Maternidad/Paternidad</div>
-            <a href="herramienta-licencias.html" class="btn-tool"
-              >Usar Herramienta</a
-            >
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><i class="fas fa-user-injured"></i></div>
-            <div class="tool-title">Incapacidades Laborales</div>
-            <a href="herramienta-incapacidades.html" class="btn-tool"
-              >Usar Herramienta</a
-            >
-          </div>
-        </div>
-
-        <div
-          style="
-            text-align: center;
-            background: #fff;
-            padding: 40px;
-            border-radius: 8px;
-            border-top: 4px solid var(--secondary);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-          "
-        >
-          <h3 style="color: var(--primary); margin-bottom: 10px">
-            ¿Necesita una revisión oficial?
-          </h3>
-          <p style="margin-bottom: 20px; color: #555">
-            Las calculadoras automáticas son referenciales. Para un concepto
-            jurídico válido ante un juez, contácteme.
-          </p>
-          <a href="contacto.html" class="btn-contact-final">
-            <i class="fab fa-whatsapp"></i> Contactar a Tu Abogado Laboral
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <div class="container" style="max-width: 1000px; margin: 0 auto">
-      <div
+    <main>
+      <section
+        class="hero"
         style="
-          background-color: #fff;
-          border-top: 3px solid #d4af37;
-          padding: 30px 20px;
-          margin: 40px 0 20px 0;
-          border-radius: 4px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-          text-align: center;
-          font-size: 0.85rem;
-          color: #666;
-          line-height: 1.6;
+          height: 35vh;
+          min-height: 250px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background:
+            linear-gradient(rgba(16, 33, 75, 0.95), rgba(16, 33, 75, 0.9)),
+            url(&quot;img/hero-bg.jpg&quot;);
+          background-size: cover;
+          background-position: center;
         "
       >
-        <h4
+        <div class="container hero-content text-center">
+          <h1 style="color: white">CALCULOS PARA CLIENTES</h1>
+          <p style="margin: 0 auto; max-width: 600px; color: #ddd">
+            Seleccione la herramienta que necesita. Cálculos rápidos y gratuitos
+            ajustados a la normativa colombiana 2026.
+          </p>
+        </div>
+      </section>
+
+      <section class="bg-light" style="padding: 60px 0">
+        <div class="container">
+          <div class="section-title text-center" style="margin-bottom: 50px">
+            <h2>Catálogo de Herramientas Gratis</h2>
+          </div>
+
+          <div class="tools-grid">
+            <div class="tool-card">
+              <div class="tool-icon"><i class="fas fa-coins"></i></div>
+              <div class="tool-title">Cesantías e Intereses</div>
+              <a href="herramienta-cesantias.html" class="btn-tool"
+                >Usar Herramienta</a
+              >
+            </div>
+
+            <div class="tool-card">
+              <div class="tool-icon"><i class="fas fa-gift"></i></div>
+              <div class="tool-title">Prima de Servicios</div>
+              <a href="herramienta-prima.html" class="btn-tool"
+                >Usar Herramienta</a
+              >
+            </div>
+
+            <div class="tool-card">
+              <div class="tool-icon"><i class="fas fa-umbrella-beach"></i></div>
+              <div class="tool-title">Liquidación Vacaciones</div>
+              <a href="herramienta-vacaciones.html" class="btn-tool"
+                >Usar Herramienta</a
+              >
+            </div>
+
+            <div class="tool-card">
+              <div class="tool-icon"><i class="fas fa-clock"></i></div>
+              <div class="tool-title">Horas Extras y Recargos</div>
+              <a href="herramienta-horas-extras.html" class="btn-tool"
+                >Usar Herramienta</a
+              >
+            </div>
+
+            <div class="tool-card">
+              <div class="tool-icon"><i class="fas fa-file-signature"></i></div>
+              <div class="tool-title">
+                Liquidación de contrato e indemnización
+              </div>
+              <a href="herramienta-liquidacion-contrato.html" class="btn-tool"
+                >Usar Herramienta</a
+              >
+            </div>
+
+            <div class="tool-card">
+              <div class="tool-icon">
+                <i class="fas fa-file-invoice-dollar"></i>
+              </div>
+              <div class="tool-title">Calculadora Retefuente</div>
+              <a href="herramienta-retefuente.html" class="btn-tool"
+                >Usar Herramienta</a
+              >
+            </div>
+
+            <div class="tool-card">
+              <div class="tool-icon">
+                <i class="fas fa-hand-holding-usd"></i>
+              </div>
+              <div class="tool-title">Calculador Pago a Trabajador</div>
+              <a href="herramienta-nomina-empleado.html" class="btn-tool"
+                >Usar Herramienta</a
+              >
+            </div>
+
+            <div class="tool-card">
+              <div class="tool-icon"><i class="fas fa-building"></i></div>
+              <div class="tool-title">
+                Costos mensual del trajador para la Empresa
+              </div>
+              <a href="herramienta-nomina-empleador.html" class="btn-tool"
+                >Usar Herramienta</a
+              >
+            </div>
+
+            <div class="tool-card">
+              <div class="tool-icon"><i class="fas fa-calculator"></i></div>
+              <div class="tool-title">Calculadora de nomina maestra</div>
+              <a
+                href="herramienta-calculadora-nomina-maestra.html"
+                class="btn-tool"
+                >Usar Herramienta</a
+              >
+            </div>
+
+            <div class="tool-card">
+              <div class="tool-icon"><i class="fas fa-gavel"></i></div>
+              <div class="tool-title">Indemnización Despido</div>
+              <a href="herramienta-indemnizacion.html" class="btn-tool"
+                >Usar Herramienta</a
+              >
+            </div>
+
+            <div class="tool-card">
+              <div class="tool-icon"><i class="fas fa-baby"></i></div>
+              <div class="tool-title">Licencias Maternidad/Paternidad</div>
+              <a href="herramienta-licencias.html" class="btn-tool"
+                >Usar Herramienta</a
+              >
+            </div>
+
+            <div class="tool-card">
+              <div class="tool-icon"><i class="fas fa-user-injured"></i></div>
+              <div class="tool-title">Incapacidades Laborales</div>
+              <a href="herramienta-incapacidades.html" class="btn-tool"
+                >Usar Herramienta</a
+              >
+            </div>
+          </div>
+
+          <div
+            style="
+              text-align: center;
+              background: #fff;
+              padding: 40px;
+              border-radius: 8px;
+              border-top: 4px solid var(--secondary);
+              box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            "
+          >
+            <h3 style="color: var(--primary); margin-bottom: 10px">
+              ¿Necesita una revisión oficial?
+            </h3>
+            <p style="margin-bottom: 20px; color: #555">
+              Las calculadoras automáticas son referenciales. Para un concepto
+              jurídico válido ante un juez, contácteme.
+            </p>
+            <a href="contacto.html" class="btn-contact-final">
+              <i class="fab fa-whatsapp"></i> Contactar a Tu Abogado Laboral
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <div class="container" style="max-width: 1000px; margin: 0 auto">
+        <div
           style="
-            color: #10214b;
-            margin: 0 0 15px 0;
-            font-size: 1.1rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            background-color: #fff;
+            border-top: 3px solid #d4af37;
+            padding: 30px 20px;
+            margin: 40px 0 20px 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            text-align: center;
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.6;
           "
         >
-          <i
-            class="fas fa-exclamation-circle"
-            style="color: #d4af37; margin-right: 5px"
-          ></i>
-          Aviso Legal
-        </h4>
+          <h4
+            style="
+              color: #10214b;
+              margin: 0 0 15px 0;
+              font-size: 1.1rem;
+              font-weight: 800;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+            "
+          >
+            <i
+              class="fas fa-exclamation-circle"
+              style="color: #d4af37; margin-right: 5px"
+            ></i>
+            Aviso Legal
+          </h4>
 
-        <p style="margin: 0; max-width: 800px; margin: 0 auto">
-          Esta herramienta realiza proyecciones basadas en la normativa laboral
-          vigente en Colombia (2026). Los resultados son
-          <strong>aproximaciones ilustrativas</strong> y pueden variar según
-          convenciones colectivas o interpretaciones judiciales. El uso de este
-          simulador no crea una relación abogado-cliente ni sustituye una
-          liquidación oficial.
-        </p>
+          <p style="margin: 0; max-width: 800px; margin: 0 auto">
+            Esta herramienta realiza proyecciones basadas en la normativa
+            laboral vigente en Colombia (2026). Los resultados son
+            <strong>aproximaciones ilustrativas</strong> y pueden variar según
+            convenciones colectivas o interpretaciones judiciales. El uso de
+            este simulador no crea una relación abogado-cliente ni sustituye una
+            liquidación oficial.
+          </p>
 
-        <span
-          style="
-            display: block;
-            margin-top: 10px;
-            font-style: italic;
-            color: #888;
-          "
-        >
-          Tu Abogado Laboral no se hace responsable por decisiones tomadas
-          basándose exclusivamente en estos datos.
-        </span>
+          <span
+            style="
+              display: block;
+              margin-top: 10px;
+              font-style: italic;
+              color: #888;
+            "
+          >
+            Tu Abogado Laboral no se hace responsable por decisiones tomadas
+            basándose exclusivamente en estos datos.
+          </span>
+        </div>
       </div>
-    </div>
-
+    </main>
     <footer>
       <div class="container">
         <div class="footer-grid">

@@ -3,7 +3,69 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Seguridad: CSP Básico -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+
     <title>Calculadora de Incapacidades Laborales | Tu Abogado Laboral</title>
+    <link rel="icon" href="img/favicon.webp" type="image/webp" />
+    <meta
+      name="description"
+      content="Liquidador de incapacidades 2026. Calcula pagos por EPS, ARL y Empleador con validación de prórrogas y piso legal."
+    />
+
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      /* --- ESTILOS ELIMINADOS (Movidos a css/style.css) --- */
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="container">
+        <div class="info">
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+        </div>
+      </div>
+    </div>
+    <header>
+      <div class="container header-container">
+        <div class="logo">
+          <a href="index.html" aria-label="Inicio">
+            <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
+          /></a>
+        </div>
+        <div
+          class="menu-toggle"
+          id="mobile-menu"
+          aria-label="Menú principal"
+          role="button"
+          tabindex="0"
+        >
+          <i class="fas fa-bars"></i>
+        </div>
+        <nav>
+          <ul class="nav-menu">
+            <li>
+              <a href="blog.html" style="color: #10214b; font-weight: bold"
+                ><i class="fas fa-arrow-left"></i> Volver a Herramientas</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+    <section class="bg-light">
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
     <meta
       name="description"
@@ -306,6 +368,7 @@
       </div>
     </section>
 
+    </main>
     <footer>
       <div class="container">
         <div class="footer-grid">

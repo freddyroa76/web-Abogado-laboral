@@ -3,7 +3,307 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Seguridad: CSP Básico -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+
     <title>Calculadora de Cesantías e Intereses | Tu Abogado Laboral</title>
+    <link rel="icon" href="img/favicon.webp" type="image/webp" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      /* ESTILOS DE LA CALCULADORA */
+      .calc-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      /* TARJETA DEL FORMULARIO */
+      .calc-card {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(16, 33, 75, 0.08);
+        border: 1px solid #eee;
+        margin-bottom: 30px;
+      }
+
+      .calc-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+      }
+
+      @media (max-width: 768px) {
+        .calc-grid {
+          grid-template-columns: 1fr;
+        }
+        .calc-card {
+          padding: 20px;
+        }
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 700;
+        color: #10214b;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+      }
+
+      .form-group small {
+        display: block;
+        color: #888;
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+      }
+
+      .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .input-icon {
+        position: absolute;
+        left: 15px;
+        color: #10214b;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 40px; /* Espacio para icono */
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+        background: #f9f9f9;
+      }
+
+      .form-control:focus {
+        border-color: #10214b;
+        background: #fff;
+        outline: none;
+      }
+
+      /* Checkbox Auxilio */
+      .checkbox-wrapper {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #eee;
+      }
+
+      .checkbox-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .btn-calculate {
+        background-color: #10214b;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .btn-calculate:hover {
+        background-color: #25d366; /* Verde Acción */
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+      }
+
+      /* RESULTADOS */
+      .result-container {
+        display: none; /* Oculto por defecto */
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid #eee;
+        animation: slideDown 0.5s ease;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .result-header {
+        background: #10214b;
+        color: white;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .result-body {
+        padding: 30px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        border-bottom: 1px solid #eee;
+      }
+
+      @media (max-width: 600px) {
+        .result-body {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+      }
+
+      .result-item label {
+        font-size: 0.85rem;
+        color: #666;
+        display: block;
+        margin-bottom: 5px;
+      }
+      .result-item span {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .result-total {
+        background: #f4f8fb;
+        padding: 25px;
+        text-align: right;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .total-label {
+        font-size: 1.2rem;
+        color: #10214b;
+        font-weight: bold;
+      }
+      .total-value {
+        font-size: 2rem;
+        color: #25d366;
+        font-weight: 900;
+      }
+
+      .cta-whatsapp {
+        display: block;
+        text-align: center;
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 15px;
+        margin: 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        border: 1px dashed #25d366;
+        transition: 0.3s;
+      }
+      .cta-whatsapp:hover {
+        background: #c8e6c9;
+      }
+      /* --- CORRECCIÓN MENÚ QUIRÚRGICA PARA MÓVILES --- */
+      @media (max-width: 768px) {
+        header .header-container {
+          position: relative; /* Referencia de posición */
+        }
+        /* 1. Posición Extrema Derecha y Color Azul */
+        header .menu-toggle {
+          position: absolute !important;
+          right: 20px !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          display: block !important;
+          z-index: 9999;
+          font-size: 1.5rem;
+          color: #10214b !important; /* Azul oscuro obligatorio */
+          cursor: pointer;
+        }
+
+        /* 2. Menú Desplegable (Fondo Blanco) */
+        header nav ul.nav-menu {
+          display: none;
+          flex-direction: column;
+          width: 100%;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background-color: white;
+          padding: 20px 0;
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+          text-align: center;
+        }
+
+        header nav ul.nav-menu.active {
+          display: flex !important;
+        }
+
+        /* 3. Color de los enlaces */
+        header nav ul.nav-menu li a {
+          color: #10214b !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="container">
+        <div class="info">
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+        </div>
+      </div>
+    </div>
+    <header>
+      <div class="container header-container">
+        <div class="logo">
+          <a href="index.html" aria-label="Inicio">
+            <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
+          /></a>
+        </div>
+        <div
+          class="menu-toggle"
+          id="mobile-menu"
+          aria-label="Menú principal"
+          role="button"
+          tabindex="0"
+        >
+          <i class="fas fa-bars"></i>
+        </div>
+        <nav>
+          <ul class="nav-menu">
+            <li>
+              <a href="blog.html" style="color: #10214b; font-weight: bold"
+                ><i class="fas fa-arrow-left"></i> Volver a Herramientas</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
     <link rel="stylesheet" href="css/style.css" />
     <link
@@ -549,6 +849,7 @@
       </div>
     </div>
 
+    </main>
     <footer>
       <div class="container">
         <div class="footer-grid">

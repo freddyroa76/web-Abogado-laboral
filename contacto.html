@@ -3,7 +3,157 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Seguridad: CSP Básico -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+
     <title>Contacto y Agendamiento | Tu Abogado Laboral Barranquilla</title>
+    <meta
+      name="description"
+      content="Agende su cita con la Dra. Johana Manga. Expertos en Derecho Laboral, Pensiones e Insolvencia. Teléfono, WhatsApp y dirección en Barranquilla."
+    />
+    <link rel="icon" type="image/webp" href="img/favicon.webp" />
+
+    <!-- Performance: Preload Hero Image (LCP) -->
+    <link rel="preload" as="image" href="img/header-contacto.webp" />
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      crossorigin="anonymous"
+    />
+
+    <style>
+
+
+      /* CORRECCIÓN CRÍTICA PARA EL MENÚ EN MÓVILES */
+      @media (max-width: 768px) {
+        /* Fuerza al botón a mostrarse y lo posiciona correctamente */
+        header .menu-toggle {
+          display: block !important;
+          cursor: pointer;
+          position: absolute;
+          right: 20px;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 1001;
+        }
+
+        /* Asegura que las barras tengan color visible */
+        header .menu-toggle .bar {
+          display: block;
+          width: 25px;
+          height: 3px;
+          margin: 5px auto;
+          background-color: #10214b !important; /* Azul oscuro forzado */
+          transition: all 0.3s ease-in-out;
+        }
+
+        /* Oculta el menú normal en móviles */
+        header nav ul.nav-menu {
+          display: none;
+          /* El JS se encarga de cambiar esto a flex o block cuando se active */
+          flex-direction: column;
+          width: 100%;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background-color: white;
+          padding: 20px 0;
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Clase que añade JS para mostrar el menú */
+        header nav ul.nav-menu.active {
+          display: flex !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="container">
+        <div class="info">
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+        </div>
+      </div>
+    </div>
+    <header style="position: relative">
+      <div
+        class="container header-container"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <div class="logo">
+          <a href="index.html" aria-label="Inicio">
+            <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
+          /></a>
+        </div>
+
+        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+          <i class="fas fa-bars"></i>
+        </div>
+
+        <nav>
+          <ul class="nav-menu">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="blog.html" class="active">Herramientas</a></li>
+            <li><a href="contacto.html" class="btn-nav">Contacto</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+    <section
+      class="hero-interno"
+      style="
+        background:
+          linear-gradient(rgba(16, 33, 75, 0.85), rgba(16, 33, 75, 0.75)),
+          url(&quot;img/header-contacto.webp&quot;);
+        background-size: cover;
+        background-position: center;
+        text-align: center;
+        padding: 140px 0 100px;
+        border-bottom: 5px solid #d4af37;
+      "
+    >
+      <div class="container">
+        <h1
+          style="
+            color: #ffffff;
+            font-family: &quot;Montserrat&quot;, sans-serif;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+          "
+        >
+          INICIE SU PROCESO CON UN ABOGADO LABORAL HOY
+        </h1>
+        <p
+          style="
+            color: #ffffff;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            font-weight: 400;
+          "
+        >
+          La tranquilidad jurídica comienza con una primera consulta. Estamos
+          listos para escuchar su caso en Barranquilla o de manera virtual.
+        </p>
+      </div>
+    </section>
     <meta
       name="description"
       content="Agende su cita con la Dra. Johana Manga. Expertos en Derecho Laboral, Pensiones e Insolvencia. Teléfono, WhatsApp y dirección en Barranquilla."
@@ -751,6 +901,7 @@
       ></iframe>
     </section>
 
+    </main>
     <footer>
       <div class="container">
         <div class="footer-grid">

@@ -3,7 +3,376 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Seguridad: CSP Básico -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+
     <title>Abogados Laborales en Barranquilla | Tu Abogado Laboral</title>
+    <meta
+      name="description"
+      content="Firma de abogados en Barranquilla experta en Derecho Laboral y Pensional. Liderada por la Dra. Johana Manga. Honestidad radical y resultados reales."
+    />
+    <link rel="icon" type="image/webp" href="img/favicon.webp" />
+
+    <!-- Performance: Preload Hero Image (LCP) -->
+    <link rel="preload" as="image" href="img/header-firma-legal.webp" />
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      crossorigin="anonymous"
+    />
+
+    <style>
+      /* ESTILOS ESPECÍFICOS DE ESTA PÁGINA */
+
+      /* HISTORIA Y VALORES */
+      .history-section {
+        padding: 80px 0;
+        background: white;
+      }
+
+      /* Clase utilitaria para justificar textos (como en Word) */
+      .text-justify {
+        text-align: justify;
+        text-justify: inter-word; /* Mejora la distribución de espacios */
+      }
+
+      .text-highlight {
+        border-left: 4px solid #d4af37;
+        padding-left: 20px;
+        font-style: italic;
+        color: #555;
+        font-size: 1.15rem;
+        margin: 40px 0;
+        background: #fcfcfc;
+        padding: 20px;
+        border-radius: 0 10px 10px 0;
+        text-align: justify; /* Justificado también */
+      }
+
+      /* PERFIL ABOGADA */
+      .profile-section {
+        background-color: #f4f8fb;
+        padding: 80px 0;
+      }
+      .profile-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        display: flex;
+        flex-direction: row;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      .profile-img {
+        flex: 1;
+        min-height: 500px;
+        position: relative;
+      }
+      .profile-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+      }
+      .profile-content {
+        flex: 1.2;
+        padding: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .profile-badge {
+        display: inline-block;
+        background: #10214b;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        margin-bottom: 15px;
+        font-weight: bold;
+        width: fit-content;
+      }
+
+      /* RESPONSIVE GENERAL */
+      @media (max-width: 900px) {
+        .profile-card {
+          flex-direction: column;
+        }
+        .profile-img {
+          height: 400px;
+        }
+        .profile-content {
+          padding: 30px;
+        }
+      }
+
+      /* --- CORRECCIÓN MENÚ HAMBURGUESA (POSICIÓN Y VISIBILIDAD) --- */
+      @media (max-width: 768px) {
+        header .header-container {
+          position: relative;
+        }
+        /* Fuerza posición a la derecha y color visible */
+        header .menu-toggle {
+          position: absolute !important;
+          right: 20px !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          display: block !important;
+          z-index: 9999;
+          font-size: 1.5rem;
+          color: #10214b !important; /* Azul oscuro para que se vea */
+        }
+
+        /* Ajustes del desplegable */
+        header nav ul.nav-menu {
+          display: none;
+          flex-direction: column;
+          width: 100%;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background-color: white;
+          padding: 20px 0;
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+          text-align: center;
+        }
+        header nav ul.nav-menu.active {
+          display: flex !important;
+        }
+        header nav ul.nav-menu li a {
+          color: #10214b !important;
+        }
+      }
+    </style>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Dra. Johana Manga Padilla",
+        "jobTitle": "Abogada Especialista en Derecho Laboral y Seguridad Social",
+        "worksFor": {
+          "@type": "LegalService",
+          "name": "Tu Abogado Laboral"
+        },
+        "url": "https://tuabogadolaboral.com.co/nosotros.html",
+        "image": "https://tuabogadolaboral.com.co/img/dra-johana-manga-perfil.webp",
+        "sameAs": [
+          "https://www.linkedin.com/in/dra-johana-manga-padilla-5745b542/",
+          "https://www.instagram.com/tuabogadolaboralbq/"
+        ],
+        "alumniOf": "Universidad Libre de Colombia",
+        "description": "Abogada litigante con más de 10 años de experiencia en la defensa de derechos laborales y pensionales en Barranquilla."
+      }
+    </script>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="container">
+        <div class="info">
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+        </div>
+      </div>
+    </div>
+    <header>
+      <div class="container header-container">
+        <div class="logo">
+          <a href="index.html" aria-label="Inicio">
+            <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55" />
+          </a>
+        </div>
+
+        <div
+          class="menu-toggle"
+          id="mobile-menu"
+          aria-label="Menú principal"
+          role="button"
+          tabindex="0"
+        >
+          <i class="fas fa-bars"></i>
+        </div>
+
+        <nav>
+          <ul class="nav-menu">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="blog.html" class="active">Herramientas</a></li>
+            <li><a href="contacto.html" class="btn-nav">Contacto</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section
+        class="hero"
+        style="
+          background:
+            linear-gradient(rgba(16, 33, 75, 0.9), rgba(16, 33, 75, 0.75)),
+            url(&quot;img/header-firma-legal.webp&quot;);
+          background-size: cover;
+          background-position: center;
+          background-attachment: fixed;
+        "
+      >
+        <div class="container hero-content text-center" style="margin: 0 auto">
+          <span class="subtitle">Nuestra Filosofía</span>
+          <h1>
+            Defensa Estratégica con <br />
+            <span style="color: #d4af37">Honestidad Radical</span>
+          </h1>
+          <p
+            style="
+              max-width: 700px;
+              margin: 20px auto 0;
+              font-size: 1.2rem;
+              color: #fff;
+            "
+          >
+            En Barranquilla y el Atlántico, equilibramos la balanza. No vendemos
+            ilusiones; garantizamos estrategia jurídica de alto nivel.
+          </p>
+        </div>
+      </section>
+
+      <section class="history-section">
+        <div class="container">
+          <div style="max-width: 800px; margin: 0 auto">
+            <h2
+              style="
+                color: #10214b;
+                font-family: &quot;Montserrat&quot;, sans-serif;
+              "
+            >
+              Más que abogados, somos estrategas
+            </h2>
+
+            <p
+              class="text-justify"
+              style="line-height: 1.8; color: #444; margin-top: 20px"
+            >
+              Las relaciones laborales requieren equilibrio. Mientras la ley
+              impone cargas a los empleadores y formalismos a los trabajadores,
+              nosotros aportamos claridad.
+              <strong
+                >Transformamos conflictos complejos en soluciones jurídicas
+                sólidas.</strong
+              >
+            </p>
+
+            <p
+              class="text-justify"
+              style="line-height: 1.8; color: #444; margin-top: 15px"
+            >
+              Fundamos <strong>Tu Abogado Laboral</strong> con una misión clara:
+              ofrecer en la Costa Caribe una defensa técnica que combine el
+              conocimiento profundo de los juzgados locales con herramientas
+              tecnológicas modernas.
+            </p>
+
+            <div class="text-highlight">
+              "Nuestra ética nos exige hablarte con la verdad procesal. Evaluamos
+              la viabilidad de tu caso con franqueza: te explicaremos los riesgos
+              y las probabilidades reales de éxito. No vendemos resultados
+              garantizados, sino una defensa técnica, estratégica y rigurosa."
+            </div>
+
+            <h3 style="color: #10214b; margin-top: 30px">
+              ¿Por qué nos eligen en Barranquilla?
+            </h3>
+            <ul style="margin-top: 15px; line-height: 1.8; color: #444">
+              <li>
+                <i class="fas fa-check-circle" style="color: #d4af37"></i>
+                <strong>Conocimiento Local:</strong> Litigamos diariamente en los
+                Juzgados del Circuito y ante el Tribunal Superior del Atlántico.
+              </li>
+              <li>
+                <i class="fas fa-check-circle" style="color: #d4af37"></i>
+                <strong>Claridad en Costos:</strong> Sin letra menuda. Sabrás
+                cuánto vale tu proceso y las probabilidades de éxito desde el día
+                uno.
+              </li>
+              <li>
+                <i class="fas fa-check-circle" style="color: #d4af37"></i>
+                <strong>Agilidad Digital:</strong> Usamos tecnología para auditar
+                liquidaciones en segundos, no en días.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="profile-section">
+        <div class="container">
+          <div class="profile-card">
+            <div class="profile-img">
+              <img
+                src="img/dra-johana-manga-perfil.webp"
+                alt="Dra. Johana Manga Padilla Abogada Laboral"
+                width="450"
+                height="500"
+                fetchpriority="high"
+              />
+            </div>
+            <div class="profile-content">
+              <span class="profile-badge">Directora Jurídica</span>
+              <h2
+                style="
+                  font-family: &quot;Montserrat&quot;, sans-serif;
+                  font-size: 2.2rem;
+                  color: #10214b;
+                  margin: 10px 0;
+                "
+              >
+                Dra. Johana Manga Padilla
+              </h2>
+              <p
+                style="
+                  color: #d4af37;
+                  font-weight: bold;
+                  text-transform: uppercase;
+                "
+              >
+                Especialista en Derecho Laboral y Seguridad Social
+              </p>
+
+              <p
+                class="text-justify"
+                style="color: #555; line-height: 1.7; margin: 20px 0"
+              >
+                Abogada especialista con una vocación definida por la defensa de
+                la dignidad laboral y el futuro pensional. La Dra. Manga se ha
+                consolidado como una referente en la reivindicación de derechos,
+                logrando mediante litigios estratégicos que trabajadores y
+                pensionados recuperen el patrimonio que les pertenece. Su dominio
+                absoluto de la normativa y de las fallas habituales del sistema le
+                otorgan una autoridad única para asesorar también al sector
+                empresarial, guiando a organizaciones que buscan corregir el
+                rumbo, prevenir demandas y operar bajo estándares de legalidad y
+                justicia.
+              </p>
+
+              <div style="margin-top: 30px">
+                <a
+                  href="contacto.html"
+                  class="btn-primary"
+                  style="padding: 12px 30px"
+                  >Solicitar consulta</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
     <meta
       name="description"
       content="Firma de abogados en Barranquilla experta en Derecho Laboral y Pensional. Liderada por la Dra. Johana Manga. Honestidad radical y resultados reales."

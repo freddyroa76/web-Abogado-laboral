@@ -3,7 +3,422 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Seguridad: CSP Básico -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+
     <title>Calculadora de Indemnización | Tu Abogado Laboral</title>
+    <link rel="icon" href="img/favicon.webp" type="image/webp" />
+
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      /* --- ESTILOS ESTÁNDAR (Base común) --- */
+      body {
+        font-family: "Lato", sans-serif;
+        margin: 0;
+        background-color: #f4f8fb;
+      }
+      .calc-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .calc-card {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(16, 33, 75, 0.08);
+        border: 1px solid #eee;
+        margin-bottom: 30px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 700;
+        color: #10214b;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+      }
+      .form-group small {
+        display: block;
+        color: #666;
+        font-size: 0.75rem;
+        margin-bottom: 8px;
+        background: #f4f8fb;
+        padding: 4px 8px;
+        border-radius: 4px;
+        width: fit-content;
+      }
+
+      .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      .input-icon {
+        position: absolute;
+        left: 15px;
+        color: #10214b;
+        z-index: 10;
+      }
+      .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 40px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: #f9f9f9;
+        box-sizing: border-box;
+        transition: 0.3s;
+      }
+      .form-control:focus {
+        border-color: #10214b;
+        background: #fff;
+        outline: none;
+      }
+      .form-control.no-icon {
+        padding-left: 15px;
+      } /* Ajuste para inputs sin icono */
+      select.form-control {
+        cursor: pointer;
+        font-weight: bold;
+        color: #10214b;
+      }
+
+      .calc-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+      }
+      .form-grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+      }
+      @media (max-width: 768px) {
+        .calc-grid,
+        .form-grid-3 {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .btn-calculate {
+        background-color: #10214b;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 30px;
+        text-transform: uppercase;
+      }
+      .btn-calculate:hover {
+        background-color: #25d366;
+        transform: translateY(-2px);
+      }
+
+      /* --- ESTILOS ESPECÍFICOS INDEMNIZACIÓN (Necesarios para la tabla) --- */
+      .period-manager {
+        margin-top: 20px;
+        display: none;
+      } /* Oculto por defecto */
+      .period-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr auto;
+        gap: 10px;
+        align-items: end;
+        margin-bottom: 15px;
+      }
+
+      .btn-add {
+        background: #28a745;
+        color: white;
+        border: none;
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+      }
+      .btn-add:hover {
+        background: #218838;
+        transform: scale(1.05);
+      }
+      .btn-delete {
+        background: #dc3545;
+        color: white;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .history-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 0.9rem;
+        background: white;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #eee;
+      }
+      .history-table th {
+        background: #e9ecef;
+        padding: 12px;
+        text-align: left;
+        color: #555;
+        font-weight: bold;
+      }
+      .history-table td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .info-box {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        color: #0d47a1;
+        line-height: 1.4;
+      }
+      .info-box.warn {
+        background: #fff3e0;
+        border-color: #ff9800;
+        color: #e65100;
+      }
+
+      /* --- RESULTADOS TIPO INFORME (Específico Indemnización) --- */
+      #resultsContainer {
+        display: none;
+        margin-top: 40px;
+      }
+      .result-container {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid #eee;
+      }
+      .result-header {
+        background: #10214b;
+        color: white;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .result-body {
+        padding: 30px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .input-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        font-size: 0.85rem;
+        margin-bottom: 30px;
+      }
+      .input-item label {
+        display: block;
+        color: #666;
+        font-weight: bold;
+        margin-bottom: 3px;
+      }
+      .input-item span {
+        color: #10214b;
+        font-weight: 800;
+        font-size: 1rem;
+      }
+
+      .simple-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      .simple-table th {
+        text-align: left;
+        padding: 12px;
+        background: #f5f5f5;
+        color: #333;
+        font-size: 0.9rem;
+        border-bottom: 2px solid #ddd;
+      }
+      .simple-table td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        font-size: 0.95rem;
+      }
+      .simple-table tr:last-child td {
+        font-weight: bold;
+        border-bottom: none;
+      }
+
+      .total-final {
+        background: #f4f8fb;
+        padding: 25px;
+        text-align: right;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .total-label {
+        font-size: 1.2rem;
+        color: #10214b;
+        font-weight: bold;
+      }
+      .total-value {
+        font-size: 2rem;
+        color: #25d366;
+        font-weight: 900;
+      }
+
+      .btn-pdf {
+        display: block;
+        width: 250px;
+        margin: 30px auto 0;
+        padding: 15px;
+        background: #c62828;
+        color: white;
+        text-align: center;
+        border: none;
+        border-radius: 50px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+        font-size: 1rem;
+      }
+      .btn-pdf:hover {
+        background: #b71c1c;
+        transform: scale(1.05);
+      }
+
+      .whatsapp-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #25d366;
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 35px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+      .whatsapp-btn:hover {
+        background-color: #128c7e;
+        transform: scale(1.1);
+      }
+      /* --- CORRECCIÓN MENÚ QUIRÚRGICA PARA MÓVILES --- */
+      @media (max-width: 768px) {
+        header .header-container {
+          position: relative; /* Referencia de posición */
+        }
+        /* 1. Posición Extrema Derecha y Color Azul */
+        header .menu-toggle {
+          position: absolute !important;
+          right: 20px !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          display: block !important;
+          z-index: 9999;
+          font-size: 1.5rem;
+          color: #10214b !important; /* Azul oscuro obligatorio */
+          cursor: pointer;
+        }
+
+        /* 2. Menú Desplegable (Fondo Blanco) */
+        header nav ul.nav-menu {
+          display: none;
+          flex-direction: column;
+          width: 100%;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background-color: white;
+          padding: 20px 0;
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+          text-align: center;
+        }
+
+        header nav ul.nav-menu.active {
+          display: flex !important;
+        }
+
+        /* 3. Color de los enlaces */
+        header nav ul.nav-menu li a {
+          color: #10214b !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="container">
+        <div class="info">
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+        </div>
+      </div>
+    </div>
+    <header>
+      <div class="container header-container">
+        <div class="logo">
+          <a href="index.html" aria-label="Inicio">
+            <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
+          /></a>
+        </div>
+        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+          <i class="fas fa-bars"></i>
+        </div>
+        <nav>
+          <ul class="nav-menu">
+            <li>
+              <a href="blog.html" style="color: #10214b; font-weight: bold"
+                ><i class="fas fa-arrow-left"></i> Volver a Herramientas</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+    <section class="bg-light">
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
 
     <link rel="stylesheet" href="css/style.css" />
@@ -855,6 +1270,7 @@
       </div>
     </section>
 
+    </main>
     <footer>
       <div class="container">
         <div class="footer-grid">

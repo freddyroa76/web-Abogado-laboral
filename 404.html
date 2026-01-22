@@ -3,7 +3,141 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Seguridad: CSP Básico -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+
     <title>Página no encontrada | Tu Abogado Laboral</title>
+    <link rel="icon" href="img/favicon.webp" type="image/webp" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      .error-container {
+        text-align: center;
+        padding: 80px 20px;
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .error-code {
+        font-size: 8rem;
+        font-weight: 900;
+        color: #d4af37;
+        line-height: 1;
+        margin: 0;
+      }
+      .error-title {
+        font-size: 2rem;
+        color: #10214b;
+        margin-top: 10px;
+        font-weight: bold;
+      }
+      .error-desc {
+        color: #666;
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 20px auto 40px auto;
+      }
+      .btn-home {
+        background-color: #10214b;
+        color: white;
+        padding: 15px 30px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .btn-home:hover {
+        background-color: #d4af37;
+        transform: translateY(-3px);
+      }
+      /* --- CORRECCIÓN MENÚ QUIRÚRGICA PARA MÓVILES --- */
+      @media (max-width: 768px) {
+        header .header-container {
+          position: relative; /* Referencia de posición */
+        }
+        /* 1. Posición Extrema Derecha y Color Azul */
+        header .menu-toggle {
+          position: absolute !important;
+          right: 20px !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          display: block !important;
+          z-index: 9999;
+          font-size: 1.5rem;
+          color: #10214b !important; /* Azul oscuro obligatorio */
+          cursor: pointer;
+        }
+
+        /* 2. Menú Desplegable (Fondo Blanco) */
+        header nav ul.nav-menu {
+          display: none;
+          flex-direction: column;
+          width: 100%;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background-color: white;
+          padding: 20px 0;
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+          text-align: center;
+        }
+
+        header nav ul.nav-menu.active {
+          display: flex !important;
+        }
+
+        /* 3. Color de los enlaces */
+        header nav ul.nav-menu li a {
+          color: #10214b !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="container">
+        <div class="info">
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+        </div>
+      </div>
+    </div>
+    <header>
+      <div class="container header-container">
+        <div class="logo">
+          <a href="index.html"
+            ><img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
+          /></a>
+        </div>
+        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+          <i class="fas fa-bars"></i>
+        </div>
+        <nav>
+          <ul class="nav-menu">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="blog.html" class="active">Herramientas</a></li>
+            <li><a href="contacto.html" class="btn-nav">Contacto</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+    <section class="bg-light">
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
     <link rel="stylesheet" href="css/style.css" />
     <link
@@ -109,6 +243,7 @@
         >
       </div>
     </section>
+    </main>
     <footer>
       <div class="container">
         <div class="footer-grid">
