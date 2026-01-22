@@ -469,7 +469,7 @@ header {
 
 .autor span {
   font-size: 0.9rem;
-  color: var(--secondary); /* Cargo en dorado */
+  color: #b08d55; /* Oscurecido para cumplir contraste AA/AAA */
   font-weight: 600;
 }
 
@@ -692,26 +692,12 @@ textarea:focus {
 }
 
 /* 2. OPTIMIZACIÓN DE CARGA DE FUENTES (CORE WEB VITALS) */
-/* 'swap' muestra el texto inmediatamente con una fuente básica 
-   mientras carga la fuente bonita, evitando el "texto invisible" */
-@font-face {
-  font-family: "Lato";
-  font-style: normal;
-  font-weight: 300 400 700;
-  font-display: swap;
-  src:
-    local("Lato"),
-    url("https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap");
-}
+/* Las fuentes se cargan desde el HTML con display=swap para mejor rendimiento */
 
-@font-face {
-  font-family: "Montserrat";
-  font-style: normal;
-  font-weight: 400 700 900;
-  font-display: swap;
-  src:
-    local("Montserrat"),
-    url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap");
+/* 3. MEJORA DE CONTRASTE EN FOOTER */
+/* El texto original era muy transparente (0.4), difícil de leer */
+.footer-bottom {
+  color: rgba(255, 255, 255, 0.85); /* Aumentado de 0.4 a 0.85 */
 }
 
 /* 3. MEJORA DE CONTRASTE EN FOOTER */
