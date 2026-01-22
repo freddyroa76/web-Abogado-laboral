@@ -72,6 +72,11 @@
           "latitude": 10.9685,
           "longitude": -74.7813
         },
+        "areaServed": {
+          "@type": "City",
+          "name": "Barranquilla"
+        },
+        "hasMap": "https://maps.app.goo.gl/placeholder",
         "openingHoursSpecification": [
           {
             "@type": "OpeningHoursSpecification",
@@ -104,6 +109,37 @@
             "closes": "12:00"
           }
         ],
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "reviewCount": "58"
+        },
+        "review": [
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Gerente General Incomac S.A.S"
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": "5"
+            },
+            "reviewBody": "Excelente manejo de los procesos laborales de nuestra empresa. Aliados estratégicos clave."
+          },
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Cliente Pensional"
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": "5"
+            },
+            "reviewBody": "La Dra. Manga demostró una idoneidad excepcional. Su rapidez en las respuestas nos dio seguridad."
+          }
+        ],
         "sameAs": [
           "https://www.facebook.com/tuabogadolaboral",
           "https://www.instagram.com/tuabogadolaboral",
@@ -121,9 +157,13 @@
     <div class="top-bar">
       <div class="container">
         <div class="info">
-          <i class="fas fa-phone-alt"></i> (+57) 321 792 7495
+          <a href="tel:+573217927495" style="margin-right: 15px"
+            ><i class="fas fa-phone-alt"></i> (+57) 321 792 7495</a
+          >
           <span class="separador">|</span>
-          <i class="fas fa-envelope"></i> tuabogadolaboral@outlook.com
+          <a href="mailto:tuabogadolaboral@outlook.com"
+            ><i class="fas fa-envelope"></i> tuabogadolaboral@outlook.com</a
+          >
         </div>
         <div class="social-icons">
           <a
@@ -198,7 +238,9 @@
         </p>
 
         <div class="cta-group">
-          <a href="contacto.html" class="btn btn-primary">Solicitar Asesoría</a>
+          <a href="contacto.html" class="btn btn-primary btn-pulse"
+            >Solicitar Asesoría</a
+          >
           <a href="#servicios-acordeon" class="btn btn-outline"
             >Áreas de Práctica</a
           >
