@@ -15,241 +15,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <style>
-      /* --- ESTILOS ESPECÍFICOS DE LA CALCULADORA --- */
-      body {
-        font-family: "Lato", sans-serif;
-        margin: 0;
-        background-color: #f4f8fb;
-      }
-      .calc-wrapper {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-      .calc-card {
-        background: white;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(16, 33, 75, 0.08);
-        border: 1px solid #eee;
-        margin-bottom: 30px;
-      }
-      .form-group label {
-        display: block;
-        font-weight: 700;
-        color: #10214b;
-        margin-bottom: 5px;
-        font-size: 0.9rem;
-      }
-      .form-group small {
-        display: block;
-        color: #666;
-        font-size: 0.75rem;
-        margin-bottom: 8px;
-        background: #f4f8fb;
-        padding: 4px 8px;
-        border-radius: 4px;
-        width: fit-content;
-      }
-      .input-group {
-        position: relative;
-        display: flex;
-        align-items: center;
-      }
-      .input-icon {
-        position: absolute;
-        left: 15px;
-        color: #10214b;
-        z-index: 10;
-      }
-      .form-control {
-        width: 100%;
-        padding: 12px 15px 12px 40px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 1rem;
-        background: #f9f9f9;
-        box-sizing: border-box;
-      }
-      .form-control:focus {
-        border-color: #10214b;
-        background: #fff;
-        outline: none;
-      }
-      select.form-control {
-        cursor: pointer;
-        font-weight: bold;
-        color: #10214b;
-      }
-
-      .calc-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 25px;
-      }
-      .hours-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-        margin-top: 20px;
-      }
-
-      @media (max-width: 768px) {
-        .calc-grid,
-        .hours-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .btn-calculate {
-        background-color: #10214b;
-        color: white;
-        border: none;
-        width: 100%;
-        padding: 15px;
-        font-size: 1.1rem;
-        font-weight: bold;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s;
-        margin-top: 30px;
-        text-transform: uppercase;
-      }
-      .btn-calculate:hover {
-        background-color: #25d366;
-        transform: translateY(-2px);
-      }
-
-      /* --- ESTILOS RESULTADOS --- */
-      .result-container {
-        display: none;
-        background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        border: 1px solid #eee;
-        margin-top: 20px;
-      }
-      .result-header {
-        background: #10214b;
-        color: white;
-        padding: 20px 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .result-body {
-        padding: 30px;
-      }
-
-      /* Grid de resultados dividido */
-      .result-split-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        margin-bottom: 20px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 20px;
-      }
-      @media (max-width: 600px) {
-        .result-split-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .result-column h4 {
-        margin: 0 0 15px 0;
-        color: #10214b;
-        font-size: 1rem;
-        border-bottom: 2px solid #e8f5e9;
-        padding-bottom: 5px;
-      }
-      .result-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 8px;
-        font-size: 0.95rem;
-      }
-
-      /* Subtotales */
-      .subtotal-row {
-        margin-top: 15px;
-        padding-top: 10px;
-        border-top: 1px dashed #ccc;
-        display: flex;
-        justify-content: space-between;
-        font-weight: bold;
-        color: #555;
-      }
-
-      .result-total {
-        background: #f4f8fb;
-        padding: 25px;
-        text-align: right;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 8px;
-      }
-      .total-value {
-        font-size: 2rem;
-        color: #25d366;
-        font-weight: 900;
-      }
-
-      .badge-info {
-        display: inline-block;
-        font-size: 0.8rem;
-        padding: 6px 10px;
-        border-radius: 6px;
-        margin-left: 0;
-        margin-right: 10px;
-        background: #e3f2fd;
-        color: #1565c0;
-        font-weight: bold;
-      }
-      /* --- CORRECCIÓN MENÚ QUIRÚRGICA PARA MÓVILES --- */
-      @media (max-width: 768px) {
-        header .header-container {
-          position: relative; /* Referencia de posición */
-        }
-        /* 1. Posición Extrema Derecha y Color Azul */
-        header .menu-toggle {
-          position: absolute !important;
-          right: 20px !important;
-          top: 50% !important;
-          transform: translateY(-50%) !important;
-          display: block !important;
-          z-index: 9999;
-          font-size: 1.5rem;
-          color: #10214b !important; /* Azul oscuro obligatorio */
-          cursor: pointer;
-        }
-
-        /* 2. Menú Desplegable (Fondo Blanco) */
-        header nav ul.nav-menu {
-          display: none;
-          flex-direction: column;
-          width: 100%;
-          position: absolute;
-          top: 100%;
-          left: 0;
-          background-color: white;
-          padding: 20px 0;
-          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-          text-align: center;
-        }
-
-        header nav ul.nav-menu.active {
-          display: flex !important;
-        }
-
-        /* 3. Color de los enlaces */
-        header nav ul.nav-menu li a {
-          color: #10214b !important;
-        }
-      }
+      /* --- ESTILOS ELIMINADOS (Movidos a css/style.css) --- */
     </style>
   </head>
   <body>
@@ -267,7 +33,13 @@
             <img src="img/logo-principal.webp" alt="Logo" class="logo-img"
           /></a>
         </div>
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+        <div
+          class="menu-toggle"
+          id="mobile-menu"
+          aria-label="Menú principal"
+          role="button"
+          tabindex="0"
+        >
           <i class="fas fa-bars"></i>
         </div>
         <nav>
@@ -668,161 +440,7 @@
       </div>
     </footer>
 
-    <script>
-      // 1. CONFIGURACIÓN LEGAL (Validada 2026 y Reforma)
-      const CONSTANTES_PERIODO = {
-        p_old: {
-          divisor: 240,
-          dom: 0.75,
-          label: "48 Horas",
-          text: "Normativa Antigua",
-        },
-        p_2023: {
-          divisor: 235,
-          dom: 0.75,
-          label: "47 Horas",
-          text: "Transición 2023-2024",
-        },
-        p_2024: {
-          divisor: 230,
-          dom: 0.75,
-          label: "46 Horas",
-          text: "Transición 2024-2025",
-        },
-        p_2025: {
-          divisor: 220,
-          dom: 0.8,
-          label: "44 Horas",
-          text: "Reforma & Reducción 2025-2026",
-        },
-        p_2026: {
-          divisor: 210,
-          dom: 0.9,
-          label: "42 Horas",
-          text: "Reforma & Reducción 2026-2027",
-        },
-        p_2027: {
-          divisor: 210,
-          dom: 1.0,
-          label: "42 Horas",
-          text: "Implementación Total",
-        },
-      };
-
-      const selectorPeriodo = document.getElementById("periodoSelector");
-      const badgeJornada = document.getElementById("badgeJornada");
-      const badgeRecargo = document.getElementById("badgeRecargo");
-
-      // Función visual actualizada con DIVISOR explícito
-      function actualizarInfoVisual() {
-        const key = selectorPeriodo.value;
-        const config = CONSTANTES_PERIODO[key];
-
-        badgeJornada.innerHTML = `<i class="fas fa-clock"></i> Jornada: ${config.label} | Divisor: ${config.divisor}`;
-        badgeRecargo.innerHTML = `<i class="fas fa-percentage"></i> Recargo Dom: ${(
-          config.dom * 100
-        ).toFixed(0)}%`;
-      }
-
-      selectorPeriodo.addEventListener("change", actualizarInfoVisual);
-      actualizarInfoVisual();
-
-      const formatoPeso = new Intl.NumberFormat("es-CO", {
-        style: "currency",
-        currency: "COP",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      });
-
-      // 2. LÓGICA DE CÁLCULO
-      document
-        .getElementById("extrasForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-
-          // A. Obtener Configuración
-          const key = selectorPeriodo.value;
-          const config = CONSTANTES_PERIODO[key];
-          const divisorJornada = config.divisor;
-          const porcentajeDominical = config.dom;
-
-          // B. Obtener Inputs
-          let salario =
-            parseFloat(document.getElementById("salario").value) || 0;
-          let qtyHed = parseFloat(document.getElementById("hed").value) || 0;
-          let qtyHen = parseFloat(document.getElementById("hen").value) || 0;
-          let qtyRn = parseFloat(document.getElementById("rn").value) || 0;
-          let qtyDf = parseFloat(document.getElementById("df").value) || 0;
-          let qtyHedf = parseFloat(document.getElementById("hedf").value) || 0;
-          let qtyHedfn =
-            parseFloat(document.getElementById("hedfn").value) || 0;
-
-          // C. Factores
-          const FACTOR_HED = 1.25;
-          const FACTOR_HEN = 1.75;
-          const FACTOR_RN = 0.35;
-
-          const FACTOR_DF = 1.0 + porcentajeDominical;
-          const FACTOR_HEDF = 1.0 + 0.25 + porcentajeDominical;
-          const FACTOR_HEDFN = 1.0 + 0.75 + porcentajeDominical;
-
-          // D. Matemáticas Individuales
-          let valHora = salario / divisorJornada;
-
-          // Grupo Extras
-          let totalHed = Math.round(valHora * FACTOR_HED * qtyHed);
-          let totalHen = Math.round(valHora * FACTOR_HEN * qtyHen);
-          let totalHedf = Math.round(valHora * FACTOR_HEDF * qtyHedf);
-          let totalHedfn = Math.round(valHora * FACTOR_HEDFN * qtyHedfn);
-
-          // Grupo Recargos
-          let totalRn = Math.round(valHora * FACTOR_RN * qtyRn);
-          let totalDf = Math.round(valHora * FACTOR_DF * qtyDf);
-
-          // E. Subtotales y Totales
-          let subtotalExtras = totalHed + totalHen + totalHedf + totalHedfn;
-          let subtotalRecargos = totalRn + totalDf;
-          let granTotal = subtotalExtras + subtotalRecargos;
-
-          // F. Renderizado en Pantalla
-          document.getElementById("valHoraOrdinaria").textContent =
-            formatoPeso.format(Math.round(valHora));
-          document.getElementById("resDivisorUsado").textContent =
-            `Divisor usado: ${divisorJornada}`;
-          document.getElementById("resPeriodoTexto").textContent =
-            `Vigencia: ${config.text}`;
-
-          // Renderizar Items Individuales
-          document.getElementById("resHed").textContent =
-            formatoPeso.format(totalHed);
-          document.getElementById("resHen").textContent =
-            formatoPeso.format(totalHen);
-          document.getElementById("resHedf").textContent =
-            formatoPeso.format(totalHedf);
-          document.getElementById("resHedfn").textContent =
-            formatoPeso.format(totalHedfn);
-
-          document.getElementById("resRn").textContent =
-            formatoPeso.format(totalRn);
-          document.getElementById("resDf").textContent =
-            formatoPeso.format(totalDf);
-
-          // Renderizar Subtotales
-          document.getElementById("subtotalExtras").textContent =
-            formatoPeso.format(subtotalExtras);
-          document.getElementById("subtotalRecargos").textContent =
-            formatoPeso.format(subtotalRecargos);
-
-          // Renderizar Gran Total
-          document.getElementById("valTotal").textContent =
-            formatoPeso.format(granTotal);
-
-          // Animación Scroll
-          let resultCard = document.getElementById("resultCard");
-          resultCard.style.display = "block";
-          resultCard.scrollIntoView({ behavior: "smooth" });
-        });
-    </script>
+    <script src="js/calculadora-horas-extras.js" defer></script>
     <a
       href="https://wa.me/573217927495"
       class="whatsapp-btn"
@@ -832,5 +450,31 @@
       <i class="fab fa-whatsapp"></i>
     </a>
     <script src="js/main.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://tuabogadolaboral.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Herramientas",
+            "item": "https://tuabogadolaboral.com/blog.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Calculadora Horas Extras",
+            "item": "https://tuabogadolaboral.com/herramienta-horas-extras.html"
+          }
+        ]
+      }
+    </script>
   </body>
 </html>

@@ -279,7 +279,13 @@
             <img src="img/logo-principal.webp" alt="Logo" class="logo-img"
           /></a>
         </div>
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+        <div
+          class="menu-toggle"
+          id="mobile-menu"
+          aria-label="Menú principal"
+          role="button"
+          tabindex="0"
+        >
           <i class="fas fa-bars"></i>
         </div>
         <nav>
@@ -613,122 +619,8 @@
       </div>
     </footer>
 
-    <script>
-      // CONTROL DE VISIBILIDAD DEL INPUT AUXILIO
-      const checkAuxilio = document.getElementById("checkAuxilio");
-      const boxValorAuxilio = document.getElementById("boxValorAuxilio");
-
-      checkAuxilio.addEventListener("change", function () {
-        if (this.checked) {
-          boxValorAuxilio.style.display = "block";
-        } else {
-          boxValorAuxilio.style.display = "none";
-          document.getElementById("valorAuxilioInput").value = ""; // Limpiar si se desmarca
-        }
-      });
-
-      // Función para formato moneda
-      const formatoPeso = new Intl.NumberFormat("es-CO", {
-        style: "currency",
-        currency: "COP",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      });
-
-      // CALCULAR DÍAS (Lógica 360 - Contable Laboral Colombiana)
-      function calcularDias360(fechaInicio, fechaFin) {
-        let inicio = new Date(fechaInicio);
-        let fin = new Date(fechaFin);
-
-        // Ajuste Zona Horaria
-        inicio.setMinutes(inicio.getMinutes() + inicio.getTimezoneOffset());
-        fin.setMinutes(fin.getMinutes() + fin.getTimezoneOffset());
-
-        if (fin < inicio) return 0;
-
-        let day1 = inicio.getDate();
-        let month1 = inicio.getMonth() + 1;
-        let year1 = inicio.getFullYear();
-
-        let day2 = fin.getDate();
-        let month2 = fin.getMonth() + 1;
-        let year2 = fin.getFullYear();
-
-        // Ajuste 360: Si el día es 31, se cuenta como 30
-        if (day1 === 31) day1 = 30;
-        if (day2 === 31) day2 = 30;
-
-        let dias =
-          (year2 - year1) * 360 + (month2 - month1) * 30 + (day2 - day1) + 1; // +1 inclusivo
-
-        return dias;
-      }
-
-      // CALCULAR TODO AL ENVIAR
-      document
-        .getElementById("cesantiasForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault(); // DETIENE EL REFRESCO DE LA PÁGINA
-
-          // 1. OBTENER VALORES
-          let salario =
-            parseFloat(document.getElementById("salario").value) || 0;
-          let otros =
-            parseFloat(document.getElementById("otrosIngresos").value) || 0;
-          let fechaInicio = document.getElementById("fechaInicio").value;
-          let fechaFin = document.getElementById("fechaFin").value;
-
-          // Lógica del Auxilio Manual
-          let incluyeAuxilio = checkAuxilio.checked;
-          let valorAuxilioDigitado = 0;
-
-          if (incluyeAuxilio) {
-            // Si el usuario marcó el check, tomamos el valor que escribió. Si lo dejó vacío, es 0.
-            valorAuxilioDigitado =
-              parseFloat(document.getElementById("valorAuxilioInput").value) ||
-              0;
-          }
-
-          // Validaciones
-          if (!fechaInicio || !fechaFin) {
-            alert("Por favor ingrese las fechas.");
-            return;
-          }
-
-          // 2. CÁLCULOS
-          let diasTrabajados = calcularDias360(fechaInicio, fechaFin);
-
-          // Base = Salario + Otros + Auxilio (si el usuario lo indicó)
-          let baseLiquidacion = salario + otros + valorAuxilioDigitado;
-
-          // Ecuaciones de Ley
-          let cesantias = (baseLiquidacion * diasTrabajados) / 360;
-          let intereses = (cesantias * diasTrabajados * 0.12) / 360;
-          let total = cesantias + intereses;
-
-          // 3. MOSTRAR RESULTADOS
-          document.getElementById("resSalario").textContent =
-            formatoPeso.format(salario + otros);
-          document.getElementById("resAuxilio").textContent =
-            formatoPeso.format(valorAuxilioDigitado);
-          document.getElementById("resDias").textContent =
-            diasTrabajados + " días";
-          document.getElementById("periodoTexto").textContent =
-            "Periodo: " + fechaInicio + " a " + fechaFin;
-
-          document.getElementById("valCesantias").textContent =
-            formatoPeso.format(cesantias);
-          document.getElementById("valIntereses").textContent =
-            formatoPeso.format(intereses);
-          document.getElementById("valTotal").textContent =
-            formatoPeso.format(total);
-
-          // 4. MOSTRAR TARJETA (ANIMACIÓN)
-          let resultCard = document.getElementById("resultCard");
-          resultCard.style.display = "block";
-          resultCard.scrollIntoView({ behavior: "smooth" });
-        });
-    </script>
+    <script src="js/main.js"></script>
+    <script src="js/calculadora-cesantias.js" defer></script>
     <a
       href="https://wa.me/573217927495"
       class="whatsapp-btn"
@@ -739,5 +631,31 @@
       <i class="fab fa-whatsapp"></i>
     </a>
     <script src="js/main.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://tuabogadolaboral.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Herramientas",
+            "item": "https://tuabogadolaboral.com/blog.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Calculadora Cesantías",
+            "item": "https://tuabogadolaboral.com/herramienta-cesantias.html"
+          }
+        ]
+      }
+    </script>
   </body>
 </html>
