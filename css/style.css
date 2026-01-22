@@ -1719,3 +1719,151 @@ select.form-control {
     color: #10214b !important;
   }
 }
+
+/* =========================================
+   ESTILOS FALTANTES CONSOLIDADOS
+   (Liquidación, Licencias, etc.)
+   ========================================= */
+
+/* GRID DE 3 COLUMNAS */
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 800px) {
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* CAJAS CONDICIONALES */
+.conditional-box {
+  display: none;
+  margin-top: 15px;
+  padding: 15px;
+  border-left: 3px solid #d4af37;
+  background: #fffdf5;
+}
+
+/* GESTIÓN DE PERIODOS (LIQUIDACIÓN) */
+.period-manager {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+.period-header {
+  background: #f1f3f5;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+  font-weight: bold;
+  color: var(--primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.period-body {
+  padding: 20px;
+}
+.period-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 15px;
+}
+@media (max-width: 600px) {
+  .period-row {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  .period-row > div:last-child {
+    margin-top: 10px;
+  }
+}
+
+/* BOTONES DE ACCIÓN (Añadir/Eliminar) */
+.btn-add {
+  background: #28a745;
+  color: white;
+  border: none;
+  width: 42px;
+  height: 38px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+.btn-add:hover {
+  background: #218838;
+  transform: scale(1.05);
+}
+.btn-delete {
+  background: #dc3545;
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* TABLA HISTORIAL */
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  font-size: 0.9rem;
+}
+.history-table th {
+  background: #e9ecef;
+  padding: 10px;
+  text-align: left;
+  color: #555;
+}
+.history-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+/* TOTAL FINAL (Unificado) */
+.total-final {
+  background: #f4f8fb;
+  padding: 25px;
+  text-align: right;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+.total-label {
+  font-size: 1.2rem;
+  color: var(--primary);
+  font-weight: bold;
+}
+.total-value {
+  font-size: 2rem;
+  color: #25d366;
+  font-weight: 900;
+}
+.total-amount {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+/* CONTACTO */
+#campo-otro-asunto {
+  display: none; /* Oculto por defecto */
+  margin-top: 15px;
+}
