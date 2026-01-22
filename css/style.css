@@ -901,3 +901,425 @@ textarea:focus {
     padding: 25px !important;
   }
 }
+
+/* =========================================
+   ESTILOS CALCULADORA NOMINA
+   ========================================= */
+/* --- ESTILOS MAESTROS --- */
+:root {
+  /* --primary: #10214b; (Ya existe en global) */
+  /* --secondary: #d7bd88; (Global es #d7bd88, aqui era #d4af37 - Usaremos variable global para consistencia o definimos localmente si es intencional) */
+  /* Mantendremos las definiciones locales dentro de una clase wrapper si fuera necesario, pero por ahora las dejamos globales para el scope de la herramienta */
+  --calc-accent: #0056b3;
+  --calc-bg-light: #f4f8fb;
+  --calc-border: #e0e0e0;
+}
+
+/* Usamos un namespace para no romper estilos globales si hay conflicto */
+.calc-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* TARJETAS */
+.calc-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(16, 33, 75, 0.05);
+  border: 1px solid var(--calc-border);
+  margin-bottom: 25px;
+}
+
+/* CONFIGURACIÓN FLOTANTE */
+.config-bar {
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+.config-label {
+  font-weight: 900;
+  color: #0d47a1;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.calc-section-title { /* Renombrado para evitar conflicto con .section-title global */
+  color: var(--primary);
+  font-size: 1.2rem;
+  font-weight: 800;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* GRIDS FORMULARIOS */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 600px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group label {
+  display: block;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 5px;
+  font-size: 0.85rem;
+}
+.form-group small {
+  display: block;
+  color: #666;
+  font-size: 0.75rem;
+  margin-bottom: 5px;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--primary);
+  z-index: 10;
+  opacity: 0.7;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 10px 10px 35px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: #fff;
+  box-sizing: border-box;
+  transition: all 0.3s;
+}
+.form-control:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 33, 75, 0.1);
+}
+.form-control:disabled {
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+select.form-control {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* CHECKBOXES */
+.check-group {
+  background: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 42px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.check-group input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+.check-group label {
+  margin: 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+  flex-grow: 1;
+}
+
+.btn-calculate {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 16px;
+  font-size: 1.1rem;
+  font-weight: 900;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.btn-calculate:hover {
+  background-color: var(--secondary);
+  transform: translateY(-2px);
+}
+
+/* --- ESTILOS PARA REPORTE MAGISTRAL (PDF Friendly) --- */
+#resultsContainer {
+  display: none; /* Oculto al inicio */
+  margin-top: 40px;
+}
+
+/* Importante: Sin overflow hidden para que PDF capture todo */
+.report-paper {
+  background: white;
+  padding: 40px;
+  border-radius: 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eee;
+  position: relative;
+}
+
+/* MARCA DE AGUA */
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 5rem;
+  font-weight: 900;
+  color: #f2f2f2; /* Gris muy claro para no tapar texto */
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 0;
+  font-family: "Montserrat", sans-serif;
+}
+
+.report-section {
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.report-header-strip {
+  background: var(--primary);
+  color: var(--secondary);
+  padding: 8px 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  border-left: 5px solid var(--secondary);
+  font-size: 0.95rem;
+}
+
+/* DATOS DE ENTRADA EN PDF */
+.input-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  font-size: 0.85rem;
+}
+.input-item label {
+  display: block;
+  color: #666;
+  font-weight: bold;
+  margin-bottom: 3px;
+}
+.input-item span {
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+/* DISEÑO PESTAÑA EMPLEADOR (GRID) */
+.employer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+@media (max-width: 800px) {
+  .employer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-box {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 20px;
+  height: 100%;
+  box-shadow: none;
+  border: 1px solid #ddd;
+}
+.summary-header {
+  color: var(--primary);
+  font-weight: 800;
+  border-bottom: 2px solid var(--secondary);
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.row-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  color: #555;
+}
+.row-item strong {
+  color: #222;
+}
+
+.total-card {
+  background: var(--primary);
+  color: white;
+  padding: 25px;
+  border-radius: 10px;
+  text-align: right;
+  margin-top: 20px;
+}
+.total-card h3 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--secondary);
+}
+
+/* TABLAS SIMPLES */
+.simple-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.simple-table th {
+  text-align: left;
+  padding: 8px;
+  background: #f5f5f5;
+  color: #333;
+  font-size: 0.85rem;
+  border-bottom: 2px solid #ddd;
+}
+.simple-table td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+.simple-table tr:last-child td {
+  border-bottom: none;
+  font-weight: bold;
+}
+
+.text-red {
+  color: #c62828;
+  font-weight: bold;
+}
+.text-green {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+/* BOTÓN PDF */
+.btn-pdf {
+  display: block;
+  width: 280px;
+  margin: 30px auto 0;
+  padding: 15px;
+  background: #c62828;
+  color: white;
+  text-align: center;
+  border: none;
+  border-radius: 50px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+  text-decoration: none;
+  font-size: 1rem;
+}
+.btn-pdf:hover {
+  background: #b71c1c;
+  transform: scale(1.05);
+}
+
+/* WhatsApp Float */
+.whatsapp-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #25d366;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 35px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+.whatsapp-btn:hover {
+  background-color: #128c7e;
+  transform: scale(1.1);
+}
+/* --- CORRECCIÓN MENÚ QUIRÚRGICA PARA MÓVILES --- */
+@media (max-width: 768px) {
+  header .header-container {
+    position: relative; /* Referencia de posición */
+  }
+  /* 1. Posición Extrema Derecha y Color Azul */
+  header .menu-toggle {
+    position: absolute !important;
+    right: 20px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    display: block !important;
+    z-index: 9999;
+    font-size: 1.5rem;
+    color: #10214b !important; /* Azul oscuro obligatorio */
+    cursor: pointer;
+  }
+
+  /* 2. Menú Desplegable (Fondo Blanco) */
+  header nav ul.nav-menu {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    padding: 20px 0;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  header nav ul.nav-menu.active {
+    display: flex !important;
+  }
+
+  /* 3. Color de los enlaces */
+  header nav ul.nav-menu li a {
+    color: #10214b !important;
+  }
+}
