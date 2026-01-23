@@ -4,18 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Seguridad: CSP Básico -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;"
+    />
 
     <title>Calculadora de Retención en la Fuente | Tu Abogado Laboral</title>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
     <link rel="stylesheet" href="css/style.css" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=optional"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      crossorigin="anonymous"
     />
     <style>
       /* --- ESTILOS ESPECÍFICOS --- */
@@ -273,10 +277,21 @@
       <div class="container header-container">
         <div class="logo">
           <a href="index.html" aria-label="Inicio">
-            <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
+            <img
+              src="img/logo-principal.webp"
+              alt="Logo"
+              class="logo-img"
+              width="200"
+              height="55"
           /></a>
         </div>
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+        <div
+          class="menu-toggle"
+          id="mobile-menu"
+          aria-label="Menú principal"
+          role="button"
+          tabindex="0"
+        >
           <i class="fas fa-bars"></i>
         </div>
         <nav>
@@ -292,335 +307,333 @@
     </header>
 
     <main>
+      <section class="bg-light" style="padding: 40px 0">
+        <div class="calc-wrapper">
+          <div class="text-center mb-5">
+            <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
+              Calculadora de Retención en la Fuente
+            </h1>
+            <p style="color: #666">
+              Cálculo preciso para Empleados e Independientes (Normativa DIAN).
+            </p>
+          </div>
 
-    <section class="bg-light" style="padding: 40px 0">
-      <div class="calc-wrapper">
-        <div class="text-center mb-5">
-          <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
-            Calculadora de Retención en la Fuente
-          </h1>
-          <p style="color: #666">
-            Cálculo preciso para Empleados e Independientes (Normativa DIAN).
-          </p>
-        </div>
-
-        <div class="calc-card">
-          <form id="retefuenteForm">
-            <div
-              style="
-                background: #eef2f6;
-                padding: 15px;
-                border-radius: 8px;
-                margin-bottom: 25px;
-                border: 1px solid #dce4ec;
-              "
-            >
-              <label
-                style="font-size: 0.9rem; color: #10214b; font-weight: bold"
-                ><i class="fas fa-cog"></i> Configuración UVT</label
-              >
+          <div class="calc-card">
+            <form id="retefuenteForm">
               <div
                 style="
-                  display: flex;
-                  gap: 15px;
-                  align-items: center;
-                  margin-top: 10px;
+                  background: #eef2f6;
+                  padding: 15px;
+                  border-radius: 8px;
+                  margin-bottom: 25px;
+                  border: 1px solid #dce4ec;
                 "
               >
-                <div style="flex: 1">
-                  <small>Valor UVT (Año Vigente):</small>
-                  <div class="input-group">
-                    <i class="fas fa-chart-bar input-icon"></i>
-                    <input
-                      type="number"
-                      id="valUvt"
-                      class="form-control"
-                      value="52374"
-                      style="background: #fff; font-weight: bold"
-                    />
-                  </div>
-                </div>
-                <div style="flex: 2">
-                  <small style="color: #666; font-style: italic"
-                    >* UVT 2026 proyectada (o ajuste al año que
-                    necesite).</small
-                  >
-                </div>
-              </div>
-            </div>
-
-            <div class="form-grid-2">
-              <div>
-                <h3 class="section-title">
-                  <i class="fas fa-money-bill-wave"></i> Ingresos Mensuales
-                </h3>
-                <div class="form-group">
-                  <label>Tipo de Contribuyente</label>
-                  <div class="input-group">
-                    <i class="fas fa-user input-icon"></i>
-                    <select class="form-control" id="tipoContribuyente">
-                      <option value="empleado">Empleado (Asalariado)</option>
-                      <option value="independiente">
-                        Independiente (Honorarios)
-                      </option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label id="lblSalario">Salario Base Mensual</label>
-                  <div class="input-group">
-                    <i class="fas fa-dollar-sign input-icon"></i>
-                    <input
-                      type="number"
-                      id="salario"
-                      class="form-control"
-                      placeholder="Ej: 6000000"
-                      required
-                    />
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label>Bonificaciones / Otros</label>
-                  <div class="input-group">
-                    <i class="fas fa-gift input-icon"></i>
-                    <input
-                      type="number"
-                      id="bonos"
-                      class="form-control"
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label>Comisiones</label>
-                  <div class="input-group">
-                    <i class="fas fa-chart-line input-icon"></i>
-                    <input
-                      type="number"
-                      id="comisiones"
-                      class="form-control"
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 class="section-title">
-                  <i class="fas fa-file-invoice-dollar"></i> Deducciones y
-                  Rentas
-                </h3>
-                <div class="form-group">
-                  <label>Recibe Auxilio de Transporte</label>
-                  <div class="checkbox-wrapper" style="padding: 10px">
-                    <div class="checkbox-header" style="margin: 0">
-                      <input
-                        type="checkbox"
-                        id="checkAux"
-                        style="
-                          width: 18px;
-                          height: 18px;
-                          accent-color: #10214b;
-                          cursor: pointer;
-                        "
-                      />
-                      <span style="font-size: 0.9rem; margin-left: 10px"
-                        >Sí, incluir en base</span
-                      >
-                    </div>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label>Aportes Voluntarios (Pensión/AFC)</label>
-                  <div class="input-group">
-                    <i class="fas fa-piggy-bank input-icon"></i>
-                    <input
-                      type="number"
-                      id="voluntarios"
-                      class="form-control"
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label>Intereses de Vivienda</label>
-                  <div class="input-group">
-                    <i class="fas fa-home input-icon"></i>
-                    <input
-                      type="number"
-                      id="interesesVivienda"
-                      class="form-control"
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label>Medicina Prepagada</label>
-                  <div class="input-group">
-                    <i class="fas fa-heartbeat input-icon"></i>
-                    <input
-                      type="number"
-                      id="prepagada"
-                      class="form-control"
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label>Dependientes</label>
-                  <div class="checkbox-wrapper" style="padding: 10px">
-                    <div class="checkbox-header" style="margin: 0">
-                      <input
-                        type="checkbox"
-                        id="checkDependientes"
-                        style="
-                          width: 18px;
-                          height: 18px;
-                          accent-color: #10214b;
-                          cursor: pointer;
-                        "
-                      />
-                      <span style="font-size: 0.9rem; margin-left: 10px"
-                        >Tiene personas a cargo</span
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <button type="submit" class="btn-calculate">
-              <i class="fas fa-calculator"></i> Calcular Retención
-            </button>
-          </form>
-        </div>
-
-        <div id="resultCard" class="result-container">
-          <div class="result-header">
-            <div class="header-title">
-              <h3>Resumen de Retención en la Fuente</h3>
-              <div class="header-uvt" id="headerUvtText">
-                Valor UVT Utilizado: $52.374
-              </div>
-            </div>
-            <div>
-              <i
-                class="fas fa-print"
-                style="font-size: 1.5rem; cursor: pointer; opacity: 0.8"
-                onclick="window.print()"
-                title="Imprimir"
-              ></i>
-            </div>
-          </div>
-
-          <div class="result-body">
-            <div class="res-grid">
-              <div>
-                <div class="res-item">
-                  <div>
-                    <label>Ingresos Totales</label
-                    ><small>Suma de salario, bonos y comisiones</small>
-                  </div>
-                  <span id="resIngresos">$0</span>
-                </div>
-                <div class="res-item">
-                  <div>
-                    <label id="lblAportes">Aportes a Seguridad Social</label>
-                    <small id="smallAportes">(Salud + Pensión)</small>
-                  </div>
-                  <span id="resSeguridadSocial" class="text-red">$0</span>
-                </div>
-                <div class="res-item">
-                  <label>Fondo Voluntario / AFC</label>
-                  <span id="resVoluntarios">$0</span>
-                </div>
-                <div class="res-item">
-                  <label>Intereses de Vivienda</label>
-                  <span id="resVivienda">$0</span>
-                </div>
+                <label
+                  style="font-size: 0.9rem; color: #10214b; font-weight: bold"
+                  ><i class="fas fa-cog"></i> Configuración UVT</label
+                >
                 <div
-                  class="res-item"
                   style="
-                    border-bottom: 2px solid #ddd;
-                    background: #f8f9fa;
-                    padding: 10px 5px;
+                    display: flex;
+                    gap: 15px;
+                    align-items: center;
+                    margin-top: 10px;
                   "
                 >
-                  <div>
-                    <label>Base Gravable (Depurada)</label
-                    ><small>Base final para tabla</small>
+                  <div style="flex: 1">
+                    <small>Valor UVT (Año Vigente):</small>
+                    <div class="input-group">
+                      <i class="fas fa-chart-bar input-icon"></i>
+                      <input
+                        type="number"
+                        id="valUvt"
+                        class="form-control"
+                        value="52374"
+                        style="background: #fff; font-weight: bold"
+                      />
+                    </div>
                   </div>
-                  <span id="resBaseGravable">$0</span>
+                  <div style="flex: 2">
+                    <small style="color: #666; font-style: italic"
+                      >* UVT 2026 proyectada (o ajuste al año que
+                      necesite).</small
+                    >
+                  </div>
                 </div>
               </div>
 
+              <div class="form-grid-2">
+                <div>
+                  <h3 class="section-title">
+                    <i class="fas fa-money-bill-wave"></i> Ingresos Mensuales
+                  </h3>
+                  <div class="form-group">
+                    <label>Tipo de Contribuyente</label>
+                    <div class="input-group">
+                      <i class="fas fa-user input-icon"></i>
+                      <select class="form-control" id="tipoContribuyente">
+                        <option value="empleado">Empleado (Asalariado)</option>
+                        <option value="independiente">
+                          Independiente (Honorarios)
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label id="lblSalario">Salario Base Mensual</label>
+                    <div class="input-group">
+                      <i class="fas fa-dollar-sign input-icon"></i>
+                      <input
+                        type="number"
+                        id="salario"
+                        class="form-control"
+                        placeholder="Ej: 6000000"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Bonificaciones / Otros</label>
+                    <div class="input-group">
+                      <i class="fas fa-gift input-icon"></i>
+                      <input
+                        type="number"
+                        id="bonos"
+                        class="form-control"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Comisiones</label>
+                    <div class="input-group">
+                      <i class="fas fa-chart-line input-icon"></i>
+                      <input
+                        type="number"
+                        id="comisiones"
+                        class="form-control"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 class="section-title">
+                    <i class="fas fa-file-invoice-dollar"></i> Deducciones y
+                    Rentas
+                  </h3>
+                  <div class="form-group">
+                    <label>Recibe Auxilio de Transporte</label>
+                    <div class="checkbox-wrapper" style="padding: 10px">
+                      <div class="checkbox-header" style="margin: 0">
+                        <input
+                          type="checkbox"
+                          id="checkAux"
+                          style="
+                            width: 18px;
+                            height: 18px;
+                            accent-color: #10214b;
+                            cursor: pointer;
+                          "
+                        />
+                        <span style="font-size: 0.9rem; margin-left: 10px"
+                          >Sí, incluir en base</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Aportes Voluntarios (Pensión/AFC)</label>
+                    <div class="input-group">
+                      <i class="fas fa-piggy-bank input-icon"></i>
+                      <input
+                        type="number"
+                        id="voluntarios"
+                        class="form-control"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Intereses de Vivienda</label>
+                    <div class="input-group">
+                      <i class="fas fa-home input-icon"></i>
+                      <input
+                        type="number"
+                        id="interesesVivienda"
+                        class="form-control"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Medicina Prepagada</label>
+                    <div class="input-group">
+                      <i class="fas fa-heartbeat input-icon"></i>
+                      <input
+                        type="number"
+                        id="prepagada"
+                        class="form-control"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Dependientes</label>
+                    <div class="checkbox-wrapper" style="padding: 10px">
+                      <div class="checkbox-header" style="margin: 0">
+                        <input
+                          type="checkbox"
+                          id="checkDependientes"
+                          style="
+                            width: 18px;
+                            height: 18px;
+                            accent-color: #10214b;
+                            cursor: pointer;
+                          "
+                        />
+                        <span style="font-size: 0.9rem; margin-left: 10px"
+                          >Tiene personas a cargo</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-calculate">
+                <i class="fas fa-calculator"></i> Calcular Retención
+              </button>
+            </form>
+          </div>
+
+          <div id="resultCard" class="result-container">
+            <div class="result-header">
+              <div class="header-title">
+                <h3>Resumen de Retención en la Fuente</h3>
+                <div class="header-uvt" id="headerUvtText">
+                  Valor UVT Utilizado: $52.374
+                </div>
+              </div>
               <div>
-                <div class="res-item">
-                  <label>Fondo Solidaridad Pensional</label>
-                  <span id="resFsp" class="text-red">$0</span>
-                </div>
-                <div class="res-item">
-                  <label>Medicina Prepagada</label>
-                  <span id="resPrepagada">$0</span>
-                </div>
-                <div class="res-item">
-                  <div>
-                    <label>Deducción Dependientes</label
-                    ><small>10% del ingreso (Tope 32 UVT)</small>
-                  </div>
-                  <span id="resDependientes">$0</span>
-                </div>
-                <div class="res-item">
-                  <div>
-                    <label>Renta Exenta (25%)</label
-                    ><small>Tope anual 790 UVT</small>
-                  </div>
-                  <span id="resRenta25" class="text-red">$0</span>
-                </div>
-                <div class="res-item" style="border: none"></div>
+                <i
+                  class="fas fa-print"
+                  style="font-size: 1.5rem; cursor: pointer; opacity: 0.8"
+                  onclick="window.print()"
+                  title="Imprimir"
+                ></i>
               </div>
             </div>
 
-            <div class="final-result">
-              <span class="final-label">Total a Retener (DIAN):</span>
-              <span class="final-value" id="valRetencion">$0</span>
+            <div class="result-body">
+              <div class="res-grid">
+                <div>
+                  <div class="res-item">
+                    <div>
+                      <label>Ingresos Totales</label
+                      ><small>Suma de salario, bonos y comisiones</small>
+                    </div>
+                    <span id="resIngresos">$0</span>
+                  </div>
+                  <div class="res-item">
+                    <div>
+                      <label id="lblAportes">Aportes a Seguridad Social</label>
+                      <small id="smallAportes">(Salud + Pensión)</small>
+                    </div>
+                    <span id="resSeguridadSocial" class="text-red">$0</span>
+                  </div>
+                  <div class="res-item">
+                    <label>Fondo Voluntario / AFC</label>
+                    <span id="resVoluntarios">$0</span>
+                  </div>
+                  <div class="res-item">
+                    <label>Intereses de Vivienda</label>
+                    <span id="resVivienda">$0</span>
+                  </div>
+                  <div
+                    class="res-item"
+                    style="
+                      border-bottom: 2px solid #ddd;
+                      background: #f8f9fa;
+                      padding: 10px 5px;
+                    "
+                  >
+                    <div>
+                      <label>Base Gravable (Depurada)</label
+                      ><small>Base final para tabla</small>
+                    </div>
+                    <span id="resBaseGravable">$0</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="res-item">
+                    <label>Fondo Solidaridad Pensional</label>
+                    <span id="resFsp" class="text-red">$0</span>
+                  </div>
+                  <div class="res-item">
+                    <label>Medicina Prepagada</label>
+                    <span id="resPrepagada">$0</span>
+                  </div>
+                  <div class="res-item">
+                    <div>
+                      <label>Deducción Dependientes</label
+                      ><small>10% del ingreso (Tope 32 UVT)</small>
+                    </div>
+                    <span id="resDependientes">$0</span>
+                  </div>
+                  <div class="res-item">
+                    <div>
+                      <label>Renta Exenta (25%)</label
+                      ><small>Tope anual 790 UVT</small>
+                    </div>
+                    <span id="resRenta25" class="text-red">$0</span>
+                  </div>
+                  <div class="res-item" style="border: none"></div>
+                </div>
+              </div>
+
+              <div class="final-result">
+                <span class="final-label">Total a Retener (DIAN):</span>
+                <span class="final-value" id="valRetencion">$0</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <div class="container" style="max-width: 1000px; margin: 0 auto">
-      <div
-        style="
-          background-color: #fff;
-          border-top: 3px solid #d4af37;
-          padding: 20px;
-          margin: 40px 0 20px 0;
-          border-radius: 4px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-          text-align: center;
-          font-size: 0.85rem;
-          color: #666;
-          line-height: 1.5;
-        "
-      >
-        <p style="margin: 0">
-          <strong style="color: #10214b">Aviso Legal:</strong>
-          Esta herramienta realiza proyecciones basadas en la normativa laboral
-          vigente en Colombia. Los resultados son
-          <strong>aproximaciones ilustrativas</strong> y pueden variar según
-          convenciones colectivas o interpretaciones judiciales. El uso de este
-          simulador no crea una relación abogado-cliente ni sustituye una
-          liquidación oficial.
-          <span style="display: block; margin-top: 5px; font-style: italic">
-            Tu Abogado Laboral no se hace responsable por decisiones tomadas
-            basándose exclusivamente en estos datos.
-          </span>
-        </p>
+      <div class="container" style="max-width: 1000px; margin: 0 auto">
+        <div
+          style="
+            background-color: #fff;
+            border-top: 3px solid #d4af37;
+            padding: 20px;
+            margin: 40px 0 20px 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            text-align: center;
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.5;
+          "
+        >
+          <p style="margin: 0">
+            <strong style="color: #10214b">Aviso Legal:</strong>
+            Esta herramienta realiza proyecciones basadas en la normativa
+            laboral vigente en Colombia. Los resultados son
+            <strong>aproximaciones ilustrativas</strong> y pueden variar según
+            convenciones colectivas o interpretaciones judiciales. El uso de
+            este simulador no crea una relación abogado-cliente ni sustituye una
+            liquidación oficial.
+            <span style="display: block; margin-top: 5px; font-style: italic">
+              Tu Abogado Laboral no se hace responsable por decisiones tomadas
+              basándose exclusivamente en estos datos.
+            </span>
+          </p>
+        </div>
       </div>
-    </div>
-
     </main>
     <footer>
       <div class="container">

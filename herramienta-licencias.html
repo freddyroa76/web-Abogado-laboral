@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Seguridad: CSP Básico -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;"
+    />
 
     <title>
       Calculadora de Licencias de Maternidad y Paternidad | Tu Abogado Laboral
@@ -13,12 +16,13 @@
     <link rel="stylesheet" href="css/style.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=optional"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      crossorigin="anonymous"
       crossorigin="anonymous"
     />
   </head>
@@ -34,7 +38,12 @@
       <div class="container header-container">
         <div class="logo">
           <a href="index.html" aria-label="Inicio">
-            <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
+            <img
+              src="img/logo-principal.webp"
+              alt="Logo"
+              class="logo-img"
+              width="200"
+              height="55"
           /></a>
         </div>
         <div
@@ -59,299 +68,297 @@
     </header>
 
     <main>
-
-    <section class="bg-light">
-      <div class="calc-wrapper">
-        <div class="text-center mb-5" style="text-align: center">
-          <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
-            Calculadora de Licencias
-          </h1>
-          <p style="color: #666">
-            Cálculo de Maternidad y Paternidad (Ley 1822 de 2017 y Ley 2114 de
-            2021).
-          </p>
-        </div>
-
-        <div class="calc-card">
-          <form id="licenciaForm">
-            <h3
-              style="
-                color: #10214b;
-                border-bottom: 2px solid #eee;
-                padding-bottom: 10px;
-                margin-bottom: 25px;
-                font-size: 1.2rem;
-              "
-            >
-              <i class="fas fa-user"></i> 1. Datos del Solicitante
-            </h3>
-
-            <div class="form-grid-2">
-              <div class="form-group">
-                <label>Rol del Trabajador(a)</label>
-                <div class="input-group">
-                  <i class="fas fa-venus-mars input-icon"></i>
-                  <select id="rolTrabajador" class="form-control">
-                    <option value="madre">
-                      Madre (Licencia de Maternidad)
-                    </option>
-                    <option value="padre">
-                      Padre (Licencia de Paternidad)
-                    </option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group">
-                <label id="lblSalario">Salario Base (IBC)</label>
-                <div class="input-group">
-                  <i class="fas fa-dollar-sign input-icon"></i>
-                  <input
-                    type="number"
-                    id="salarioBase"
-                    class="form-control"
-                    placeholder="Ej: 1500000"
-                    required
-                  />
-                </div>
-                <small id="helpSalario"
-                  >Si es salario variable, ingrese el promedio del último
-                  año.</small
-                >
-              </div>
-            </div>
-
-            <h3
-              style="
-                color: #10214b;
-                border-bottom: 2px solid #eee;
-                padding-bottom: 10px;
-                margin-bottom: 25px;
-                margin-top: 30px;
-                font-size: 1.2rem;
-              "
-            >
-              <i class="fas fa-baby"></i> 2. Detalles del Nacimiento
-            </h3>
-
-            <div class="form-grid-3">
-              <div class="form-group">
-                <label>Fecha Probable de Parto (FPP)</label>
-                <input
-                  type="date"
-                  id="fechaProbable"
-                  class="form-control no-icon"
-                  required
-                />
-                <small>Fecha estimada por el médico.</small>
-              </div>
-              <div class="form-group">
-                <label>Fecha Real de Nacimiento</label>
-                <input
-                  type="date"
-                  id="fechaNacimiento"
-                  class="form-control no-icon"
-                  required
-                />
-                <small>Fecha de inicio de la licencia.</small>
-              </div>
-              <div class="form-group" style="display: flex; align-items: end">
-                <div class="check-group" style="width: 100%">
-                  <input type="checkbox" id="partoMultiple" />
-                  <label for="partoMultiple">¿Parto Múltiple?</label>
-                </div>
-              </div>
-            </div>
-
-            <div id="seccionCompartida" style="margin-top: 25px">
-              <div class="check-group">
-                <input type="checkbox" id="licenciaCompartida" />
-                <label for="licenciaCompartida"
-                  ><strong>Optar por Licencia Parental Compartida</strong> (Ley
-                  2114)</label
-                >
-              </div>
-
-              <div id="boxCompartida" class="conditional-box">
-                <div class="form-group">
-                  <label>Semanas a ceder al padre (Máximo 6):</label>
-                  <div class="input-group">
-                    <i class="fas fa-exchange-alt input-icon"></i>
-                    <select
-                      id="semanasCeder"
-                      class="form-control"
-                      style="max-width: 200px"
-                    >
-                      <option value="1">1 Semana</option>
-                      <option value="2">2 Semanas</option>
-                      <option value="3">3 Semanas</option>
-                      <option value="4">4 Semanas</option>
-                      <option value="5">5 Semanas</option>
-                      <option value="6">6 Semanas</option>
-                    </select>
-                  </div>
-                  <small
-                    >Estas semanas se restarán de la madre y se sumarán al
-                    padre.</small
-                  >
-                </div>
-              </div>
-            </div>
-
-            <button type="submit" id="btnCalcular" class="btn-calculate">
-              <i class="fas fa-calculator"></i> Calcular Licencia
-            </button>
-          </form>
-        </div>
-
-        <div id="resultsContainer">
-          <div class="result-container" id="printArea">
-            <div class="result-header">
-              <div>
-                <h3 style="margin: 0; font-size: 1.3rem">
-                  Liquidación de Prestación Económica
-                </h3>
-                <small style="opacity: 0.9"
-                  >Licencia de
-                  <span id="resTipoLicencia">Maternidad</span></small
-                >
-              </div>
-              <div style="text-align: right">
-                <i
-                  class="fas fa-baby-carriage"
-                  style="font-size: 2rem; opacity: 0.5"
-                ></i>
-              </div>
-            </div>
-
-            <div class="result-body">
-              <div
-                class="input-summary-grid"
-                style="grid-template-columns: 1fr 1fr"
-              >
-                <div class="input-item">
-                  <label>Fecha Inicio:</label><span id="resInicio">--</span>
-                </div>
-                <div class="input-item">
-                  <label>Fecha Retorno:</label
-                  ><span id="resFin" style="color: #c62828">--</span>
-                </div>
-              </div>
-
-              <h4
-                style="
-                  color: #10214b;
-                  border-bottom: 1px solid #eee;
-                  padding-bottom: 5px;
-                "
-              >
-                Detalle del Tiempo
-              </h4>
-              <table class="simple-table">
-                <thead>
-                  <tr>
-                    <th>Concepto</th>
-                    <th style="text-align: right">Días</th>
-                  </tr>
-                </thead>
-                <tbody id="tablaTiempos"></tbody>
-                <tfoot>
-                  <tr style="background: #f4f8fb">
-                    <td><strong>TOTAL DÍAS A DISFRUTAR</strong></td>
-                    <td style="text-align: right">
-                      <strong
-                        id="resTotalDias"
-                        style="font-size: 1.1rem; color: #10214b"
-                        >0</strong
-                      >
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-
-              <h4
-                style="
-                  color: #10214b;
-                  border-bottom: 1px solid #eee;
-                  padding-bottom: 5px;
-                  margin-top: 25px;
-                "
-              >
-                Liquidación Monetaria
-              </h4>
-              <table class="simple-table">
-                <thead>
-                  <tr>
-                    <th>Concepto</th>
-                    <th style="text-align: right">Valor</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      Valor Bruto Licencia <br /><small>(IBC x Días)</small>
-                    </td>
-                    <td
-                      id="resValorBruto"
-                      style="text-align: right; font-weight: bold"
-                    >
-                      $0
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      Aporte Salud (4%) <br /><small style="color: #c62828"
-                        >A cargo del trabajador</small
-                      >
-                    </td>
-                    <td
-                      id="resDedSalud"
-                      style="text-align: right; color: #c62828"
-                    >
-                      $0
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      Aporte Pensión (4%) <br /><small style="color: #c62828"
-                        >A cargo del trabajador</small
-                      >
-                    </td>
-                    <td
-                      id="resDedPension"
-                      style="text-align: right; color: #c62828"
-                    >
-                      $0
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="total-final">
-              <span class="total-label">Valor Neto a Pagar:</span>
-              <span id="totalNeto" class="total-value">$0</span>
-            </div>
-
-            <p
-              style="
-                text-align: center;
-                margin-top: 20px;
-                font-size: 0.8rem;
-                color: #999;
-              "
-            >
-              * Cálculo basado en Art. 236 CST y Ley 2114 de 2021. Este valor lo
-              reconoce la EPS al empleador.
+      <section class="bg-light">
+        <div class="calc-wrapper">
+          <div class="text-center mb-5" style="text-align: center">
+            <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
+              Calculadora de Licencias
+            </h1>
+            <p style="color: #666">
+              Cálculo de Maternidad y Paternidad (Ley 1822 de 2017 y Ley 2114 de
+              2021).
             </p>
           </div>
 
-          <button onclick="downloadPDF()" class="btn-pdf">
-            <i class="fas fa-file-pdf"></i> Descargar Informe PDF
-          </button>
-        </div>
-      </div>
-    </section>
+          <div class="calc-card">
+            <form id="licenciaForm">
+              <h3
+                style="
+                  color: #10214b;
+                  border-bottom: 2px solid #eee;
+                  padding-bottom: 10px;
+                  margin-bottom: 25px;
+                  font-size: 1.2rem;
+                "
+              >
+                <i class="fas fa-user"></i> 1. Datos del Solicitante
+              </h3>
 
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Rol del Trabajador(a)</label>
+                  <div class="input-group">
+                    <i class="fas fa-venus-mars input-icon"></i>
+                    <select id="rolTrabajador" class="form-control">
+                      <option value="madre">
+                        Madre (Licencia de Maternidad)
+                      </option>
+                      <option value="padre">
+                        Padre (Licencia de Paternidad)
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label id="lblSalario">Salario Base (IBC)</label>
+                  <div class="input-group">
+                    <i class="fas fa-dollar-sign input-icon"></i>
+                    <input
+                      type="number"
+                      id="salarioBase"
+                      class="form-control"
+                      placeholder="Ej: 1500000"
+                      required
+                    />
+                  </div>
+                  <small id="helpSalario"
+                    >Si es salario variable, ingrese el promedio del último
+                    año.</small
+                  >
+                </div>
+              </div>
+
+              <h3
+                style="
+                  color: #10214b;
+                  border-bottom: 2px solid #eee;
+                  padding-bottom: 10px;
+                  margin-bottom: 25px;
+                  margin-top: 30px;
+                  font-size: 1.2rem;
+                "
+              >
+                <i class="fas fa-baby"></i> 2. Detalles del Nacimiento
+              </h3>
+
+              <div class="form-grid-3">
+                <div class="form-group">
+                  <label>Fecha Probable de Parto (FPP)</label>
+                  <input
+                    type="date"
+                    id="fechaProbable"
+                    class="form-control no-icon"
+                    required
+                  />
+                  <small>Fecha estimada por el médico.</small>
+                </div>
+                <div class="form-group">
+                  <label>Fecha Real de Nacimiento</label>
+                  <input
+                    type="date"
+                    id="fechaNacimiento"
+                    class="form-control no-icon"
+                    required
+                  />
+                  <small>Fecha de inicio de la licencia.</small>
+                </div>
+                <div class="form-group" style="display: flex; align-items: end">
+                  <div class="check-group" style="width: 100%">
+                    <input type="checkbox" id="partoMultiple" />
+                    <label for="partoMultiple">¿Parto Múltiple?</label>
+                  </div>
+                </div>
+              </div>
+
+              <div id="seccionCompartida" style="margin-top: 25px">
+                <div class="check-group">
+                  <input type="checkbox" id="licenciaCompartida" />
+                  <label for="licenciaCompartida"
+                    ><strong>Optar por Licencia Parental Compartida</strong>
+                    (Ley 2114)</label
+                  >
+                </div>
+
+                <div id="boxCompartida" class="conditional-box">
+                  <div class="form-group">
+                    <label>Semanas a ceder al padre (Máximo 6):</label>
+                    <div class="input-group">
+                      <i class="fas fa-exchange-alt input-icon"></i>
+                      <select
+                        id="semanasCeder"
+                        class="form-control"
+                        style="max-width: 200px"
+                      >
+                        <option value="1">1 Semana</option>
+                        <option value="2">2 Semanas</option>
+                        <option value="3">3 Semanas</option>
+                        <option value="4">4 Semanas</option>
+                        <option value="5">5 Semanas</option>
+                        <option value="6">6 Semanas</option>
+                      </select>
+                    </div>
+                    <small
+                      >Estas semanas se restarán de la madre y se sumarán al
+                      padre.</small
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" id="btnCalcular" class="btn-calculate">
+                <i class="fas fa-calculator"></i> Calcular Licencia
+              </button>
+            </form>
+          </div>
+
+          <div id="resultsContainer">
+            <div class="result-container" id="printArea">
+              <div class="result-header">
+                <div>
+                  <h3 style="margin: 0; font-size: 1.3rem">
+                    Liquidación de Prestación Económica
+                  </h3>
+                  <small style="opacity: 0.9"
+                    >Licencia de
+                    <span id="resTipoLicencia">Maternidad</span></small
+                  >
+                </div>
+                <div style="text-align: right">
+                  <i
+                    class="fas fa-baby-carriage"
+                    style="font-size: 2rem; opacity: 0.5"
+                  ></i>
+                </div>
+              </div>
+
+              <div class="result-body">
+                <div
+                  class="input-summary-grid"
+                  style="grid-template-columns: 1fr 1fr"
+                >
+                  <div class="input-item">
+                    <label>Fecha Inicio:</label><span id="resInicio">--</span>
+                  </div>
+                  <div class="input-item">
+                    <label>Fecha Retorno:</label
+                    ><span id="resFin" style="color: #c62828">--</span>
+                  </div>
+                </div>
+
+                <h4
+                  style="
+                    color: #10214b;
+                    border-bottom: 1px solid #eee;
+                    padding-bottom: 5px;
+                  "
+                >
+                  Detalle del Tiempo
+                </h4>
+                <table class="simple-table">
+                  <thead>
+                    <tr>
+                      <th>Concepto</th>
+                      <th style="text-align: right">Días</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tablaTiempos"></tbody>
+                  <tfoot>
+                    <tr style="background: #f4f8fb">
+                      <td><strong>TOTAL DÍAS A DISFRUTAR</strong></td>
+                      <td style="text-align: right">
+                        <strong
+                          id="resTotalDias"
+                          style="font-size: 1.1rem; color: #10214b"
+                          >0</strong
+                        >
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+
+                <h4
+                  style="
+                    color: #10214b;
+                    border-bottom: 1px solid #eee;
+                    padding-bottom: 5px;
+                    margin-top: 25px;
+                  "
+                >
+                  Liquidación Monetaria
+                </h4>
+                <table class="simple-table">
+                  <thead>
+                    <tr>
+                      <th>Concepto</th>
+                      <th style="text-align: right">Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        Valor Bruto Licencia <br /><small>(IBC x Días)</small>
+                      </td>
+                      <td
+                        id="resValorBruto"
+                        style="text-align: right; font-weight: bold"
+                      >
+                        $0
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Aporte Salud (4%) <br /><small style="color: #c62828"
+                          >A cargo del trabajador</small
+                        >
+                      </td>
+                      <td
+                        id="resDedSalud"
+                        style="text-align: right; color: #c62828"
+                      >
+                        $0
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Aporte Pensión (4%) <br /><small style="color: #c62828"
+                          >A cargo del trabajador</small
+                        >
+                      </td>
+                      <td
+                        id="resDedPension"
+                        style="text-align: right; color: #c62828"
+                      >
+                        $0
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="total-final">
+                <span class="total-label">Valor Neto a Pagar:</span>
+                <span id="totalNeto" class="total-value">$0</span>
+              </div>
+
+              <p
+                style="
+                  text-align: center;
+                  margin-top: 20px;
+                  font-size: 0.8rem;
+                  color: #999;
+                "
+              >
+                * Cálculo basado en Art. 236 CST y Ley 2114 de 2021. Este valor
+                lo reconoce la EPS al empleador.
+              </p>
+            </div>
+
+            <button onclick="downloadPDF()" class="btn-pdf">
+              <i class="fas fa-file-pdf"></i> Descargar Informe PDF
+            </button>
+          </div>
+        </div>
+      </section>
     </main>
     <footer>
       <div class="container">

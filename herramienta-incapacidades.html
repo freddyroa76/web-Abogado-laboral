@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Seguridad: CSP Básico -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;"
+    />
 
     <title>Calculadora de Incapacidades Laborales | Tu Abogado Laboral</title>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
@@ -16,12 +19,13 @@
     <link rel="stylesheet" href="css/style.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=optional"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      crossorigin="anonymous"
     />
 
     <style>
@@ -40,7 +44,12 @@
       <div class="container header-container">
         <div class="logo">
           <a href="index.html" aria-label="Inicio">
-            <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
+            <img
+              src="img/logo-principal.webp"
+              alt="Logo"
+              class="logo-img"
+              width="200"
+              height="55"
           /></a>
         </div>
         <div
@@ -65,252 +74,253 @@
     </header>
 
     <main>
-
-    <section class="bg-light">
-      <div class="calc-wrapper">
-        <div class="text-center mb-5" style="text-align: center">
-          <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
-            Calculadora de Incapacidades
-          </h1>
-          <p style="color: #666">
-            Liquide correctamente enfermedad general, laboral y prórrogas
-            (Vigencia 2026).
-          </p>
-        </div>
-
-        <div class="calc-card">
-          <form id="incapacidadForm">
-            <div
-              style="
-                background: #eef2f6;
-                padding: 10px;
-                border-radius: 6px;
-                margin-bottom: 20px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                border: 1px solid #dce4ec;
-              "
-            >
-              <small
-                style="
-                  margin: 0;
-                  background: none;
-                  font-weight: bold;
-                  color: #10214b;
-                "
-                >Parámetros SMLV:</small
-              >
-              <div style="display: flex; align-items: center; gap: 5px">
-                <label style="margin: 0; font-size: 0.8rem">SMMLV</label>
-                <input
-                  type="number"
-                  id="confSalarioMin"
-                  class="form-control"
-                  value="1705905"
-                  style="
-                    border: 1px solid #ccc;
-                    padding: 3px;
-                    border-radius: 4px;
-                    width: 100px;
-                    color: #666;
-                    height: auto;
-                  "
-                />
-              </div>
-            </div>
-
-            <div class="form-grid-2">
-              <div class="form-group">
-                <label>Salario Base (IBC)</label>
-                <div class="input-group">
-                  <i class="fas fa-dollar-sign input-icon"></i>
-                  <input
-                    type="number"
-                    id="salarioBase"
-                    class="form-control"
-                    placeholder="Ej: 2500000"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Origen de la Incapacidad</label>
-                <div class="input-group">
-                  <i class="fas fa-file-medical input-icon"></i>
-                  <select id="tipoIncapacidad" class="form-control">
-                    <option value="comun">
-                      Enfermedad General / Accidente Común
-                    </option>
-                    <option value="laboral">
-                      Accidente de Trabajo / Enfermedad Laboral
-                    </option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-grid-2" style="margin-top: 20px">
-              <div class="form-group">
-                <label>Días de Incapacidad (Actual)</label>
-                <div class="input-group">
-                  <i class="far fa-clock input-icon"></i>
-                  <input
-                    type="number"
-                    id="diasSolicitados"
-                    class="form-control"
-                    placeholder="Ej: 5"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Días Acumulados (Prórroga)</label>
-                <div class="input-group">
-                  <i class="fas fa-history input-icon"></i>
-                  <input
-                    type="number"
-                    id="diasAcumulados"
-                    class="form-control"
-                    value="0"
-                  />
-                </div>
-                <small style="font-size: 0.75rem"
-                  >Si es continuación de una anterior, ingrese cuántos días
-                  lleva. Si es nueva, deje en 0.</small
-                >
-              </div>
-            </div>
-
-            <button type="submit" id="btnCalcular" class="btn-calculate">
-              <i class="fas fa-calculator"></i> Calcular Prestación
-            </button>
-          </form>
-        </div>
-
-        <div id="resultsContainer">
-          <div class="result-container" id="printArea">
-            <div class="result-header">
-              <div>
-                <h3 style="margin: 0; font-size: 1.3rem">
-                  Liquidación de Incapacidad
-                </h3>
-                <small style="opacity: 0.9"
-                  >Detalle de pagos y responsables</small
-                >
-              </div>
-              <div style="text-align: right">
-                <i
-                  class="fas fa-hand-holding-medical"
-                  style="font-size: 2rem; opacity: 0.5"
-                ></i>
-              </div>
-            </div>
-
-            <div class="result-body">
-              <div class="input-summary-grid">
-                <div class="input-item">
-                  <label>Origen:</label><span id="resOrigen">--</span>
-                </div>
-                <div class="input-item">
-                  <label>IBC:</label><span id="resIBC">--</span>
-                </div>
-                <div class="input-item">
-                  <label>Días a Pagar:</label><span id="resDias">--</span>
-                </div>
-              </div>
-
-              <h4
-                style="
-                  color: #10214b;
-                  border-bottom: 1px solid #eee;
-                  padding-bottom: 5px;
-                "
-              >
-                Responsabilidad del Pago
-              </h4>
-              <table class="simple-table">
-                <thead>
-                  <tr>
-                    <th>Entidad Responsable</th>
-                    <th style="text-align: center">Días</th>
-                    <th>Detalle</th>
-                    <th style="text-align: right">Valor</th>
-                  </tr>
-                </thead>
-                <tbody id="tablaResultados"></tbody>
-              </table>
-
-              <h4
-                style="
-                  color: #10214b;
-                  border-bottom: 1px solid #eee;
-                  padding-bottom: 5px;
-                  margin-top: 25px;
-                "
-              >
-                Aportes Seguridad Social (Trabajador)
-              </h4>
-              <div
-                style="
-                  background: #fff3e0;
-                  padding: 10px;
-                  border-radius: 4px;
-                  font-size: 0.8rem;
-                  color: #e65100;
-                  margin-bottom: 10px;
-                "
-              >
-                <i class="fas fa-exclamation-triangle"></i> Durante la
-                incapacidad, se debe cotizar Salud y Pensión sobre el valor
-                recibido.
-              </div>
-              <table class="simple-table">
-                <tbody>
-                  <tr>
-                    <td>Aporte Salud (4%)</td>
-                    <td id="resSalud" style="text-align: right; color: #c62828">
-                      $0
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Aporte Pensión (4%)</td>
-                    <td
-                      id="resPension"
-                      style="text-align: right; color: #c62828"
-                    >
-                      $0
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="total-final">
-              <span class="total-label">Neto a Recibir:</span>
-              <span id="resNeto" class="total-value">$0</span>
-            </div>
-
-            <p
-              style="
-                text-align: center;
-                margin-top: 20px;
-                font-size: 0.8rem;
-                color: #999;
-              "
-            >
-              * Cálculo basado en Art. 227 CST, Ley 776/2002 y Sentencia
-              C-543/2007 (Piso Mínimo).
+      <section class="bg-light">
+        <div class="calc-wrapper">
+          <div class="text-center mb-5" style="text-align: center">
+            <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
+              Calculadora de Incapacidades
+            </h1>
+            <p style="color: #666">
+              Liquide correctamente enfermedad general, laboral y prórrogas
+              (Vigencia 2026).
             </p>
           </div>
 
-          <button onclick="downloadPDF()" class="btn-pdf">
-            <i class="fas fa-file-pdf"></i> Descargar Informe PDF
-          </button>
-        </div>
-      </div>
-    </section>
+          <div class="calc-card">
+            <form id="incapacidadForm">
+              <div
+                style="
+                  background: #eef2f6;
+                  padding: 10px;
+                  border-radius: 6px;
+                  margin-bottom: 20px;
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  border: 1px solid #dce4ec;
+                "
+              >
+                <small
+                  style="
+                    margin: 0;
+                    background: none;
+                    font-weight: bold;
+                    color: #10214b;
+                  "
+                  >Parámetros SMLV:</small
+                >
+                <div style="display: flex; align-items: center; gap: 5px">
+                  <label style="margin: 0; font-size: 0.8rem">SMMLV</label>
+                  <input
+                    type="number"
+                    id="confSalarioMin"
+                    class="form-control"
+                    value="1705905"
+                    style="
+                      border: 1px solid #ccc;
+                      padding: 3px;
+                      border-radius: 4px;
+                      width: 100px;
+                      color: #666;
+                      height: auto;
+                    "
+                  />
+                </div>
+              </div>
 
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Salario Base (IBC)</label>
+                  <div class="input-group">
+                    <i class="fas fa-dollar-sign input-icon"></i>
+                    <input
+                      type="number"
+                      id="salarioBase"
+                      class="form-control"
+                      placeholder="Ej: 2500000"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Origen de la Incapacidad</label>
+                  <div class="input-group">
+                    <i class="fas fa-file-medical input-icon"></i>
+                    <select id="tipoIncapacidad" class="form-control">
+                      <option value="comun">
+                        Enfermedad General / Accidente Común
+                      </option>
+                      <option value="laboral">
+                        Accidente de Trabajo / Enfermedad Laboral
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-grid-2" style="margin-top: 20px">
+                <div class="form-group">
+                  <label>Días de Incapacidad (Actual)</label>
+                  <div class="input-group">
+                    <i class="far fa-clock input-icon"></i>
+                    <input
+                      type="number"
+                      id="diasSolicitados"
+                      class="form-control"
+                      placeholder="Ej: 5"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Días Acumulados (Prórroga)</label>
+                  <div class="input-group">
+                    <i class="fas fa-history input-icon"></i>
+                    <input
+                      type="number"
+                      id="diasAcumulados"
+                      class="form-control"
+                      value="0"
+                    />
+                  </div>
+                  <small style="font-size: 0.75rem"
+                    >Si es continuación de una anterior, ingrese cuántos días
+                    lleva. Si es nueva, deje en 0.</small
+                  >
+                </div>
+              </div>
+
+              <button type="submit" id="btnCalcular" class="btn-calculate">
+                <i class="fas fa-calculator"></i> Calcular Prestación
+              </button>
+            </form>
+          </div>
+
+          <div id="resultsContainer">
+            <div class="result-container" id="printArea">
+              <div class="result-header">
+                <div>
+                  <h3 style="margin: 0; font-size: 1.3rem">
+                    Liquidación de Incapacidad
+                  </h3>
+                  <small style="opacity: 0.9"
+                    >Detalle de pagos y responsables</small
+                  >
+                </div>
+                <div style="text-align: right">
+                  <i
+                    class="fas fa-hand-holding-medical"
+                    style="font-size: 2rem; opacity: 0.5"
+                  ></i>
+                </div>
+              </div>
+
+              <div class="result-body">
+                <div class="input-summary-grid">
+                  <div class="input-item">
+                    <label>Origen:</label><span id="resOrigen">--</span>
+                  </div>
+                  <div class="input-item">
+                    <label>IBC:</label><span id="resIBC">--</span>
+                  </div>
+                  <div class="input-item">
+                    <label>Días a Pagar:</label><span id="resDias">--</span>
+                  </div>
+                </div>
+
+                <h4
+                  style="
+                    color: #10214b;
+                    border-bottom: 1px solid #eee;
+                    padding-bottom: 5px;
+                  "
+                >
+                  Responsabilidad del Pago
+                </h4>
+                <table class="simple-table">
+                  <thead>
+                    <tr>
+                      <th>Entidad Responsable</th>
+                      <th style="text-align: center">Días</th>
+                      <th>Detalle</th>
+                      <th style="text-align: right">Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tablaResultados"></tbody>
+                </table>
+
+                <h4
+                  style="
+                    color: #10214b;
+                    border-bottom: 1px solid #eee;
+                    padding-bottom: 5px;
+                    margin-top: 25px;
+                  "
+                >
+                  Aportes Seguridad Social (Trabajador)
+                </h4>
+                <div
+                  style="
+                    background: #fff3e0;
+                    padding: 10px;
+                    border-radius: 4px;
+                    font-size: 0.8rem;
+                    color: #e65100;
+                    margin-bottom: 10px;
+                  "
+                >
+                  <i class="fas fa-exclamation-triangle"></i> Durante la
+                  incapacidad, se debe cotizar Salud y Pensión sobre el valor
+                  recibido.
+                </div>
+                <table class="simple-table">
+                  <tbody>
+                    <tr>
+                      <td>Aporte Salud (4%)</td>
+                      <td
+                        id="resSalud"
+                        style="text-align: right; color: #c62828"
+                      >
+                        $0
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Aporte Pensión (4%)</td>
+                      <td
+                        id="resPension"
+                        style="text-align: right; color: #c62828"
+                      >
+                        $0
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="total-final">
+                <span class="total-label">Neto a Recibir:</span>
+                <span id="resNeto" class="total-value">$0</span>
+              </div>
+
+              <p
+                style="
+                  text-align: center;
+                  margin-top: 20px;
+                  font-size: 0.8rem;
+                  color: #999;
+                "
+              >
+                * Cálculo basado en Art. 227 CST, Ley 776/2002 y Sentencia
+                C-543/2007 (Piso Mínimo).
+              </p>
+            </div>
+
+            <button onclick="downloadPDF()" class="btn-pdf">
+              <i class="fas fa-file-pdf"></i> Descargar Informe PDF
+            </button>
+          </div>
+        </div>
+      </section>
     </main>
     <footer>
       <div class="container">

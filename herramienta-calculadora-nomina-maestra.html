@@ -4,21 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Seguridad: CSP Básico -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;"
+    />
 
     <title>Calculadora Laboral Integrada | Tu Abogado Laboral</title>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="css/style.css" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Montserrat:wght@400;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Montserrat:wght@400;700;900&display=optional"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      crossorigin="anonymous"
     />
-
   </head>
   <body>
     <div class="top-bar">
@@ -32,10 +35,21 @@
       <div class="container header-container">
         <div class="logo">
           <a href="index.html" aria-label="Inicio">
-            <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
+            <img
+              src="img/logo-principal.webp"
+              alt="Logo"
+              class="logo-img"
+              width="200"
+              height="55"
           /></a>
         </div>
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+        <div
+          class="menu-toggle"
+          id="mobile-menu"
+          aria-label="Menú principal"
+          role="button"
+          tabindex="0"
+        >
           <i class="fas fa-bars"></i>
         </div>
         <nav>
@@ -51,679 +65,688 @@
     </header>
 
     <main>
-    <section class="bg-light" style="padding: 40px 0">
-      <div class="calc-wrapper">
-        <div class="text-center mb-5">
-          <h1
-            style="
-              color: var(--primary);
-              font-size: 2.2rem;
-              margin-bottom: 10px;
-            "
-          >
-            Calculadora Laboral Integrada
-          </h1>
-          <p style="color: #666">
-            Cálculo 100% actualizado de Nómina, Costos Empresariales y
-            Retención.
-          </p>
-        </div>
-
-        <form id="masterForm">
-          <div class="config-bar">
-            <span class="config-label"
-              ><i class="fas fa-calendar-check"></i> Valores 2026:</span
+      <section class="bg-light" style="padding: 40px 0">
+        <div class="calc-wrapper">
+          <div class="text-center mb-5">
+            <h1
+              style="
+                color: var(--primary);
+                font-size: 2.2rem;
+                margin-bottom: 10px;
+              "
             >
-            <div class="input-group" style="width: 150px">
-              <small
-                style="
-                  position: absolute;
-                  top: -18px;
-                  left: 0;
-                  font-weight: bold;
-                "
-                >SMMLV</small
-              >
-              <input
-                type="number"
-                id="confSalarioMin"
-                class="form-control"
-                value="1750905"
-                style="
-                  padding: 5px 10px;
-                  height: 38px;
-                  font-weight: bold;
-                  color: var(--primary);
-                "
-              />
-            </div>
-            <div class="input-group" style="width: 150px">
-              <small
-                style="
-                  position: absolute;
-                  top: -18px;
-                  left: 0;
-                  font-weight: bold;
-                "
-                >Aux. Transporte</small
-              >
-              <input
-                type="number"
-                id="confAuxilio"
-                class="form-control"
-                value="249095"
-                style="
-                  padding: 5px 10px;
-                  height: 38px;
-                  font-weight: bold;
-                  color: var(--primary);
-                "
-              />
-            </div>
-            <div class="input-group" style="width: 120px">
-              <small
-                style="
-                  position: absolute;
-                  top: -18px;
-                  left: 0;
-                  font-weight: bold;
-                "
-                >UVT</small
-              >
-              <input
-                type="number"
-                id="confUVT"
-                class="form-control"
-                value="52374"
-                style="
-                  padding: 5px 10px;
-                  height: 38px;
-                  font-weight: bold;
-                  color: var(--primary);
-                "
-              />
-            </div>
+              Calculadora Laboral Integrada
+            </h1>
+            <p style="color: #666">
+              Cálculo 100% actualizado de Nómina, Costos Empresariales y
+              Retención.
+            </p>
           </div>
 
-          <div class="form-grid-2">
-            <div class="calc-card">
-              <h3 class="section-title">
-                <i class="fas fa-user-clock"></i> Datos del Contrato
-              </h3>
-
-              <div class="form-group">
-                <label>Tipo de Vinculación</label>
-                <div class="input-group">
-                  <i class="fas fa-file-contract input-icon"></i>
-                  <select id="tipoContrato" class="form-control">
-                    <option value="fijo">Contrato a Término Fijo</option>
-                    <option value="indefinido" selected>
-                      Contrato a Término Indefinido
-                    </option>
-                    <option value="obra">Contrato por Obra o Labor</option>
-                    <option value="servicios">
-                      Contrato de Prestación de Servicios
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="salarioBase">Salario Base Mensual</label>
-                <div class="input-group">
-                  <i class="fas fa-dollar-sign input-icon"></i>
-                  <input
-                    type="number"
-                    id="salarioBase"
-                    class="form-control"
-                    placeholder="Ej: 3000000"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="diasLaborados">Días a Liquidar</label>
-                <div class="input-group">
-                  <i class="fas fa-calendar-day input-icon"></i>
-                  <input
-                    type="number"
-                    id="diasLaborados"
-                    class="form-control"
-                    value="30"
-                    min="1"
-                    max="30"
-                    required
-                  />
-                </div>
-                <small>Por defecto 30 (mes completo).</small>
-              </div>
-
-              <div class="form-group" id="grpAuxilio">
-                <label>Auxilio de Transporte</label>
-                <div style="display: flex; gap: 10px">
-                  <div class="check-group" style="flex: 0 0 auto">
-                    <input type="checkbox" id="checkAux" />
-                    <label for="checkAux">Incluir</label>
-                  </div>
-                  <input
-                    type="number"
-                    id="valAuxilioInput"
-                    class="form-control"
-                    placeholder="Valor Auxilio"
-                    disabled
-                    style="background: #f9f9f9"
-                  />
-                </div>
+          <form id="masterForm">
+            <div class="config-bar">
+              <span class="config-label"
+                ><i class="fas fa-calendar-check"></i> Valores 2026:</span
+              >
+              <div class="input-group" style="width: 150px">
                 <small
-                  >Se marca automáticamente si el salario base es <= 2
-                  SMMLV.</small
+                  style="
+                    position: absolute;
+                    top: -18px;
+                    left: 0;
+                    font-weight: bold;
+                  "
+                  >SMMLV</small
                 >
+                <input
+                  type="number"
+                  id="confSalarioMin"
+                  class="form-control"
+                  value="1750905"
+                  style="
+                    padding: 5px 10px;
+                    height: 38px;
+                    font-weight: bold;
+                    color: var(--primary);
+                  "
+                />
               </div>
-
-              <div class="form-group">
-                <label>Otros Ingresos (Bonos/Comisiones)</label>
-                <div class="input-group">
-                  <i class="fas fa-plus-circle input-icon"></i>
-                  <input
-                    type="number"
-                    id="otrosIngresos"
-                    class="form-control"
-                    placeholder="0"
-                  />
-                </div>
+              <div class="input-group" style="width: 150px">
+                <small
+                  style="
+                    position: absolute;
+                    top: -18px;
+                    left: 0;
+                    font-weight: bold;
+                  "
+                  >Aux. Transporte</small
+                >
+                <input
+                  type="number"
+                  id="confAuxilio"
+                  class="form-control"
+                  value="249095"
+                  style="
+                    padding: 5px 10px;
+                    height: 38px;
+                    font-weight: bold;
+                    color: var(--primary);
+                  "
+                />
+              </div>
+              <div class="input-group" style="width: 120px">
+                <small
+                  style="
+                    position: absolute;
+                    top: -18px;
+                    left: 0;
+                    font-weight: bold;
+                  "
+                  >UVT</small
+                >
+                <input
+                  type="number"
+                  id="confUVT"
+                  class="form-control"
+                  value="52374"
+                  style="
+                    padding: 5px 10px;
+                    height: 38px;
+                    font-weight: bold;
+                    color: var(--primary);
+                  "
+                />
               </div>
             </div>
 
-            <div class="calc-card">
-              <h3 class="section-title">
-                <i class="fas fa-building"></i> Configuración Avanzada
-              </h3>
+            <div class="form-grid-2">
+              <div class="calc-card">
+                <h3 class="section-title">
+                  <i class="fas fa-user-clock"></i> Datos del Contrato
+                </h3>
 
-              <div id="panelLaboral">
                 <div class="form-group">
-                  <label>Exoneración Aportes (Empresa)</label>
+                  <label>Tipo de Vinculación</label>
                   <div class="input-group">
-                    <i class="fas fa-hand-holding-usd input-icon"></i>
-                    <select id="selectExonerado" class="form-control">
-                      <option value="no" selected>No Exonerada</option>
-                      <option value="si">Exonerada (Ley 1607)</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-grid-2">
-                  <div class="form-group">
-                    <label>Riesgo ARL</label>
-                    <select id="nivelArl" class="form-control">
-                      <option value="0.00522">I (0.522%)</option>
-                      <option value="0.01044">II (1.044%)</option>
-                      <option value="0.02436">III (2.436%)</option>
-                      <option value="0.04350">IV (4.350%)</option>
-                      <option value="0.06960">V (6.960%)</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label>Ley Pensional (FSP)</label>
-                    <select id="leyPensional" class="form-control">
-                      <option value="ley100">Ley 100</option>
-                      <option value="ley2381" selected>
-                        Ley 2381 (Reforma)
+                    <i class="fas fa-file-contract input-icon"></i>
+                    <select id="tipoContrato" class="form-control">
+                      <option value="fijo">Contrato a Término Fijo</option>
+                      <option value="indefinido" selected>
+                        Contrato a Término Indefinido
+                      </option>
+                      <option value="obra">Contrato por Obra o Labor</option>
+                      <option value="servicios">
+                        Contrato de Prestación de Servicios
                       </option>
                     </select>
                   </div>
                 </div>
-              </div>
 
-              <div
-                style="
-                  background: #f0f7ff;
-                  padding: 15px;
-                  border-radius: 8px;
-                  margin-top: 15px;
-                  border: 1px dashed #bbdefb;
-                "
-              >
-                <label
-                  style="
-                    color: #0d47a1;
-                    margin-bottom: 10px;
-                    display: block;
-                    font-size: 0.9rem;
-                    font-weight: bold;
-                  "
-                  ><i class="fas fa-calculator"></i> Datos para Retención en la
-                  Fuente</label
-                >
-                <div class="form-grid-2">
-                  <div class="form-group">
-                    <small>Medicina Prepagada</small>
+                <div class="form-group">
+                  <label for="salarioBase">Salario Base Mensual</label>
+                  <div class="input-group">
+                    <i class="fas fa-dollar-sign input-icon"></i>
                     <input
                       type="number"
-                      id="dedPrepagada"
+                      id="salarioBase"
+                      class="form-control"
+                      placeholder="Ej: 3000000"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="diasLaborados">Días a Liquidar</label>
+                  <div class="input-group">
+                    <i class="fas fa-calendar-day input-icon"></i>
+                    <input
+                      type="number"
+                      id="diasLaborados"
+                      class="form-control"
+                      value="30"
+                      min="1"
+                      max="30"
+                      required
+                    />
+                  </div>
+                  <small>Por defecto 30 (mes completo).</small>
+                </div>
+
+                <div class="form-group" id="grpAuxilio">
+                  <label>Auxilio de Transporte</label>
+                  <div style="display: flex; gap: 10px">
+                    <div class="check-group" style="flex: 0 0 auto">
+                      <input type="checkbox" id="checkAux" />
+                      <label for="checkAux">Incluir</label>
+                    </div>
+                    <input
+                      type="number"
+                      id="valAuxilioInput"
+                      class="form-control"
+                      placeholder="Valor Auxilio"
+                      disabled
+                      style="background: #f9f9f9"
+                    />
+                  </div>
+                  <small
+                    >Se marca automáticamente si el salario base es <= 2
+                    SMMLV.</small
+                  >
+                </div>
+
+                <div class="form-group">
+                  <label>Otros Ingresos (Bonos/Comisiones)</label>
+                  <div class="input-group">
+                    <i class="fas fa-plus-circle input-icon"></i>
+                    <input
+                      type="number"
+                      id="otrosIngresos"
                       class="form-control"
                       placeholder="0"
                     />
                   </div>
+                </div>
+              </div>
+
+              <div class="calc-card">
+                <h3 class="section-title">
+                  <i class="fas fa-building"></i> Configuración Avanzada
+                </h3>
+
+                <div id="panelLaboral">
                   <div class="form-group">
-                    <small>Dependientes</small>
-                    <div class="check-group" style="height: 38px">
-                      <input type="checkbox" id="checkDependientes" />
-                      <label for="checkDependientes">Sí (10%)</label>
+                    <label>Exoneración Aportes (Empresa)</label>
+                    <div class="input-group">
+                      <i class="fas fa-hand-holding-usd input-icon"></i>
+                      <select id="selectExonerado" class="form-control">
+                        <option value="no" selected>No Exonerada</option>
+                        <option value="si">Exonerada (Ley 1607)</option>
+                      </select>
                     </div>
                   </div>
-                  <div class="form-group">
-                    <small>Intereses Vivienda</small>
-                    <input
-                      type="number"
-                      id="dedVivienda"
-                      class="form-control"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <small>Aportes Voluntarios</small>
-                    <input
-                      type="number"
-                      id="dedVoluntarios"
-                      class="form-control"
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <button type="submit" class="btn-calculate" id="btnCalcular">
-            <i class="fas fa-check-circle"></i> Calcular Todo
-          </button>
-        </form>
-
-        <div id="resultsContainer">
-          <div class="report-paper" id="printArea">
-            <div class="watermark">TU ABOGADO LABORAL</div>
-
-            <div style="text-align: center; margin-bottom: 30px">
-              <img
-                src="img/logo-principal.webp"
-                alt="Logo"
-                style="height: 60px; margin-bottom: 10px"
-                onerror="this.style.display = 'none'"
-              />
-              <h2 style="color: var(--primary); margin: 0">
-                INFORME DETALLADO DE NÓMINA
-              </h2>
-              <p style="color: #666; font-size: 0.9rem">
-                Proyección Jurídica y Contable 2026
-              </p>
-            </div>
-
-            <div class="report-section">
-              <div class="report-header-strip">0. Datos de Liquidación</div>
-              <div class="input-summary-grid">
-                <div class="input-item">
-                  <label>Salario Base:</label>
-                  <span id="pSalarioBase">$0</span>
-                </div>
-                <div class="input-item">
-                  <label>Días Liq:</label>
-                  <span id="pDiasLiq">30</span>
-                </div>
-                <div class="input-item">
-                  <label>Tipo Contrato:</label>
-                  <span id="pTipoContrato" style="text-transform: capitalize"
-                    >--</span
-                  >
-                </div>
-                <div class="input-item">
-                  <label>Auxilio Transporte:</label>
-                  <span id="pAuxilioIncluido">$0</span>
-                </div>
-                <div class="input-item">
-                  <label>Otros Ingresos:</label>
-                  <span id="pOtrosIngresos">$0</span>
-                </div>
-                <div class="input-item">
-                  <label>Exoneración Ley 1607:</label>
-                  <span id="pExonerado">--</span>
-                </div>
-                <div class="input-item">
-                  <label>Riesgo ARL:</label>
-                  <span id="pRiesgoArl">--</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="report-section">
-              <div class="report-header-strip">1. Nómina Empleado</div>
-
-              <div
-                class="calc-card"
-                style="
-                  border-top: 4px solid var(--secondary);
-                  border: 1px solid #eee;
-                  box-shadow: none;
-                "
-              >
-                <div class="form-grid-2">
-                  <div>
-                    <h4 class="text-green">
-                      <i class="fas fa-plus-circle"></i> DEVENGADO
-                    </h4>
-                    <table class="simple-table">
-                      <tr>
-                        <td>Salario Básico (Periodo)</td>
-                        <td id="eSalario" style="text-align: right">$0</td>
-                      </tr>
-                      <tr>
-                        <td>Aux. Transporte</td>
-                        <td id="eAuxilio" style="text-align: right">$0</td>
-                      </tr>
-                      <tr>
-                        <td>Otros/Bonos</td>
-                        <td id="eOtros" style="text-align: right">$0</td>
-                      </tr>
-                      <tr style="background: #e8f5e9">
-                        <td><strong>TOTAL DEVENGADO</strong></td>
-                        <td
-                          id="eTotalDev"
-                          style="text-align: right; font-weight: bold"
-                        >
-                          $0
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                  <div>
-                    <h4 class="text-red">
-                      <i class="fas fa-minus-circle"></i> DEDUCCIONES
-                    </h4>
-                    <table class="simple-table">
-                      <tr>
-                        <td>Salud (4%)</td>
-                        <td id="eSalud" style="text-align: right">$0</td>
-                      </tr>
-                      <tr>
-                        <td>Pensión (4%)</td>
-                        <td id="ePension" style="text-align: right">$0</td>
-                      </tr>
-                      <tr>
-                        <td>Fondo Solidaridad</td>
-                        <td id="eFsp" style="text-align: right">$0</td>
-                      </tr>
-                      <tr>
-                        <td>Retención Fuente</td>
-                        <td id="eRetefuente" style="text-align: right">$0</td>
-                      </tr>
-                      <tr style="background: #ffebee">
-                        <td><strong>TOTAL DEDUCCIONES</strong></td>
-                        <td
-                          id="eTotalDed"
-                          style="text-align: right; font-weight: bold"
-                        >
-                          $0
-                        </td>
-                      </tr>
-                    </table>
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label>Riesgo ARL</label>
+                      <select id="nivelArl" class="form-control">
+                        <option value="0.00522">I (0.522%)</option>
+                        <option value="0.01044">II (1.044%)</option>
+                        <option value="0.02436">III (2.436%)</option>
+                        <option value="0.04350">IV (4.350%)</option>
+                        <option value="0.06960">V (6.960%)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Ley Pensional (FSP)</label>
+                      <select id="leyPensional" class="form-control">
+                        <option value="ley100">Ley 100</option>
+                        <option value="ley2381" selected>
+                          Ley 2381 (Reforma)
+                        </option>
+                      </select>
+                    </div>
                   </div>
                 </div>
+
                 <div
                   style="
-                    background: #fdfbf5;
-                    padding: 20px;
-                    text-align: right;
+                    background: #f0f7ff;
+                    padding: 15px;
                     border-radius: 8px;
-                    margin-top: 30px;
-                    border: 1px solid var(--secondary);
+                    margin-top: 15px;
+                    border: 1px dashed #bbdefb;
                   "
                 >
-                  <span
+                  <label
                     style="
-                      font-size: 1.1rem;
+                      color: #0d47a1;
+                      margin-bottom: 10px;
+                      display: block;
+                      font-size: 0.9rem;
                       font-weight: bold;
-                      color: var(--primary);
                     "
-                    >NETO A PAGAR AL EMPLEADO:</span
+                    ><i class="fas fa-calculator"></i> Datos para Retención en
+                    la Fuente</label
                   >
-                  <div
-                    id="eNeto"
-                    style="
-                      font-size: 2.5rem;
-                      font-weight: 900;
-                      color: var(--secondary);
-                    "
-                  >
-                    $0
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <small>Medicina Prepagada</small>
+                      <input
+                        type="number"
+                        id="dedPrepagada"
+                        class="form-control"
+                        placeholder="0"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <small>Dependientes</small>
+                      <div class="check-group" style="height: 38px">
+                        <input type="checkbox" id="checkDependientes" />
+                        <label for="checkDependientes">Sí (10%)</label>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <small>Intereses Vivienda</small>
+                      <input
+                        type="number"
+                        id="dedVivienda"
+                        class="form-control"
+                        placeholder="0"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <small>Aportes Voluntarios</small>
+                      <input
+                        type="number"
+                        id="dedVoluntarios"
+                        class="form-control"
+                        placeholder="0"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="report-section">
-              <div
-                style="
-                  border-left: 3px solid var(--primary);
-                  padding-left: 15px;
-                  margin-bottom: 10px;
-                "
-              >
-                <h4 style="margin: 0; color: #555">
-                  <i class="fas fa-info-circle"></i> Anexo: Cálculo Retención en
-                  la Fuente
-                </h4>
+            <button type="submit" class="btn-calculate" id="btnCalcular">
+              <i class="fas fa-check-circle"></i> Calcular Todo
+            </button>
+          </form>
+
+          <div id="resultsContainer">
+            <div class="report-paper" id="printArea">
+              <div class="watermark">TU ABOGADO LABORAL</div>
+
+              <div style="text-align: center; margin-bottom: 30px">
+                <img
+                  src="img/logo-principal.webp"
+                  alt="Logo"
+                  style="height: 60px; margin-bottom: 10px"
+                  onerror="this.style.display = 'none'"
+                />
+                <h2 style="color: var(--primary); margin: 0">
+                  INFORME DETALLADO DE NÓMINA
+                </h2>
+                <p style="color: #666; font-size: 0.9rem">
+                  Proyección Jurídica y Contable 2026
+                </p>
               </div>
-              <div
-                style="background: #f9f9f9; padding: 20px; border-radius: 8px"
-              >
-                <table class="simple-table">
-                  <tr>
-                    <th>Concepto Depuración</th>
-                    <th style="text-align: right">Valor</th>
-                  </tr>
-                  <tr>
-                    <td>(+) Ingresos Totales</td>
-                    <td id="rIngresos" style="text-align: right">$0</td>
-                  </tr>
-                  <tr>
-                    <td>(-) Aportes Seguridad Social</td>
-                    <td
-                      id="rSeguridad"
-                      style="text-align: right; color: #c62828"
+
+              <div class="report-section">
+                <div class="report-header-strip">0. Datos de Liquidación</div>
+                <div class="input-summary-grid">
+                  <div class="input-item">
+                    <label>Salario Base:</label>
+                    <span id="pSalarioBase">$0</span>
+                  </div>
+                  <div class="input-item">
+                    <label>Días Liq:</label>
+                    <span id="pDiasLiq">30</span>
+                  </div>
+                  <div class="input-item">
+                    <label>Tipo Contrato:</label>
+                    <span id="pTipoContrato" style="text-transform: capitalize"
+                      >--</span
                     >
-                      $0
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><strong>(=) Ingreso Neto</strong></td>
-                    <td id="rNeto" style="text-align: right; font-weight: bold">
-                      $0
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>(-) Deducciones Totales</td>
-                    <td
-                      id="rDeducciones"
-                      style="text-align: right; color: #c62828"
-                    >
-                      $0
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>(-) Rentas Exentas</td>
-                    <td id="rExentas" style="text-align: right; color: #c62828">
-                      $0
-                    </td>
-                  </tr>
-                  <tr style="background: #e3f2fd">
-                    <td><strong>(=) BASE GRAVABLE FINAL</strong></td>
-                    <td
-                      id="rBase"
+                  </div>
+                  <div class="input-item">
+                    <label>Auxilio Transporte:</label>
+                    <span id="pAuxilioIncluido">$0</span>
+                  </div>
+                  <div class="input-item">
+                    <label>Otros Ingresos:</label>
+                    <span id="pOtrosIngresos">$0</span>
+                  </div>
+                  <div class="input-item">
+                    <label>Exoneración Ley 1607:</label>
+                    <span id="pExonerado">--</span>
+                  </div>
+                  <div class="input-item">
+                    <label>Riesgo ARL:</label>
+                    <span id="pRiesgoArl">--</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="report-section">
+                <div class="report-header-strip">1. Nómina Empleado</div>
+
+                <div
+                  class="calc-card"
+                  style="
+                    border-top: 4px solid var(--secondary);
+                    border: 1px solid #eee;
+                    box-shadow: none;
+                  "
+                >
+                  <div class="form-grid-2">
+                    <div>
+                      <h4 class="text-green">
+                        <i class="fas fa-plus-circle"></i> DEVENGADO
+                      </h4>
+                      <table class="simple-table">
+                        <tr>
+                          <td>Salario Básico (Periodo)</td>
+                          <td id="eSalario" style="text-align: right">$0</td>
+                        </tr>
+                        <tr>
+                          <td>Aux. Transporte</td>
+                          <td id="eAuxilio" style="text-align: right">$0</td>
+                        </tr>
+                        <tr>
+                          <td>Otros/Bonos</td>
+                          <td id="eOtros" style="text-align: right">$0</td>
+                        </tr>
+                        <tr style="background: #e8f5e9">
+                          <td><strong>TOTAL DEVENGADO</strong></td>
+                          <td
+                            id="eTotalDev"
+                            style="text-align: right; font-weight: bold"
+                          >
+                            $0
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                    <div>
+                      <h4 class="text-red">
+                        <i class="fas fa-minus-circle"></i> DEDUCCIONES
+                      </h4>
+                      <table class="simple-table">
+                        <tr>
+                          <td>Salud (4%)</td>
+                          <td id="eSalud" style="text-align: right">$0</td>
+                        </tr>
+                        <tr>
+                          <td>Pensión (4%)</td>
+                          <td id="ePension" style="text-align: right">$0</td>
+                        </tr>
+                        <tr>
+                          <td>Fondo Solidaridad</td>
+                          <td id="eFsp" style="text-align: right">$0</td>
+                        </tr>
+                        <tr>
+                          <td>Retención Fuente</td>
+                          <td id="eRetefuente" style="text-align: right">$0</td>
+                        </tr>
+                        <tr style="background: #ffebee">
+                          <td><strong>TOTAL DEDUCCIONES</strong></td>
+                          <td
+                            id="eTotalDed"
+                            style="text-align: right; font-weight: bold"
+                          >
+                            $0
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                  <div
+                    style="
+                      background: #fdfbf5;
+                      padding: 20px;
+                      text-align: right;
+                      border-radius: 8px;
+                      margin-top: 30px;
+                      border: 1px solid var(--secondary);
+                    "
+                  >
+                    <span
                       style="
-                        text-align: right;
+                        font-size: 1.1rem;
                         font-weight: bold;
                         color: var(--primary);
                       "
+                      >NETO A PAGAR AL EMPLEADO:</span
                     >
-                      $0
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><strong>IMPUESTO A RETENER (DIAN)</strong></td>
-                    <td
-                      id="rTotal"
+                    <div
+                      id="eNeto"
                       style="
-                        text-align: right;
+                        font-size: 2.5rem;
                         font-weight: 900;
-                        color: var(--primary);
-                        font-size: 1.1rem;
+                        color: var(--secondary);
                       "
                     >
                       $0
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-
-            <div class="report-section">
-              <div class="report-header-strip">2. Costos del Empleador</div>
-
-              <div class="employer-grid">
-                <div class="summary-box">
-                  <div class="summary-header">Salario y Seguridad Social</div>
-
-                  <div class="row-item">
-                    <span>Salario Base (Dev):</span>
-                    <strong id="cSalario">$0</strong>
-                  </div>
-                  <div class="row-item">
-                    <span>Auxilio Transporte:</span>
-                    <strong id="cAuxilio">$0</strong>
-                  </div>
-                  <div class="row-item">
-                    <span>Dotación (Prov):</span> <span id="cDotacion">$0</span>
-                  </div>
-                  <div
-                    class="row-item"
-                    style="
-                      border-top: 1px dashed #ccc;
-                      margin-top: 10px;
-                      padding-top: 10px;
-                    "
-                  >
-                    <span>Salud (8.5%):</span> <strong id="cSalud">$0</strong>
-                  </div>
-                  <div class="row-item">
-                    <span>Pensión (12%):</span>
-                    <strong id="cPension">$0</strong>
-                  </div>
-                  <div class="row-item">
-                    <span>ARL:</span> <strong id="cArl">$0</strong>
-                  </div>
-                </div>
-
-                <div class="summary-box">
-                  <div class="summary-header">Parafiscales y Prestaciones</div>
-
-                  <div class="row-item">
-                    <span>Caja Compensación (4%):</span>
-                    <strong id="cCaja">$0</strong>
-                  </div>
-                  <div class="row-item">
-                    <span>ICBF (3%):</span> <strong id="cIcbf">$0</strong>
-                  </div>
-                  <div class="row-item">
-                    <span>SENA (2%):</span> <strong id="cSena">$0</strong>
-                  </div>
-
-                  <div
-                    class="row-item"
-                    style="
-                      border-top: 1px dashed #ccc;
-                      margin-top: 10px;
-                      padding-top: 10px;
-                    "
-                  >
-                    <span>Prima de Servicios:</span>
-                    <strong id="cPrima">$0</strong>
-                  </div>
-                  <div class="row-item">
-                    <span>Cesantías:</span> <strong id="cCesantias">$0</strong>
-                  </div>
-                  <div class="row-item">
-                    <span>Int. Cesantías:</span>
-                    <strong id="cIntereses">$0</strong>
-                  </div>
-                  <div class="row-item">
-                    <span>Vacaciones:</span>
-                    <strong id="cVacaciones">$0</strong>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div class="total-card">
-                <span style="opacity: 0.8; font-size: 1rem"
-                  >COSTO TOTAL DEL PERIODO PARA LA EMPRESA</span
+              <div class="report-section">
+                <div
+                  style="
+                    border-left: 3px solid var(--primary);
+                    padding-left: 15px;
+                    margin-bottom: 10px;
+                  "
                 >
-                <h3 id="cTotalMensual">$0</h3>
-                <div style="font-size: 0.9rem; margin-top: 5px; opacity: 0.9">
-                  Costo Anual Proyectado: <strong id="cTotalAnual">$0</strong>
+                  <h4 style="margin: 0; color: #555">
+                    <i class="fas fa-info-circle"></i> Anexo: Cálculo Retención
+                    en la Fuente
+                  </h4>
+                </div>
+                <div
+                  style="background: #f9f9f9; padding: 20px; border-radius: 8px"
+                >
+                  <table class="simple-table">
+                    <tr>
+                      <th>Concepto Depuración</th>
+                      <th style="text-align: right">Valor</th>
+                    </tr>
+                    <tr>
+                      <td>(+) Ingresos Totales</td>
+                      <td id="rIngresos" style="text-align: right">$0</td>
+                    </tr>
+                    <tr>
+                      <td>(-) Aportes Seguridad Social</td>
+                      <td
+                        id="rSeguridad"
+                        style="text-align: right; color: #c62828"
+                      >
+                        $0
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>(=) Ingreso Neto</strong></td>
+                      <td
+                        id="rNeto"
+                        style="text-align: right; font-weight: bold"
+                      >
+                        $0
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>(-) Deducciones Totales</td>
+                      <td
+                        id="rDeducciones"
+                        style="text-align: right; color: #c62828"
+                      >
+                        $0
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>(-) Rentas Exentas</td>
+                      <td
+                        id="rExentas"
+                        style="text-align: right; color: #c62828"
+                      >
+                        $0
+                      </td>
+                    </tr>
+                    <tr style="background: #e3f2fd">
+                      <td><strong>(=) BASE GRAVABLE FINAL</strong></td>
+                      <td
+                        id="rBase"
+                        style="
+                          text-align: right;
+                          font-weight: bold;
+                          color: var(--primary);
+                        "
+                      >
+                        $0
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>IMPUESTO A RETENER (DIAN)</strong></td>
+                      <td
+                        id="rTotal"
+                        style="
+                          text-align: right;
+                          font-weight: 900;
+                          color: var(--primary);
+                          font-size: 1.1rem;
+                        "
+                      >
+                        $0
+                      </td>
+                    </tr>
+                  </table>
                 </div>
               </div>
+
+              <div class="report-section">
+                <div class="report-header-strip">2. Costos del Empleador</div>
+
+                <div class="employer-grid">
+                  <div class="summary-box">
+                    <div class="summary-header">Salario y Seguridad Social</div>
+
+                    <div class="row-item">
+                      <span>Salario Base (Dev):</span>
+                      <strong id="cSalario">$0</strong>
+                    </div>
+                    <div class="row-item">
+                      <span>Auxilio Transporte:</span>
+                      <strong id="cAuxilio">$0</strong>
+                    </div>
+                    <div class="row-item">
+                      <span>Dotación (Prov):</span>
+                      <span id="cDotacion">$0</span>
+                    </div>
+                    <div
+                      class="row-item"
+                      style="
+                        border-top: 1px dashed #ccc;
+                        margin-top: 10px;
+                        padding-top: 10px;
+                      "
+                    >
+                      <span>Salud (8.5%):</span> <strong id="cSalud">$0</strong>
+                    </div>
+                    <div class="row-item">
+                      <span>Pensión (12%):</span>
+                      <strong id="cPension">$0</strong>
+                    </div>
+                    <div class="row-item">
+                      <span>ARL:</span> <strong id="cArl">$0</strong>
+                    </div>
+                  </div>
+
+                  <div class="summary-box">
+                    <div class="summary-header">
+                      Parafiscales y Prestaciones
+                    </div>
+
+                    <div class="row-item">
+                      <span>Caja Compensación (4%):</span>
+                      <strong id="cCaja">$0</strong>
+                    </div>
+                    <div class="row-item">
+                      <span>ICBF (3%):</span> <strong id="cIcbf">$0</strong>
+                    </div>
+                    <div class="row-item">
+                      <span>SENA (2%):</span> <strong id="cSena">$0</strong>
+                    </div>
+
+                    <div
+                      class="row-item"
+                      style="
+                        border-top: 1px dashed #ccc;
+                        margin-top: 10px;
+                        padding-top: 10px;
+                      "
+                    >
+                      <span>Prima de Servicios:</span>
+                      <strong id="cPrima">$0</strong>
+                    </div>
+                    <div class="row-item">
+                      <span>Cesantías:</span>
+                      <strong id="cCesantias">$0</strong>
+                    </div>
+                    <div class="row-item">
+                      <span>Int. Cesantías:</span>
+                      <strong id="cIntereses">$0</strong>
+                    </div>
+                    <div class="row-item">
+                      <span>Vacaciones:</span>
+                      <strong id="cVacaciones">$0</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-card">
+                  <span style="opacity: 0.8; font-size: 1rem"
+                    >COSTO TOTAL DEL PERIODO PARA LA EMPRESA</span
+                  >
+                  <h3 id="cTotalMensual">$0</h3>
+                  <div style="font-size: 0.9rem; margin-top: 5px; opacity: 0.9">
+                    Costo Anual Proyectado: <strong id="cTotalAnual">$0</strong>
+                  </div>
+                </div>
+              </div>
+
+              <p
+                style="
+                  text-align: center;
+                  margin-top: 30px;
+                  font-size: 0.8rem;
+                  color: #888;
+                "
+              >
+                * Herramienta auditada bajo normativa laboral colombiana
+                proyectada para 2026. <br />
+                * Documento generado automáticamente por Tu Abogado Laboral.
+              </p>
             </div>
 
-            <p
-              style="
-                text-align: center;
-                margin-top: 30px;
-                font-size: 0.8rem;
-                color: #888;
-              "
-            >
-              * Herramienta auditada bajo normativa laboral colombiana
-              proyectada para 2026. <br />
-              * Documento generado automáticamente por Tu Abogado Laboral.
-            </p>
+            <button onclick="downloadPDF()" class="btn-pdf">
+              <i class="fas fa-file-pdf"></i> Descargar PDF Oficial
+            </button>
           </div>
+        </div>
+      </section>
 
-          <button onclick="downloadPDF()" class="btn-pdf">
-            <i class="fas fa-file-pdf"></i> Descargar PDF Oficial
-          </button>
+      <div class="container" style="max-width: 1000px; margin: 0 auto">
+        <div
+          style="
+            background-color: #fff;
+            border-top: 3px solid #d4af37;
+            padding: 20px;
+            margin: 40px 0 20px 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            text-align: center;
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.5;
+          "
+        >
+          <p style="margin: 0">
+            <strong style="color: #10214b">Aviso Legal:</strong>
+            Esta herramienta realiza proyecciones basadas en la normativa
+            laboral vigente en Colombia. Los resultados son
+            <strong>aproximaciones ilustrativas</strong> y pueden variar según
+            convenciones colectivas o interpretaciones judiciales. El uso de
+            este simulador no crea una relación abogado-cliente ni sustituye una
+            liquidación oficial.
+            <span style="display: block; margin-top: 5px; font-style: italic">
+              Tu Abogado Laboral no se hace responsable por decisiones tomadas
+              basándose exclusivamente en estos datos.
+            </span>
+          </p>
         </div>
       </div>
-    </section>
-
-    <div class="container" style="max-width: 1000px; margin: 0 auto">
-      <div
-        style="
-          background-color: #fff;
-          border-top: 3px solid #d4af37;
-          padding: 20px;
-          margin: 40px 0 20px 0;
-          border-radius: 4px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-          text-align: center;
-          font-size: 0.85rem;
-          color: #666;
-          line-height: 1.5;
-        "
-      >
-        <p style="margin: 0">
-          <strong style="color: #10214b">Aviso Legal:</strong>
-          Esta herramienta realiza proyecciones basadas en la normativa laboral
-          vigente en Colombia. Los resultados son
-          <strong>aproximaciones ilustrativas</strong> y pueden variar según
-          convenciones colectivas o interpretaciones judiciales. El uso de este
-          simulador no crea una relación abogado-cliente ni sustituye una
-          liquidación oficial.
-          <span style="display: block; margin-top: 5px; font-style: italic">
-            Tu Abogado Laboral no se hace responsable por decisiones tomadas
-            basándose exclusivamente en estos datos.
-          </span>
-        </p>
-      </div>
-    </div>
-
     </main>
     <footer>
       <div class="container">

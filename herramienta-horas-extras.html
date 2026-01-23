@@ -4,18 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Seguridad: CSP Básico -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;"
+    />
 
     <title>Calculadora de Horas Extras | Tu Abogado Laboral</title>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
     <link rel="stylesheet" href="css/style.css" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=optional"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      crossorigin="anonymous"
     />
     <style>
       /* --- ESTILOS ELIMINADOS (Movidos a css/style.css) --- */
@@ -33,7 +37,12 @@
       <div class="container header-container">
         <div class="logo">
           <a href="index.html" aria-label="Inicio">
-            <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
+            <img
+              src="img/logo-principal.webp"
+              alt="Logo"
+              class="logo-img"
+              width="200"
+              height="55"
           /></a>
         </div>
         <div
@@ -58,323 +67,327 @@
     </header>
 
     <main>
+      <section class="bg-light" style="padding: 40px 0">
+        <div class="calc-wrapper">
+          <div class="text-center mb-5" style="text-align: center">
+            <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
+              Calculadora de Horas Extras
+            </h1>
+            <p style="color: #666">
+              Seleccione el periodo para aplicar la norma correcta.
+            </p>
+          </div>
 
-    <section class="bg-light" style="padding: 40px 0">
-      <div class="calc-wrapper">
-        <div class="text-center mb-5" style="text-align: center">
-          <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
-            Calculadora de Horas Extras
-          </h1>
-          <p style="color: #666">
-            Seleccione el periodo para aplicar la norma correcta.
-          </p>
-        </div>
-
-        <div class="calc-card">
-          <form id="extrasForm">
-            <div
-              class="form-group"
-              style="
-                background: #eef2f6;
-                padding: 15px;
-                border-radius: 8px;
-                margin-bottom: 25px;
-                border: 1px solid #dce4ec;
-              "
-            >
-              <label
-                ><i class="fas fa-calendar-check"></i> Periodo Aplicable
-                (Vigencia)</label
-              >
-              <small
-                >Ajusta automáticamente la Jornada Máxima y el % de Recargo
-                Dominical.</small
-              >
-              <div class="input-group">
-                <select
-                  id="periodoSelector"
-                  class="form-control"
-                  style="background: white"
-                >
-                  <option value="p_old">
-                    Antes de Jul 2023 (48h | Dom 75%)
-                  </option>
-                  <option value="p_2023">
-                    Jul 2023 - Jul 2024 (47h | Dom 75%)
-                  </option>
-                  <option value="p_2024">
-                    Jul 2024 - Jul 2025 (46h | Dom 75%)
-                  </option>
-                  <option value="p_2025" selected>
-                    Jul 2025 - Jul 2026 (44h | Dom 80%)
-                  </option>
-                  <option value="p_2026">
-                    Jul 2026 - Jul 2027 (42h | Dom 90%)
-                  </option>
-                  <option value="p_2027">
-                    Jul 2027 en adelante (42h | Dom 100%)
-                  </option>
-                </select>
-              </div>
-              <div
-                style="
-                  margin-top: 15px;
-                  display: flex;
-                  flex-wrap: wrap;
-                  gap: 10px;
-                "
-              >
-                <span class="badge-info" id="badgeJornada"></span>
-                <span
-                  class="badge-info"
-                  id="badgeRecargo"
-                  style="background: #e8f5e9; color: #2e7d32"
-                ></span>
-              </div>
-            </div>
-
-            <div class="calc-grid">
-              <div class="form-group">
-                <label>Salario Base Mensual</label>
-                <div class="input-group">
-                  <i class="fas fa-dollar-sign input-icon"></i>
-                  <input
-                    type="number"
-                    id="salario"
-                    class="form-control"
-                    placeholder="Ej: 2000000"
-                    required
-                  />
-                </div>
-              </div>
+          <div class="calc-card">
+            <form id="extrasForm">
               <div
                 class="form-group"
-                style="display: flex; align-items: center"
+                style="
+                  background: #eef2f6;
+                  padding: 15px;
+                  border-radius: 8px;
+                  margin-bottom: 25px;
+                  border: 1px solid #dce4ec;
+                "
               >
-                <small style="font-size: 0.85rem; color: #888">
-                  * El sistema calculará el valor de la hora ordinaria
-                  dividiendo el salario entre el
-                  <strong>divisor indicado arriba</strong>.
-                </small>
-              </div>
-            </div>
-
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0" />
-
-            <h3 style="font-size: 1.1rem; color: #10214b; margin-bottom: 15px">
-              Detalle de horas laboradas:
-            </h3>
-
-            <div class="hours-grid">
-              <div class="form-group">
-                <label>Extra Diurna</label>
-                <small>Recargo fijo: 25%</small>
+                <label
+                  ><i class="fas fa-calendar-check"></i> Periodo Aplicable
+                  (Vigencia)</label
+                >
+                <small
+                  >Ajusta automáticamente la Jornada Máxima y el % de Recargo
+                  Dominical.</small
+                >
                 <div class="input-group">
-                  <i class="far fa-clock input-icon"></i>
-                  <input
-                    type="number"
-                    id="hed"
+                  <select
+                    id="periodoSelector"
                     class="form-control"
-                    placeholder="0"
-                    min="0"
-                  />
+                    style="background: white"
+                  >
+                    <option value="p_old">
+                      Antes de Jul 2023 (48h | Dom 75%)
+                    </option>
+                    <option value="p_2023">
+                      Jul 2023 - Jul 2024 (47h | Dom 75%)
+                    </option>
+                    <option value="p_2024">
+                      Jul 2024 - Jul 2025 (46h | Dom 75%)
+                    </option>
+                    <option value="p_2025" selected>
+                      Jul 2025 - Jul 2026 (44h | Dom 80%)
+                    </option>
+                    <option value="p_2026">
+                      Jul 2026 - Jul 2027 (42h | Dom 90%)
+                    </option>
+                    <option value="p_2027">
+                      Jul 2027 en adelante (42h | Dom 100%)
+                    </option>
+                  </select>
                 </div>
-              </div>
-              <div class="form-group">
-                <label>Extra Nocturna</label>
-                <small>Recargo fijo: 75%</small>
-                <div class="input-group">
-                  <i class="fas fa-moon input-icon"></i>
-                  <input
-                    type="number"
-                    id="hen"
-                    class="form-control"
-                    placeholder="0"
-                    min="0"
-                  />
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label>Extra Dom. Diurna</label>
-                <small>25% + Recargo Periodo</small>
-                <div class="input-group">
-                  <i class="fas fa-sun input-icon"></i>
-                  <input
-                    type="number"
-                    id="hedf"
-                    class="form-control"
-                    placeholder="0"
-                    min="0"
-                  />
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Extra Dom. Nocturna</label>
-                <small>75% + Recargo Periodo</small>
-                <div class="input-group">
-                  <i class="fas fa-stars input-icon"></i>
-                  <input
-                    type="number"
-                    id="hedfn"
-                    class="form-control"
-                    placeholder="0"
-                    min="0"
-                  />
+                <div
+                  style="
+                    margin-top: 15px;
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                  "
+                >
+                  <span class="badge-info" id="badgeJornada"></span>
+                  <span
+                    class="badge-info"
+                    id="badgeRecargo"
+                    style="background: #e8f5e9; color: #2e7d32"
+                  ></span>
                 </div>
               </div>
 
-              <div class="form-group">
-                <label>Recargo Nocturno</label>
-                <small>35% (Sin ser extra)</small>
-                <div class="input-group">
-                  <i class="fas fa-cloud-moon input-icon"></i>
-                  <input
-                    type="number"
-                    id="rn"
-                    class="form-control"
-                    placeholder="0"
-                    min="0"
-                  />
+              <div class="calc-grid">
+                <div class="form-group">
+                  <label>Salario Base Mensual</label>
+                  <div class="input-group">
+                    <i class="fas fa-dollar-sign input-icon"></i>
+                    <input
+                      type="number"
+                      id="salario"
+                      class="form-control"
+                      placeholder="Ej: 2000000"
+                      required
+                    />
+                  </div>
+                </div>
+                <div
+                  class="form-group"
+                  style="display: flex; align-items: center"
+                >
+                  <small style="font-size: 0.85rem; color: #888">
+                    * El sistema calculará el valor de la hora ordinaria
+                    dividiendo el salario entre el
+                    <strong>divisor indicado arriba</strong>.
+                  </small>
                 </div>
               </div>
-              <div class="form-group">
-                <label>Dom/Fest (Ordinaria)</label>
-                <small>Solo Recargo (Variable)</small>
-                <div class="input-group">
-                  <i class="fas fa-calendar-day input-icon"></i>
-                  <input
-                    type="number"
-                    id="df"
-                    class="form-control"
-                    placeholder="0"
-                    min="0"
-                  />
-                </div>
-              </div>
-            </div>
 
-            <button type="submit" class="btn-calculate">
-              <i class="fas fa-calculator"></i> Calcular Liquidación
-            </button>
-          </form>
-        </div>
+              <hr
+                style="border: 0; border-top: 1px solid #eee; margin: 25px 0"
+              />
 
-        <div id="resultCard" class="result-container">
-          <div class="result-header">
-            <div>
-              <h3 style="margin: 0; font-size: 1.2rem">
-                Resumen de Liquidación
+              <h3
+                style="font-size: 1.1rem; color: #10214b; margin-bottom: 15px"
+              >
+                Detalle de horas laboradas:
               </h3>
-              <small style="opacity: 0.8" id="resPeriodoTexto"
-                >Periodo Seleccionado</small
-              >
-            </div>
+
+              <div class="hours-grid">
+                <div class="form-group">
+                  <label>Extra Diurna</label>
+                  <small>Recargo fijo: 25%</small>
+                  <div class="input-group">
+                    <i class="far fa-clock input-icon"></i>
+                    <input
+                      type="number"
+                      id="hed"
+                      class="form-control"
+                      placeholder="0"
+                      min="0"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Extra Nocturna</label>
+                  <small>Recargo fijo: 75%</small>
+                  <div class="input-group">
+                    <i class="fas fa-moon input-icon"></i>
+                    <input
+                      type="number"
+                      id="hen"
+                      class="form-control"
+                      placeholder="0"
+                      min="0"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Extra Dom. Diurna</label>
+                  <small>25% + Recargo Periodo</small>
+                  <div class="input-group">
+                    <i class="fas fa-sun input-icon"></i>
+                    <input
+                      type="number"
+                      id="hedf"
+                      class="form-control"
+                      placeholder="0"
+                      min="0"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Extra Dom. Nocturna</label>
+                  <small>75% + Recargo Periodo</small>
+                  <div class="input-group">
+                    <i class="fas fa-stars input-icon"></i>
+                    <input
+                      type="number"
+                      id="hedfn"
+                      class="form-control"
+                      placeholder="0"
+                      min="0"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Recargo Nocturno</label>
+                  <small>35% (Sin ser extra)</small>
+                  <div class="input-group">
+                    <i class="fas fa-cloud-moon input-icon"></i>
+                    <input
+                      type="number"
+                      id="rn"
+                      class="form-control"
+                      placeholder="0"
+                      min="0"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Dom/Fest (Ordinaria)</label>
+                  <small>Solo Recargo (Variable)</small>
+                  <div class="input-group">
+                    <i class="fas fa-calendar-day input-icon"></i>
+                    <input
+                      type="number"
+                      id="df"
+                      class="form-control"
+                      placeholder="0"
+                      min="0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-calculate">
+                <i class="fas fa-calculator"></i> Calcular Liquidación
+              </button>
+            </form>
           </div>
 
-          <div class="result-body">
-            <div
-              style="
-                background: #e8f5e9;
-                padding: 15px;
-                border-radius: 8px;
-                margin-bottom: 20px;
-                text-align: center;
-                border: 1px solid #c8e6c9;
-              "
-            >
-              <label style="font-size: 0.9rem; color: #2e7d32; display: block"
-                >Valor Hora Ordinaria</label
-              >
+          <div id="resultCard" class="result-container">
+            <div class="result-header">
+              <div>
+                <h3 style="margin: 0; font-size: 1.2rem">
+                  Resumen de Liquidación
+                </h3>
+                <small style="opacity: 0.8" id="resPeriodoTexto"
+                  >Periodo Seleccionado</small
+                >
+              </div>
+            </div>
+
+            <div class="result-body">
               <div
-                id="valHoraOrdinaria"
-                style="font-size: 1.4rem; font-weight: bold; color: #10214b"
+                style="
+                  background: #e8f5e9;
+                  padding: 15px;
+                  border-radius: 8px;
+                  margin-bottom: 20px;
+                  text-align: center;
+                  border: 1px solid #c8e6c9;
+                "
               >
-                $0
-              </div>
-              <small id="resDivisorUsado" style="color: #666">--</small>
-            </div>
-
-            <div class="result-split-grid">
-              <div class="result-column">
-                <h4><i class="fas fa-stopwatch"></i> Horas Extras</h4>
-                <div class="result-item">
-                  <label>Diurnas:</label><span id="resHed">$0</span>
+                <label style="font-size: 0.9rem; color: #2e7d32; display: block"
+                  >Valor Hora Ordinaria</label
+                >
+                <div
+                  id="valHoraOrdinaria"
+                  style="font-size: 1.4rem; font-weight: bold; color: #10214b"
+                >
+                  $0
                 </div>
-                <div class="result-item">
-                  <label>Nocturnas:</label><span id="resHen">$0</span>
-                </div>
-                <div class="result-item">
-                  <label>Dom. Diurnas:</label><span id="resHedf">$0</span>
-                </div>
-                <div class="result-item">
-                  <label>Dom. Nocturnas:</label><span id="resHedfn">$0</span>
-                </div>
-
-                <div class="subtotal-row">
-                  <span>Subtotal Extras:</span>
-                  <span id="subtotalExtras" style="color: #10214b">$0</span>
-                </div>
+                <small id="resDivisorUsado" style="color: #666">--</small>
               </div>
 
-              <div class="result-column">
-                <h4><i class="fas fa-bolt"></i> Recargos Ordinarios</h4>
-                <div class="result-item">
-                  <label>Rec. Nocturno:</label><span id="resRn">$0</span>
-                </div>
-                <div class="result-item">
-                  <label>Dom. Ordinario:</label><span id="resDf">$0</span>
+              <div class="result-split-grid">
+                <div class="result-column">
+                  <h4><i class="fas fa-stopwatch"></i> Horas Extras</h4>
+                  <div class="result-item">
+                    <label>Diurnas:</label><span id="resHed">$0</span>
+                  </div>
+                  <div class="result-item">
+                    <label>Nocturnas:</label><span id="resHen">$0</span>
+                  </div>
+                  <div class="result-item">
+                    <label>Dom. Diurnas:</label><span id="resHedf">$0</span>
+                  </div>
+                  <div class="result-item">
+                    <label>Dom. Nocturnas:</label><span id="resHedfn">$0</span>
+                  </div>
+
+                  <div class="subtotal-row">
+                    <span>Subtotal Extras:</span>
+                    <span id="subtotalExtras" style="color: #10214b">$0</span>
+                  </div>
                 </div>
 
-                <div style="height: 52px"></div>
+                <div class="result-column">
+                  <h4><i class="fas fa-bolt"></i> Recargos Ordinarios</h4>
+                  <div class="result-item">
+                    <label>Rec. Nocturno:</label><span id="resRn">$0</span>
+                  </div>
+                  <div class="result-item">
+                    <label>Dom. Ordinario:</label><span id="resDf">$0</span>
+                  </div>
 
-                <div class="subtotal-row">
-                  <span>Subtotal Recargos:</span>
-                  <span id="subtotalRecargos" style="color: #10214b">$0</span>
+                  <div style="height: 52px"></div>
+
+                  <div class="subtotal-row">
+                    <span>Subtotal Recargos:</span>
+                    <span id="subtotalRecargos" style="color: #10214b">$0</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class="result-total">
-              <span class="total-label">Total Nómina (Extras + Recargos):</span>
-              <span id="valTotal" class="total-value">$0</span>
+              <div class="result-total">
+                <span class="total-label"
+                  >Total Nómina (Extras + Recargos):</span
+                >
+                <span id="valTotal" class="total-value">$0</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <div class="container" style="max-width: 1000px; margin: 0 auto">
-      <div
-        style="
-          background-color: #fff;
-          border-top: 3px solid #d4af37;
-          padding: 20px;
-          margin: 40px 0 20px 0;
-          border-radius: 4px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-          text-align: center;
-          font-size: 0.85rem;
-          color: #666;
-          line-height: 1.5;
-        "
-      >
-        <p style="margin: 0">
-          <strong style="color: #10214b">Aviso Legal:</strong>
-          Esta herramienta realiza proyecciones basadas en la normativa laboral
-          vigente en Colombia. Los resultados son
-          <strong>aproximaciones ilustrativas</strong> y pueden variar según
-          convenciones colectivas o interpretaciones judiciales. El uso de este
-          simulador no crea una relación abogado-cliente ni sustituye una
-          liquidación oficial.
-          <span style="display: block; margin-top: 5px; font-style: italic">
-            Tu Abogado Laboral no se hace responsable por decisiones tomadas
-            basándose exclusivamente en estos datos.
-          </span>
-        </p>
+      <div class="container" style="max-width: 1000px; margin: 0 auto">
+        <div
+          style="
+            background-color: #fff;
+            border-top: 3px solid #d4af37;
+            padding: 20px;
+            margin: 40px 0 20px 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            text-align: center;
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.5;
+          "
+        >
+          <p style="margin: 0">
+            <strong style="color: #10214b">Aviso Legal:</strong>
+            Esta herramienta realiza proyecciones basadas en la normativa
+            laboral vigente en Colombia. Los resultados son
+            <strong>aproximaciones ilustrativas</strong> y pueden variar según
+            convenciones colectivas o interpretaciones judiciales. El uso de
+            este simulador no crea una relación abogado-cliente ni sustituye una
+            liquidación oficial.
+            <span style="display: block; margin-top: 5px; font-style: italic">
+              Tu Abogado Laboral no se hace responsable por decisiones tomadas
+              basándose exclusivamente en estos datos.
+            </span>
+          </p>
+        </div>
       </div>
-    </div>
-
     </main>
     <footer>
       <div class="container">

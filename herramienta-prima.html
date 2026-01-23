@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Seguridad: CSP Básico -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;"
+    />
 
     <title>Calculadora de Prima de Servicios | Tu Abogado Laboral</title>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
@@ -14,12 +17,13 @@
     />
     <link rel="stylesheet" href="css/style.css" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=optional"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      crossorigin="anonymous"
     />
     <style>
       /* ESTILOS DE LA CALCULADORA */
@@ -281,10 +285,21 @@
       <div class="container header-container">
         <div class="logo">
           <a href="index.html" aria-label="Inicio">
-            <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
+            <img
+              src="img/logo-principal.webp"
+              alt="Logo"
+              class="logo-img"
+              width="200"
+              height="55"
           /></a>
         </div>
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+        <div
+          class="menu-toggle"
+          id="mobile-menu"
+          aria-label="Menú principal"
+          role="button"
+          tabindex="0"
+        >
           <i class="fas fa-bars"></i>
         </div>
         <nav>
@@ -300,273 +315,275 @@
     </header>
 
     <main>
+      <section class="bg-light" style="padding: 40px 0">
+        <div class="container">
+          <div class="text-center mb-5">
+            <h1 style="color: #10214b; font-size: 2.2rem">
+              Calculadora de Prima de Servicios
+            </h1>
+            <p style="color: #666; max-width: 600px; margin: 0 auto">
+              Cálculo oficial con desglose semestral según el Art. 306 del CST.
+            </p>
+          </div>
 
-    <section class="bg-light" style="padding: 40px 0">
-      <div class="container">
-        <div class="text-center mb-5">
-          <h1 style="color: #10214b; font-size: 2.2rem">
-            Calculadora de Prima de Servicios
-          </h1>
-          <p style="color: #666; max-width: 600px; margin: 0 auto">
-            Cálculo oficial con desglose semestral según el Art. 306 del CST.
-          </p>
-        </div>
-
-        <div class="calc-wrapper">
-          <div class="calc-card">
-            <form id="primaForm">
-              <div class="calc-grid">
-                <div>
-                  <div class="form-group">
-                    <label>Salario Base Mensual</label>
-                    <small>Ingrese su salario fijo mensual</small>
-                    <div class="input-group">
-                      <i class="fas fa-dollar-sign input-icon"></i>
-                      <input
-                        type="number"
-                        id="salario"
-                        class="form-control"
-                        placeholder="Ingrese valor sin puntos"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div class="form-group" style="margin-top: 20px">
-                    <label>Otros Ingresos (Promedio Mensual)</label>
-                    <small
-                      >Promedio de horas extras, recargos o comisiones</small
-                    >
-                    <div class="input-group">
-                      <i class="fas fa-coins input-icon"></i>
-                      <input
-                        type="number"
-                        id="otrosIngresos"
-                        class="form-control"
-                        placeholder="0"
-                        value="0"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <div class="form-group">
-                    <label>Periodo a Liquidar</label>
-                    <small
-                      >Ingrese fecha inicial y final del contrato/periodo</small
-                    >
-                    <div style="display: flex; gap: 10px">
-                      <input
-                        type="date"
-                        id="fechaInicio"
-                        class="form-control"
-                        style="padding-left: 15px"
-                        required
-                      />
-                      <input
-                        type="date"
-                        id="fechaFin"
-                        class="form-control"
-                        style="padding-left: 15px"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div class="form-group" style="margin-top: 20px">
-                    <label>Auxilio de Transporte</label>
-                    <div class="checkbox-wrapper">
-                      <div class="checkbox-header">
+          <div class="calc-wrapper">
+            <div class="calc-card">
+              <form id="primaForm">
+                <div class="calc-grid">
+                  <div>
+                    <div class="form-group">
+                      <label>Salario Base Mensual</label>
+                      <small>Ingrese su salario fijo mensual</small>
+                      <div class="input-group">
+                        <i class="fas fa-dollar-sign input-icon"></i>
                         <input
-                          type="checkbox"
-                          id="checkAuxilio"
-                          style="
-                            width: 20px;
-                            height: 20px;
-                            accent-color: #10214b;
-                          "
+                          type="number"
+                          id="salario"
+                          class="form-control"
+                          placeholder="Ingrese valor sin puntos"
+                          required
                         />
-                        <span
-                          style="
-                            font-size: 0.95rem;
-                            font-weight: bold;
-                            color: #333;
-                          "
-                          >Incluir Auxilio de Transporte</span
-                        >
                       </div>
+                    </div>
 
-                      <div
-                        id="boxValorAuxilio"
-                        style="display: none; margin-top: 10px"
+                    <div class="form-group" style="margin-top: 20px">
+                      <label>Otros Ingresos (Promedio Mensual)</label>
+                      <small
+                        >Promedio de horas extras, recargos o comisiones</small
                       >
-                        <small>Ingrese valor del Auxilio del año actual:</small>
-                        <div class="input-group">
-                          <i class="fas fa-bus input-icon"></i>
+                      <div class="input-group">
+                        <i class="fas fa-coins input-icon"></i>
+                        <input
+                          type="number"
+                          id="otrosIngresos"
+                          class="form-control"
+                          placeholder="0"
+                          value="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="form-group">
+                      <label>Periodo a Liquidar</label>
+                      <small
+                        >Ingrese fecha inicial y final del
+                        contrato/periodo</small
+                      >
+                      <div style="display: flex; gap: 10px">
+                        <input
+                          type="date"
+                          id="fechaInicio"
+                          class="form-control"
+                          style="padding-left: 15px"
+                          required
+                        />
+                        <input
+                          type="date"
+                          id="fechaFin"
+                          class="form-control"
+                          style="padding-left: 15px"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 20px">
+                      <label>Auxilio de Transporte</label>
+                      <div class="checkbox-wrapper">
+                        <div class="checkbox-header">
                           <input
-                            type="number"
-                            id="valorAuxilioInput"
-                            class="form-control"
-                            placeholder="Ej: 162000"
+                            type="checkbox"
+                            id="checkAuxilio"
+                            style="
+                              width: 20px;
+                              height: 20px;
+                              accent-color: #10214b;
+                            "
                           />
+                          <span
+                            style="
+                              font-size: 0.95rem;
+                              font-weight: bold;
+                              color: #333;
+                            "
+                            >Incluir Auxilio de Transporte</span
+                          >
+                        </div>
+
+                        <div
+                          id="boxValorAuxilio"
+                          style="display: none; margin-top: 10px"
+                        >
+                          <small
+                            >Ingrese valor del Auxilio del año actual:</small
+                          >
+                          <div class="input-group">
+                            <i class="fas fa-bus input-icon"></i>
+                            <input
+                              type="number"
+                              id="valorAuxilioInput"
+                              class="form-control"
+                              placeholder="Ej: 162000"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <button type="submit" class="btn-calculate">
-                <i class="fas fa-calculator"></i> Calcular Prima
-              </button>
-            </form>
-          </div>
-
-          <div id="resultCard" class="result-container">
-            <div class="result-header">
-              <div>
-                <h3 style="margin: 0; font-size: 1.2rem">
-                  Liquidación Detallada
-                </h3>
-                <small id="periodoTexto" style="opacity: 0.8"
-                  >Periodo: -- a --</small
-                >
-              </div>
-              <div style="text-align: right">
-                <i
-                  class="fas fa-gift"
-                  style="font-size: 2rem; opacity: 0.5"
-                ></i>
-              </div>
+                <button type="submit" class="btn-calculate">
+                  <i class="fas fa-calculator"></i> Calcular Prima
+                </button>
+              </form>
             </div>
 
-            <div class="result-body">
-              <div style="border-right: 1px solid #eee; padding-right: 20px">
-                <h4
-                  style="
-                    color: #10214b;
-                    border-bottom: 2px solid #eee;
-                    padding-bottom: 10px;
-                    margin-bottom: 15px;
-                  "
-                >
-                  Datos Base
-                </h4>
-
-                <div class="result-item" style="margin-bottom: 15px">
-                  <label>Base Salarial (Salario + Aux + Otros)</label>
-                  <span id="resBase">$0</span>
+            <div id="resultCard" class="result-container">
+              <div class="result-header">
+                <div>
+                  <h3 style="margin: 0; font-size: 1.2rem">
+                    Liquidación Detallada
+                  </h3>
+                  <small id="periodoTexto" style="opacity: 0.8"
+                    >Periodo: -- a --</small
+                  >
                 </div>
-                <div class="result-item">
-                  <label>Días Totales Trabajados</label>
-                  <span id="resDias" style="color: #10214b">0 días</span>
+                <div style="text-align: right">
+                  <i
+                    class="fas fa-gift"
+                    style="font-size: 2rem; opacity: 0.5"
+                  ></i>
                 </div>
               </div>
 
-              <div>
-                <h4
-                  style="
-                    color: #10214b;
-                    border-bottom: 2px solid #eee;
-                    padding-bottom: 10px;
-                    margin-bottom: 15px;
-                  "
-                >
-                  Desglose Prima
-                </h4>
+              <div class="result-body">
+                <div style="border-right: 1px solid #eee; padding-right: 20px">
+                  <h4
+                    style="
+                      color: #10214b;
+                      border-bottom: 2px solid #eee;
+                      padding-bottom: 10px;
+                      margin-bottom: 15px;
+                    "
+                  >
+                    Datos Base
+                  </h4>
 
-                <div id="rowSem1" class="sub-result">
-                  <span>Prima Semestre 1 (Ene-Jun):</span>
-                  <span id="valSem1" style="font-weight: bold">$0</span>
-                </div>
-                <div
-                  id="rowSem2"
-                  class="sub-result"
-                  style="border-bottom: none; margin-bottom: 15px"
-                >
-                  <span>Prima Semestre 2 (Jul-Dic):</span>
-                  <span id="valSem2" style="font-weight: bold">$0</span>
+                  <div class="result-item" style="margin-bottom: 15px">
+                    <label>Base Salarial (Salario + Aux + Otros)</label>
+                    <span id="resBase">$0</span>
+                  </div>
+                  <div class="result-item">
+                    <label>Días Totales Trabajados</label>
+                    <span id="resDias" style="color: #10214b">0 días</span>
+                  </div>
                 </div>
 
-                <p
-                  style="
-                    font-size: 0.8rem;
-                    color: #666;
-                    line-height: 1.4;
-                    background: #fffde7;
-                    padding: 10px;
-                    border-radius: 4px;
-                  "
-                >
-                  <i class="fas fa-info-circle"></i> <strong>Nota:</strong> Si
-                  el periodo abarca ambos semestres, aquí ve el valor
-                  correspondiente a cada corte (30 Jun / 30 Dic).
-                </p>
+                <div>
+                  <h4
+                    style="
+                      color: #10214b;
+                      border-bottom: 2px solid #eee;
+                      padding-bottom: 10px;
+                      margin-bottom: 15px;
+                    "
+                  >
+                    Desglose Prima
+                  </h4>
+
+                  <div id="rowSem1" class="sub-result">
+                    <span>Prima Semestre 1 (Ene-Jun):</span>
+                    <span id="valSem1" style="font-weight: bold">$0</span>
+                  </div>
+                  <div
+                    id="rowSem2"
+                    class="sub-result"
+                    style="border-bottom: none; margin-bottom: 15px"
+                  >
+                    <span>Prima Semestre 2 (Jul-Dic):</span>
+                    <span id="valSem2" style="font-weight: bold">$0</span>
+                  </div>
+
+                  <p
+                    style="
+                      font-size: 0.8rem;
+                      color: #666;
+                      line-height: 1.4;
+                      background: #fffde7;
+                      padding: 10px;
+                      border-radius: 4px;
+                    "
+                  >
+                    <i class="fas fa-info-circle"></i> <strong>Nota:</strong> Si
+                    el periodo abarca ambos semestres, aquí ve el valor
+                    correspondiente a cada corte (30 Jun / 30 Dic).
+                  </p>
+                </div>
               </div>
+
+              <div class="result-total">
+                <span class="total-label">Total Acumulado:</span>
+                <span id="valTotal" class="total-value">$0</span>
+              </div>
+
+              <a
+                href="https://wa.me/573217927495?text=Hola%20Tu%20Abogado%20Laboral,%20calculé%20mi%20prima%20y%20el%20valor%20no%20coincide%20con%20lo%20que%20me%20pagaron."
+                target="_blank"
+                class="cta-whatsapp"
+              >
+                <i class="fab fa-whatsapp"></i> ¿No le pagaron lo correcto?
+                Contactar a Tu Abogado Laboral
+              </a>
             </div>
 
-            <div class="result-total">
-              <span class="total-label">Total Acumulado:</span>
-              <span id="valTotal" class="total-value">$0</span>
-            </div>
-
-            <a
-              href="https://wa.me/573217927495?text=Hola%20Tu%20Abogado%20Laboral,%20calculé%20mi%20prima%20y%20el%20valor%20no%20coincide%20con%20lo%20que%20me%20pagaron."
-              target="_blank"
-              class="cta-whatsapp"
+            <p
+              style="
+                text-align: center;
+                font-size: 0.8rem;
+                color: #999;
+                margin-top: 20px;
+              "
             >
-              <i class="fab fa-whatsapp"></i> ¿No le pagaron lo correcto?
-              Contactar a Tu Abogado Laboral
-            </a>
+              * Esta herramienta es informativa. Los cálculos pueden variar por
+              novedades de nómina (incapacidades, suspensiones) no incluidas
+              aquí.
+            </p>
           </div>
+        </div>
+      </section>
 
-          <p
-            style="
-              text-align: center;
-              font-size: 0.8rem;
-              color: #999;
-              margin-top: 20px;
-            "
-          >
-            * Esta herramienta es informativa. Los cálculos pueden variar por
-            novedades de nómina (incapacidades, suspensiones) no incluidas aquí.
+      <div class="container" style="max-width: 1000px; margin: 0 auto">
+        <div
+          style="
+            background-color: #fff;
+            border-top: 3px solid #d4af37;
+            padding: 20px;
+            margin: 40px 0 20px 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            text-align: center;
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.5;
+          "
+        >
+          <p style="margin: 0">
+            <strong style="color: #10214b">Aviso Legal:</strong>
+            Esta herramienta realiza proyecciones basadas en la normativa
+            laboral vigente en Colombia. Los resultados son
+            <strong>aproximaciones ilustrativas</strong> y pueden variar según
+            convenciones colectivas o interpretaciones judiciales. El uso de
+            este simulador no crea una relación abogado-cliente ni sustituye una
+            liquidación oficial.
+            <span style="display: block; margin-top: 5px; font-style: italic">
+              Tu Abogado Laboral no se hace responsable por decisiones tomadas
+              basándose exclusivamente en estos datos.
+            </span>
           </p>
         </div>
       </div>
-    </section>
-
-    <div class="container" style="max-width: 1000px; margin: 0 auto">
-      <div
-        style="
-          background-color: #fff;
-          border-top: 3px solid #d4af37;
-          padding: 20px;
-          margin: 40px 0 20px 0;
-          border-radius: 4px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-          text-align: center;
-          font-size: 0.85rem;
-          color: #666;
-          line-height: 1.5;
-        "
-      >
-        <p style="margin: 0">
-          <strong style="color: #10214b">Aviso Legal:</strong>
-          Esta herramienta realiza proyecciones basadas en la normativa laboral
-          vigente en Colombia. Los resultados son
-          <strong>aproximaciones ilustrativas</strong> y pueden variar según
-          convenciones colectivas o interpretaciones judiciales. El uso de este
-          simulador no crea una relación abogado-cliente ni sustituye una
-          liquidación oficial.
-          <span style="display: block; margin-top: 5px; font-style: italic">
-            Tu Abogado Laboral no se hace responsable por decisiones tomadas
-            basándose exclusivamente en estos datos.
-          </span>
-        </p>
-      </div>
-    </div>
-
     </main>
     <footer>
       <div class="container">

@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Seguridad: CSP Básico -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;"
+    />
 
     <title>Calculadora de Indemnización | Tu Abogado Laboral</title>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
@@ -12,12 +15,13 @@
     <link rel="stylesheet" href="css/style.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=optional"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      crossorigin="anonymous"
     />
 
     <style>
@@ -399,10 +403,21 @@
       <div class="container header-container">
         <div class="logo">
           <a href="index.html" aria-label="Inicio">
-            <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
+            <img
+              src="img/logo-principal.webp"
+              alt="Logo"
+              class="logo-img"
+              width="200"
+              height="55"
           /></a>
         </div>
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+        <div
+          class="menu-toggle"
+          id="mobile-menu"
+          aria-label="Menú principal"
+          role="button"
+          tabindex="0"
+        >
           <i class="fas fa-bars"></i>
         </div>
         <nav>
@@ -418,448 +433,453 @@
     </header>
 
     <main>
+      <section class="bg-light">
+        <div class="calc-wrapper">
+          <div class="text-center mb-5" style="text-align: center">
+            <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
+              Calculadora de Indemnización
+            </h1>
+            <p style="color: #666">
+              Cálculo jurídico por Despido Sin Justa Causa (Art. 64 CST).
+            </p>
+          </div>
 
-    <section class="bg-light">
-      <div class="calc-wrapper">
-        <div class="text-center mb-5" style="text-align: center">
-          <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
-            Calculadora de Indemnización
-          </h1>
-          <p style="color: #666">
-            Cálculo jurídico por Despido Sin Justa Causa (Art. 64 CST).
-          </p>
-        </div>
-
-        <div class="calc-card">
-          <form id="indemForm">
-            <div
-              style="
-                background: #eef2f6;
-                padding: 10px;
-                border-radius: 6px;
-                margin-bottom: 20px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                border: 1px solid #dce4ec;
-              "
-            >
-              <small
+          <div class="calc-card">
+            <form id="indemForm">
+              <div
                 style="
-                  margin: 0;
-                  background: none;
-                  font-weight: bold;
-                  color: #10214b;
+                  background: #eef2f6;
+                  padding: 10px;
+                  border-radius: 6px;
+                  margin-bottom: 20px;
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  border: 1px solid #dce4ec;
                 "
-                >Parámetros 2026:</small
               >
-              <div style="display: flex; align-items: center; gap: 5px">
-                <label style="margin: 0; font-size: 0.8rem">SMMLV</label>
-                <input
-                  type="number"
-                  id="confSalarioMin"
-                  value="1705905"
+                <small
                   style="
-                    border: 1px solid #ccc;
-                    padding: 3px;
-                    border-radius: 4px;
-                    width: 100px;
-                    color: #666;
-                  "
-                />
-              </div>
-            </div>
-
-            <h3
-              style="
-                color: #10214b;
-                border-bottom: 2px solid #eee;
-                padding-bottom: 10px;
-                margin-bottom: 25px;
-                font-size: 1.2rem;
-              "
-            >
-              <i class="fas fa-file-signature"></i> 1. Información del Contrato
-            </h3>
-
-            <div class="form-grid-3">
-              <div class="form-group">
-                <label>Tipo de Contrato</label>
-                <div class="input-group">
-                  <i class="fas fa-file-contract input-icon"></i>
-                  <select id="tipoContrato" class="form-control">
-                    <option value="indefinido">Término Indefinido</option>
-                    <option value="fijo">Término Fijo</option>
-                    <option value="obra">Obra o Labor</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Fecha Inicio</label>
-                <input
-                  type="date"
-                  id="fechaInicio"
-                  class="form-control no-icon"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label>Fecha Despido</label>
-                <input
-                  type="date"
-                  id="fechaDespido"
-                  class="form-control no-icon"
-                  required
-                />
-              </div>
-            </div>
-
-            <div
-              id="panelFechaPactada"
-              style="
-                margin-top: 20px;
-                display: none;
-                background: #fff3e0;
-                padding: 15px;
-                border-radius: 8px;
-                border-left: 5px solid #ff9800;
-              "
-            >
-              <div class="form-group">
-                <label
-                  id="lblFechaPactada"
-                  style="color: #e65100; font-size: 1rem"
-                  >Fecha Vencimiento Pactada / Fin de Obra</label
-                >
-                <input
-                  type="date"
-                  id="fechaFinPactada"
-                  class="form-control no-icon"
-                />
-                <small style="color: #e65100; background: none"
-                  >* Necesario para calcular el lucro cesante.</small
-                >
-              </div>
-            </div>
-
-            <div
-              style="
-                margin-top: 30px;
-                background: #f8f9fa;
-                padding: 20px;
-                border-radius: 8px;
-                border: 1px solid #eee;
-              "
-            >
-              <h3
-                style="color: #10214b; margin-bottom: 20px; font-size: 1.2rem"
-              >
-                <i class="fas fa-money-bill-wave"></i> 2. Base Salarial
-              </h3>
-
-              <div class="form-group">
-                <label>Modalidad Salarial</label>
-                <div class="input-group">
-                  <i class="fas fa-exchange-alt input-icon"></i>
-                  <select id="modalidadSalarial" class="form-control">
-                    <option value="fijo">
-                      Salario Fijo (Incluye aumentos)
-                    </option>
-                    <option value="variable">
-                      Salario Variable (Comisiones/Destajo)
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <div id="boxSalarioFijo" style="margin-top: 15px">
-                <div class="info-box">
-                  <i class="fas fa-info-circle"></i>
-                  <strong>Criterio Legal:</strong> Si su salario es fijo
-                  (incluso si tuvo aumentos), la indemnización se liquida con el
-                  <strong>Último Salario Devengado</strong>.
-                </div>
-                <div class="form-group">
-                  <label>Último Salario Mensual</label>
-                  <div class="input-group">
-                    <i class="fas fa-dollar-sign input-icon"></i>
-                    <input
-                      type="number"
-                      id="salarioFijoInput"
-                      class="form-control"
-                      placeholder="Ej: 2500000"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div id="boxSalarioVariable" class="period-manager">
-                <div class="info-box warn">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <strong>Salario Variable:</strong> Ingrese el historial del
-                  último año. El sistema validará que los periodos cubran la
-                  ventana legal requerida.
-                </div>
-
-                <div class="period-row">
-                  <div class="form-group">
-                    <label style="font-size: 0.8rem">Desde</label
-                    ><input
-                      type="date"
-                      id="pInicio"
-                      class="form-control no-icon"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label style="font-size: 0.8rem">Hasta</label
-                    ><input
-                      type="date"
-                      id="pFin"
-                      class="form-control no-icon"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label style="font-size: 0.8rem">Salario Básico</label>
-                    <div class="input-group" style="margin: 0">
-                      <i
-                        class="fas fa-dollar-sign input-icon"
-                        style="font-size: 0.8rem; left: 10px"
-                      ></i>
-                      <input
-                        type="number"
-                        id="pSalario"
-                        class="form-control"
-                        placeholder="0"
-                        style="padding-left: 25px"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      class="btn-add"
-                      onclick="agregarPeriodo()"
-                      title="Agregar"
-                    >
-                      <i class="fas fa-plus"></i>
-                    </button>
-                  </div>
-                </div>
-
-                <table
-                  class="history-table"
-                  id="tablaPeriodos"
-                  style="display: none"
-                >
-                  <thead>
-                    <tr>
-                      <th>Periodo</th>
-                      <th>Días</th>
-                      <th>Salario</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-
-                <div
-                  style="
-                    text-align: right;
-                    margin-top: 10px;
+                    margin: 0;
+                    background: none;
                     font-weight: bold;
                     color: #10214b;
-                    display: none;
                   "
-                  id="boxPromedio"
+                  >Parámetros 2026:</small
                 >
-                  Promedio Calculado: <span id="txtPromedio">$0</span>
+                <div style="display: flex; align-items: center; gap: 5px">
+                  <label style="margin: 0; font-size: 0.8rem">SMMLV</label>
+                  <input
+                    type="number"
+                    id="confSalarioMin"
+                    value="1705905"
+                    style="
+                      border: 1px solid #ccc;
+                      padding: 3px;
+                      border-radius: 4px;
+                      width: 100px;
+                      color: #666;
+                    "
+                  />
                 </div>
               </div>
-            </div>
 
-            <button type="submit" id="btnCalcular" class="btn-calculate">
-              <i class="fas fa-gavel"></i> Calcular Indemnización
-            </button>
-          </form>
-        </div>
+              <h3
+                style="
+                  color: #10214b;
+                  border-bottom: 2px solid #eee;
+                  padding-bottom: 10px;
+                  margin-bottom: 25px;
+                  font-size: 1.2rem;
+                "
+              >
+                <i class="fas fa-file-signature"></i> 1. Información del
+                Contrato
+              </h3>
 
-        <div id="resultsContainer">
-          <div class="result-container" id="printArea">
-            <div class="result-header">
-              <div>
-                <h3 style="margin: 0; font-size: 1.3rem">
-                  Liquidación de Indemnización
-                </h3>
-                <small style="opacity: 0.9"
-                  >Art. 64 Código Sustantivo del Trabajo</small
-                >
+              <div class="form-grid-3">
+                <div class="form-group">
+                  <label>Tipo de Contrato</label>
+                  <div class="input-group">
+                    <i class="fas fa-file-contract input-icon"></i>
+                    <select id="tipoContrato" class="form-control">
+                      <option value="indefinido">Término Indefinido</option>
+                      <option value="fijo">Término Fijo</option>
+                      <option value="obra">Obra o Labor</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Fecha Inicio</label>
+                  <input
+                    type="date"
+                    id="fechaInicio"
+                    class="form-control no-icon"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Fecha Despido</label>
+                  <input
+                    type="date"
+                    id="fechaDespido"
+                    class="form-control no-icon"
+                    required
+                  />
+                </div>
               </div>
-              <div style="text-align: right">
-                <i
-                  class="fas fa-balance-scale"
-                  style="font-size: 2rem; opacity: 0.5"
-                ></i>
-              </div>
-            </div>
 
-            <div class="result-body">
-              <div class="input-summary-grid">
-                <div class="input-item">
-                  <label>Contrato:</label
-                  ><span id="rTipo" style="text-transform: capitalize">--</span>
-                </div>
-                <div class="input-item">
-                  <label>Fecha Inicio:</label><span id="rInicio">--</span>
-                </div>
-                <div class="input-item">
-                  <label>Fecha Despido:</label><span id="rFin">--</span>
-                </div>
-                <div class="input-item">
-                  <label>Días Laborados:</label
-                  ><span id="rDiasLaborados">--</span>
-                </div>
-                <div class="input-item">
-                  <label>Salario Base:</label><span id="rBase">$0</span>
-                </div>
-                <div
-                  class="input-item"
-                  style="
-                    grid-column: 1 / -1;
-                    border-top: 1px dashed #ddd;
-                    padding-top: 10px;
-                    margin-top: 5px;
-                  "
-                >
-                  <label>Criterio de Base:</label
-                  ><span
-                    id="rCriterioBase"
-                    style="font-size: 0.9rem; font-weight: normal; color: #666"
-                    >--</span
+              <div
+                id="panelFechaPactada"
+                style="
+                  margin-top: 20px;
+                  display: none;
+                  background: #fff3e0;
+                  padding: 15px;
+                  border-radius: 8px;
+                  border-left: 5px solid #ff9800;
+                "
+              >
+                <div class="form-group">
+                  <label
+                    id="lblFechaPactada"
+                    style="color: #e65100; font-size: 1rem"
+                    >Fecha Vencimiento Pactada / Fin de Obra</label
+                  >
+                  <input
+                    type="date"
+                    id="fechaFinPactada"
+                    class="form-control no-icon"
+                  />
+                  <small style="color: #e65100; background: none"
+                    >* Necesario para calcular el lucro cesante.</small
                   >
                 </div>
               </div>
 
-              <div id="detalleIndefinido" style="display: none">
-                <h4
-                  style="
-                    color: #10214b;
-                    border-bottom: 1px solid #eee;
-                    padding-bottom: 5px;
-                    margin-bottom: 15px;
-                  "
+              <div
+                style="
+                  margin-top: 30px;
+                  background: #f8f9fa;
+                  padding: 20px;
+                  border-radius: 8px;
+                  border: 1px solid #eee;
+                "
+              >
+                <h3
+                  style="color: #10214b; margin-bottom: 20px; font-size: 1.2rem"
                 >
-                  Cálculo (Ley 789/2002)
-                </h4>
-                <table class="simple-table">
-                  <thead>
-                    <tr>
-                      <th>Concepto</th>
-                      <th>Días a Pagar</th>
-                      <th style="text-align: right">Valor</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <strong>Primer Año</strong><br /><small
-                          style="color: #888"
-                          >Tarifa inicial según salario</small
-                        >
-                      </td>
-                      <td id="diasAnio1">0</td>
-                      <td id="valAnio1" style="text-align: right">$0</td>
-                    </tr>
-                    <tr id="rowAniosSub" style="display: none">
-                      <td>
-                        <strong>Años Subsiguientes</strong><br /><small
-                          style="color: #888"
-                          >Proporcional al tiempo restante</small
-                        >
-                      </td>
-                      <td id="diasAniosSub">0</td>
-                      <td id="valAniosSub" style="text-align: right">$0</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+                  <i class="fas fa-money-bill-wave"></i> 2. Base Salarial
+                </h3>
 
-              <div id="detalleFijo" style="display: none">
-                <h4
-                  style="
-                    color: #10214b;
-                    border-bottom: 1px solid #eee;
-                    padding-bottom: 5px;
-                    margin-bottom: 15px;
-                  "
-                >
-                  Cálculo (Lucro Cesante)
-                </h4>
-                <table class="simple-table">
-                  <thead>
-                    <tr>
-                      <th>Concepto</th>
-                      <th>Detalle</th>
-                      <th style="text-align: right">Valor</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>Fecha Vencimiento / Fin Obra</strong></td>
-                      <td colspan="2" id="rFechaPactada">--</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Tiempo Faltante</strong></td>
-                      <td><span id="diasFaltantes">0</span> días</td>
-                      <td id="valFaltante" style="text-align: right">$0</td>
-                    </tr>
-                    <tr
-                      id="rowPisoObra"
-                      style="display: none; background: #fff3e0"
-                    >
-                      <td colspan="2" style="color: #e65100">
-                        <strong>Ajuste Mínimo Legal (15 días)</strong
-                        ><br /><small>Art. 64 CST para Obra o Labor</small>
-                      </td>
-                      <td
-                        id="valAjusteObra"
-                        style="
-                          text-align: right;
-                          font-weight: bold;
-                          color: #e65100;
-                        "
+                <div class="form-group">
+                  <label>Modalidad Salarial</label>
+                  <div class="input-group">
+                    <i class="fas fa-exchange-alt input-icon"></i>
+                    <select id="modalidadSalarial" class="form-control">
+                      <option value="fijo">
+                        Salario Fijo (Incluye aumentos)
+                      </option>
+                      <option value="variable">
+                        Salario Variable (Comisiones/Destajo)
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                <div id="boxSalarioFijo" style="margin-top: 15px">
+                  <div class="info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Criterio Legal:</strong> Si su salario es fijo
+                    (incluso si tuvo aumentos), la indemnización se liquida con
+                    el <strong>Último Salario Devengado</strong>.
+                  </div>
+                  <div class="form-group">
+                    <label>Último Salario Mensual</label>
+                    <div class="input-group">
+                      <i class="fas fa-dollar-sign input-icon"></i>
+                      <input
+                        type="number"
+                        id="salarioFijoInput"
+                        class="form-control"
+                        placeholder="Ej: 2500000"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div id="boxSalarioVariable" class="period-manager">
+                  <div class="info-box warn">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <strong>Salario Variable:</strong> Ingrese el historial del
+                    último año. El sistema validará que los periodos cubran la
+                    ventana legal requerida.
+                  </div>
+
+                  <div class="period-row">
+                    <div class="form-group">
+                      <label style="font-size: 0.8rem">Desde</label
+                      ><input
+                        type="date"
+                        id="pInicio"
+                        class="form-control no-icon"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label style="font-size: 0.8rem">Hasta</label
+                      ><input
+                        type="date"
+                        id="pFin"
+                        class="form-control no-icon"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label style="font-size: 0.8rem">Salario Básico</label>
+                      <div class="input-group" style="margin: 0">
+                        <i
+                          class="fas fa-dollar-sign input-icon"
+                          style="font-size: 0.8rem; left: 10px"
+                        ></i>
+                        <input
+                          type="number"
+                          id="pSalario"
+                          class="form-control"
+                          placeholder="0"
+                          style="padding-left: 25px"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        class="btn-add"
+                        onclick="agregarPeriodo()"
+                        title="Agregar"
                       >
-                        $0
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <table
+                    class="history-table"
+                    id="tablaPeriodos"
+                    style="display: none"
+                  >
+                    <thead>
+                      <tr>
+                        <th>Periodo</th>
+                        <th>Días</th>
+                        <th>Salario</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+
+                  <div
+                    style="
+                      text-align: right;
+                      margin-top: 10px;
+                      font-weight: bold;
+                      color: #10214b;
+                      display: none;
+                    "
+                    id="boxPromedio"
+                  >
+                    Promedio Calculado: <span id="txtPromedio">$0</span>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div class="total-final">
-              <span class="total-label">Total Indemnización:</span>
-              <span id="totalIndemnizacion" class="total-value">$0</span>
-            </div>
-
-            <p
-              style="
-                text-align: center;
-                margin-top: 20px;
-                font-size: 0.8rem;
-                color: #999;
-              "
-            >
-              * Documento informativo generado por Tu Abogado Laboral.
-            </p>
+              <button type="submit" id="btnCalcular" class="btn-calculate">
+                <i class="fas fa-gavel"></i> Calcular Indemnización
+              </button>
+            </form>
           </div>
 
-          <button onclick="downloadPDF()" class="btn-pdf">
-            <i class="fas fa-file-pdf"></i> Descargar Informe PDF
-          </button>
-        </div>
-      </div>
-    </section>
+          <div id="resultsContainer">
+            <div class="result-container" id="printArea">
+              <div class="result-header">
+                <div>
+                  <h3 style="margin: 0; font-size: 1.3rem">
+                    Liquidación de Indemnización
+                  </h3>
+                  <small style="opacity: 0.9"
+                    >Art. 64 Código Sustantivo del Trabajo</small
+                  >
+                </div>
+                <div style="text-align: right">
+                  <i
+                    class="fas fa-balance-scale"
+                    style="font-size: 2rem; opacity: 0.5"
+                  ></i>
+                </div>
+              </div>
 
+              <div class="result-body">
+                <div class="input-summary-grid">
+                  <div class="input-item">
+                    <label>Contrato:</label
+                    ><span id="rTipo" style="text-transform: capitalize"
+                      >--</span
+                    >
+                  </div>
+                  <div class="input-item">
+                    <label>Fecha Inicio:</label><span id="rInicio">--</span>
+                  </div>
+                  <div class="input-item">
+                    <label>Fecha Despido:</label><span id="rFin">--</span>
+                  </div>
+                  <div class="input-item">
+                    <label>Días Laborados:</label
+                    ><span id="rDiasLaborados">--</span>
+                  </div>
+                  <div class="input-item">
+                    <label>Salario Base:</label><span id="rBase">$0</span>
+                  </div>
+                  <div
+                    class="input-item"
+                    style="
+                      grid-column: 1 / -1;
+                      border-top: 1px dashed #ddd;
+                      padding-top: 10px;
+                      margin-top: 5px;
+                    "
+                  >
+                    <label>Criterio de Base:</label
+                    ><span
+                      id="rCriterioBase"
+                      style="
+                        font-size: 0.9rem;
+                        font-weight: normal;
+                        color: #666;
+                      "
+                      >--</span
+                    >
+                  </div>
+                </div>
+
+                <div id="detalleIndefinido" style="display: none">
+                  <h4
+                    style="
+                      color: #10214b;
+                      border-bottom: 1px solid #eee;
+                      padding-bottom: 5px;
+                      margin-bottom: 15px;
+                    "
+                  >
+                    Cálculo (Ley 789/2002)
+                  </h4>
+                  <table class="simple-table">
+                    <thead>
+                      <tr>
+                        <th>Concepto</th>
+                        <th>Días a Pagar</th>
+                        <th style="text-align: right">Valor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <strong>Primer Año</strong><br /><small
+                            style="color: #888"
+                            >Tarifa inicial según salario</small
+                          >
+                        </td>
+                        <td id="diasAnio1">0</td>
+                        <td id="valAnio1" style="text-align: right">$0</td>
+                      </tr>
+                      <tr id="rowAniosSub" style="display: none">
+                        <td>
+                          <strong>Años Subsiguientes</strong><br /><small
+                            style="color: #888"
+                            >Proporcional al tiempo restante</small
+                          >
+                        </td>
+                        <td id="diasAniosSub">0</td>
+                        <td id="valAniosSub" style="text-align: right">$0</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div id="detalleFijo" style="display: none">
+                  <h4
+                    style="
+                      color: #10214b;
+                      border-bottom: 1px solid #eee;
+                      padding-bottom: 5px;
+                      margin-bottom: 15px;
+                    "
+                  >
+                    Cálculo (Lucro Cesante)
+                  </h4>
+                  <table class="simple-table">
+                    <thead>
+                      <tr>
+                        <th>Concepto</th>
+                        <th>Detalle</th>
+                        <th style="text-align: right">Valor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Fecha Vencimiento / Fin Obra</strong></td>
+                        <td colspan="2" id="rFechaPactada">--</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Tiempo Faltante</strong></td>
+                        <td><span id="diasFaltantes">0</span> días</td>
+                        <td id="valFaltante" style="text-align: right">$0</td>
+                      </tr>
+                      <tr
+                        id="rowPisoObra"
+                        style="display: none; background: #fff3e0"
+                      >
+                        <td colspan="2" style="color: #e65100">
+                          <strong>Ajuste Mínimo Legal (15 días)</strong
+                          ><br /><small>Art. 64 CST para Obra o Labor</small>
+                        </td>
+                        <td
+                          id="valAjusteObra"
+                          style="
+                            text-align: right;
+                            font-weight: bold;
+                            color: #e65100;
+                          "
+                        >
+                          $0
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="total-final">
+                <span class="total-label">Total Indemnización:</span>
+                <span id="totalIndemnizacion" class="total-value">$0</span>
+              </div>
+
+              <p
+                style="
+                  text-align: center;
+                  margin-top: 20px;
+                  font-size: 0.8rem;
+                  color: #999;
+                "
+              >
+                * Documento informativo generado por Tu Abogado Laboral.
+              </p>
+            </div>
+
+            <button onclick="downloadPDF()" class="btn-pdf">
+              <i class="fas fa-file-pdf"></i> Descargar Informe PDF
+            </button>
+          </div>
+        </div>
+      </section>
     </main>
     <footer>
       <div class="container">
@@ -932,7 +952,11 @@
     </footer>
     r>
 
-    <a href="https://wa.me/573217927495" class="whatsapp-btn" target="_blank" aria-label="Contactar por WhatsApp"
+    <a
+      href="https://wa.me/573217927495"
+      class="whatsapp-btn"
+      target="_blank"
+      aria-label="Contactar por WhatsApp"
       ><i class="fab fa-whatsapp"></i
     ></a>
 
