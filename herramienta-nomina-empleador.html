@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Seguridad: CSP Básico -->
+    <!-- Seguridad: CSP BÃ¡sico -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
 
     <title>
@@ -236,12 +236,12 @@
         font-weight: bold;
         margin-left: 5px;
       }
-      /* --- CORRECCIÓN MENÚ QUIRÚRGICA PARA MÓVILES --- */
+      /* --- CORRECCIÃ“N MENÃš QUIRÃšRGICA PARA MÃ“VILES --- */
       @media (max-width: 768px) {
         header .header-container {
-          position: relative; /* Referencia de posición */
+          position: relative; /* Referencia de posiciÃ³n */
         }
-        /* 1. Posición Extrema Derecha y Color Azul */
+        /* 1. PosiciÃ³n Extrema Derecha y Color Azul */
         header .menu-toggle {
           position: absolute !important;
           right: 20px !important;
@@ -254,7 +254,7 @@
           cursor: pointer;
         }
 
-        /* 2. Menú Desplegable (Fondo Blanco) */
+        /* 2. MenÃº Desplegable (Fondo Blanco) */
         header nav ul.nav-menu {
           display: none;
           flex-direction: column;
@@ -283,7 +283,7 @@
     <div class="top-bar">
       <div class="container">
         <div class="info">
-          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+          Herramientas JurÃ­dicas Gratuitas | Tu Abogado Laboral
         </div>
       </div>
     </div>
@@ -294,7 +294,7 @@
             <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
           /></a>
         </div>
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+        <div class="menu-toggle" id="mobile-menu" aria-label="MenÃº principal" role="button" tabindex="0">
           <i class="fas fa-bars"></i>
         </div>
         <nav>
@@ -310,306 +310,6 @@
     </header>
 
     <main>
-    <section class="bg-light" style="padding: 40px 0">
-    <link rel="icon" href="img/favicon.webp" type="image/webp" />
-    <link rel="stylesheet" href="css/style.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <style>
-      /* --- ESTILOS BASE --- */
-      body {
-        font-family: "Lato", sans-serif;
-        background-color: #f4f8fb;
-        margin: 0;
-      }
-
-      .calc-wrapper {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
-      .calc-card {
-        background: white;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(16, 33, 75, 0.08);
-        border: 1px solid #eee;
-        margin-bottom: 30px;
-      }
-
-      .section-title {
-        color: #10214b;
-        font-size: 1.1rem;
-        font-weight: 700;
-        border-bottom: 2px solid #e8f5e9;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-        margin-top: 0;
-      }
-
-      .form-grid-3 {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-      }
-      @media (max-width: 900px) {
-        .form-grid-3 {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .form-group label {
-        display: block;
-        font-weight: 700;
-        color: #10214b;
-        margin-bottom: 5px;
-        font-size: 0.9rem;
-      }
-      .input-group {
-        position: relative;
-        display: flex;
-        align-items: center;
-      }
-      .input-icon {
-        position: absolute;
-        left: 15px;
-        color: #10214b;
-        z-index: 10;
-      }
-      .form-control {
-        width: 100%;
-        padding: 12px 15px 12px 40px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 1rem;
-        background: #f9f9f9;
-        box-sizing: border-box;
-      }
-      .form-control:focus {
-        border-color: #10214b;
-        background: #fff;
-        outline: none;
-      }
-      select.form-control {
-        cursor: pointer;
-        font-weight: bold;
-        color: #10214b;
-      }
-
-      /* Checkboxes Estilizados (Para auxilio transporte) */
-      .checkbox-wrapper {
-        background: #f0f4f8;
-        padding: 10px 15px;
-        border-radius: 8px;
-        border: 1px solid #dce4ec;
-        margin-bottom: 10px;
-      }
-      .checkbox-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .btn-calculate {
-        background-color: #10214b;
-        color: white;
-        border: none;
-        width: 100%;
-        padding: 15px;
-        font-size: 1.1rem;
-        font-weight: bold;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s;
-        margin-top: 30px;
-        text-transform: uppercase;
-      }
-      .btn-calculate:hover {
-        background-color: #25d366;
-        transform: translateY(-2px);
-      }
-
-      /* RESULTADOS */
-      .result-container {
-        display: none;
-        background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        border: 1px solid #eee;
-        margin-top: 20px;
-      }
-      .result-header {
-        background: #10214b;
-        color: white;
-        padding: 20px 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      /* Grid de Resultados */
-      .cost-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        border-bottom: 1px solid #eee;
-      }
-      @media (max-width: 800px) {
-        .cost-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .cost-column {
-        padding: 25px;
-        border-right: 1px dashed #ddd;
-      }
-      .cost-column:last-child {
-        border-right: none;
-      }
-
-      .col-title {
-        font-size: 1.1rem;
-        font-weight: 900;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: #10214b;
-        border-bottom: 2px solid #f0f4f8;
-        padding-bottom: 10px;
-      }
-
-      .item-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-        font-size: 0.9rem;
-        color: #555;
-      }
-      .item-row span {
-        font-weight: bold;
-        color: #333;
-      }
-
-      .subtotal-box {
-        background: #f9fafb;
-        padding: 10px;
-        border-radius: 6px;
-        margin-top: 15px;
-        display: flex;
-        justify-content: space-between;
-        font-weight: bold;
-        color: #10214b;
-      }
-
-      .total-section {
-        background: #10214b;
-        color: white;
-        padding: 30px;
-        text-align: right;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .total-value {
-        font-size: 2.5rem;
-        font-weight: 900;
-        color: #25d366;
-      }
-      .total-label {
-        font-size: 1.2rem;
-        opacity: 0.9;
-      }
-
-      .badge-exonerado {
-        background: #e8f5e9;
-        color: #2e7d32;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 0.7rem;
-        font-weight: bold;
-        margin-left: 5px;
-      }
-      /* --- CORRECCIÓN MENÚ QUIRÚRGICA PARA MÓVILES --- */
-      @media (max-width: 768px) {
-        header .header-container {
-          position: relative; /* Referencia de posición */
-        }
-        /* 1. Posición Extrema Derecha y Color Azul */
-        header .menu-toggle {
-          position: absolute !important;
-          right: 20px !important;
-          top: 50% !important;
-          transform: translateY(-50%) !important;
-          display: block !important;
-          z-index: 9999;
-          font-size: 1.5rem;
-          color: #10214b !important; /* Azul oscuro obligatorio */
-          cursor: pointer;
-        }
-
-        /* 2. Menú Desplegable (Fondo Blanco) */
-        header nav ul.nav-menu {
-          display: none;
-          flex-direction: column;
-          width: 100%;
-          position: absolute;
-          top: 100%;
-          left: 0;
-          background-color: white;
-          padding: 20px 0;
-          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-          text-align: center;
-        }
-
-        header nav ul.nav-menu.active {
-          display: flex !important;
-        }
-
-        /* 3. Color de los enlaces */
-        header nav ul.nav-menu li a {
-          color: #10214b !important;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="top-bar">
-      <div class="container">
-        <div class="info">
-          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
-        </div>
-      </div>
-    </div>
-    <header>
-      <div class="container header-container">
-        <div class="logo">
-          <a href="index.html" aria-label="Inicio">
-            <img src="img/logo-principal.webp" alt="Logo" class="logo-img"
-          /></a>
-        </div>
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
-          <i class="fas fa-bars"></i>
-        </div>
-        <nav>
-          <ul class="nav-menu">
-            <li>
-              <a href="blog.html" style="color: #10214b; font-weight: bold"
-                ><i class="fas fa-arrow-left"></i> Volver a Herramientas</a
-              >
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </header>
 
     <section class="bg-light" style="padding: 40px 0">
       <div class="calc-wrapper">
@@ -618,7 +318,7 @@
             Calculadora de Costos para Empleador
           </h1>
           <p style="color: #666">
-            Calcule el costo real de nómina incluyendo prestaciones, seguridad
+            Calcule el costo real de nÃ³mina incluyendo prestaciones, seguridad
             social y parafiscales.
           </p>
         </div>
@@ -636,7 +336,7 @@
             >
               <label
                 style="font-size: 0.9rem; color: #10214b; font-weight: bold"
-                ><i class="fas fa-briefcase"></i> Datos de Contratación y
+                ><i class="fas fa-briefcase"></i> Datos de ContrataciÃ³n y
                 Riesgos</label
               >
 
@@ -660,17 +360,17 @@
                         Nivel III (2.436%) - Riesgo medio
                       </option>
                       <option value="0.04350">
-                        Nivel IV (4.350%) - Transporte/Químicos
+                        Nivel IV (4.350%) - Transporte/QuÃ­micos
                       </option>
                       <option value="0.06960">
-                        Nivel V (6.960%) - Construcción/Minería
+                        Nivel V (6.960%) - ConstrucciÃ³n/MinerÃ­a
                       </option>
                     </select>
                   </div>
                 </div>
 
                 <div class="form-group" style="grid-column: span 2">
-                  <label>Beneficio Tributario (Exoneración Aportes)</label>
+                  <label>Beneficio Tributario (ExoneraciÃ³n Aportes)</label>
                   <div class="input-group">
                     <i class="fas fa-hand-holding-usd input-icon"></i>
                     <select
@@ -713,7 +413,7 @@
                       id="checkAux"
                       style="width: 18px; height: 18px; accent-color: #10214b"
                     />
-                    <span>¿Paga Auxilio?</span>
+                    <span>Â¿Paga Auxilio?</span>
                   </div>
                   <div
                     id="inputAuxContainer"
@@ -788,7 +488,7 @@
                     color: #10214b;
                   "
                 >
-                  <strong>Total Nómina:</strong>
+                  <strong>Total NÃ³mina:</strong>
                   <strong id="resNominaBasica">$0</strong>
                 </div>
               </div>
@@ -797,11 +497,11 @@
                 Provisiones Prestaciones:
               </h5>
               <div class="item-row">
-                <label>Cesantías (8.33%):</label
+                <label>CesantÃ­as (8.33%):</label
                 ><span id="resCesantias">$0</span>
               </div>
               <div class="item-row">
-                <label>Int. Cesantías (1%):</label
+                <label>Int. CesantÃ­as (1%):</label
                 ><span id="resIntereses">$0</span>
               </div>
               <div class="item-row">
@@ -831,7 +531,7 @@
                 <span id="resSalud">$0</span>
               </div>
               <div class="item-row">
-                <label>Pensión (12%):</label>
+                <label>PensiÃ³n (12%):</label>
                 <span id="resPension">$0</span>
               </div>
               <div class="item-row">
@@ -855,7 +555,7 @@
                 "
               >
                 * Nota: El empleado aporta un 4% adicional a Salud y 4% a
-                Pensión, que se descuentan de su nómina, no son costo extra
+                PensiÃ³n, que se descuentan de su nÃ³mina, no son costo extra
                 empresa.
               </p>
             </div>
@@ -892,7 +592,7 @@
             <div>
               <div class="total-label">COSTO TOTAL PARA LA EMPRESA</div>
               <small style="opacity: 0.7"
-                >(Nómina + Prestaciones + SS + Parafiscales)</small
+                >(NÃ³mina + Prestaciones + SS + Parafiscales)</small
               >
             </div>
             <div class="total-value" id="valGranTotal">$0</div>
@@ -907,7 +607,7 @@
             color: #888;
           "
         >
-          * Cálculo de provisiones basado en días calendario (30). La base de
+          * CÃ¡lculo de provisiones basado en dÃ­as calendario (30). La base de
           vacaciones excluye auxilio de transporte.
         </p>
       </div>
@@ -932,13 +632,13 @@
           <strong style="color: #10214b">Aviso Legal:</strong>
           Esta herramienta realiza proyecciones basadas en la normativa laboral
           vigente en Colombia. Los resultados son
-          <strong>aproximaciones ilustrativas</strong> y pueden variar según
+          <strong>aproximaciones ilustrativas</strong> y pueden variar segÃºn
           convenciones colectivas o interpretaciones judiciales. El uso de este
-          simulador no crea una relación abogado-cliente ni sustituye una
-          liquidación oficial.
+          simulador no crea una relaciÃ³n abogado-cliente ni sustituye una
+          liquidaciÃ³n oficial.
           <span style="display: block; margin-top: 5px; font-style: italic">
             Tu Abogado Laboral no se hace responsable por decisiones tomadas
-            basándose exclusivamente en estos datos.
+            basÃ¡ndose exclusivamente en estos datos.
           </span>
         </p>
       </div>
@@ -951,7 +651,7 @@
           <div class="footer-col">
             <div class="footer-logo">Tu Abogado <span>Laboral</span></div>
             <p style="color: #ccc; margin-bottom: 20px; font-size: 0.9rem">
-              Defensa experta y estratégica en Derecho Laboral y Pensional.
+              Defensa experta y estratÃ©gica en Derecho Laboral y Pensional.
               Barranquilla, Colombia.
             </p>
             <div class="social-icons-footer">
@@ -977,11 +677,11 @@
           </div>
 
           <div class="footer-col links-col">
-            <h4>Enlaces Rápidos</h4>
+            <h4>Enlaces RÃ¡pidos</h4>
             <ul>
               <li><a href="index.html">Inicio</a></li>
               <li><a href="nosotros.html">Sobre Nosotros</a></li>
-              <li><a href="servicios.html">Áreas de Práctica</a></li>
+              <li><a href="servicios.html">Ãreas de PrÃ¡ctica</a></li>
               <li><a href="blog.html">Herramientas</a></li>
               <li>
                 <a href="contacto.html" class="active-footer">Agendar Cita</a>
@@ -1007,9 +707,9 @@
       </div>
       <div class="footer-bottom">
         <div class="container copyright-flex">
-          <p>© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
+          <p>Â© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
           <a href="politica-privacidad.html" class="privacy-link"
-            >Política de Privacidad</a
+            >PolÃ­tica de Privacidad</a
           >
         </div>
       </div>
@@ -1039,7 +739,7 @@
         maximumFractionDigits: 0,
       });
 
-      // 2. LÓGICA DE CÁLCULO
+      // 2. LÃ“GICA DE CÃLCULO
       document
         .getElementById("costosForm")
         .addEventListener("submit", function (e) {
@@ -1056,7 +756,7 @@
           let porcentajeARL = parseFloat(
             document.getElementById("nivelArl").value,
           );
-          // Lógica simplificada: Si value es "si", es true. Si es "no", es false.
+          // LÃ³gica simplificada: Si value es "si", es true. Si es "no", es false.
           let exonerado =
             document.getElementById("selectExonerado").value === "si";
 
@@ -1065,9 +765,9 @@
           let basePrestacional = baseSalarial + valorAuxilio;
           let ibc = baseSalarial;
 
-          // C. CÁLCULOS
+          // C. CÃLCULOS
 
-          // 1. Nómina Básica
+          // 1. NÃ³mina BÃ¡sica
           let nominaBasica = basePrestacional;
 
           // 2. Provisiones Prestaciones
@@ -1172,7 +872,7 @@
       href="https://wa.me/573217927495"
       class="whatsapp-btn"
       target="_blank"
-      title="Contáctanos por WhatsApp"
+      title="ContÃ¡ctanos por WhatsApp"
     >
       <i class="fab fa-whatsapp"></i>
     </a>

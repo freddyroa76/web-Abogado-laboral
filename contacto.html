@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Seguridad: CSP Básico -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:; frame-src 'self' https://www.google.com;"
+    />
 
     <title>Contacto y Agendamiento | Tu Abogado Laboral Barranquilla</title>
     <meta
@@ -28,8 +31,6 @@
     />
 
     <style>
-
-
       /* CORRECCIÓN CRÍTICA PARA EL MENÚ EN MÓVILES */
       @media (max-width: 768px) {
         /* Fuerza al botón a mostrarse y lo posiciona correctamente */
@@ -93,11 +94,22 @@
       >
         <div class="logo">
           <a href="index.html" aria-label="Inicio">
-            <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
+            <img
+              src="img/logo-principal.webp"
+              alt="Logo"
+              class="logo-img"
+              width="200"
+              height="55"
           /></a>
         </div>
 
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+        <div
+          class="menu-toggle"
+          id="mobile-menu"
+          aria-label="Menú principal"
+          role="button"
+          tabindex="0"
+        >
           <i class="fas fa-bars"></i>
         </div>
 
@@ -114,703 +126,598 @@
     </header>
 
     <main>
-    <section
-      class="hero-interno"
-      style="
-        background:
-          linear-gradient(rgba(16, 33, 75, 0.85), rgba(16, 33, 75, 0.75)),
-          url(&quot;img/header-contacto.webp&quot;);
-        background-size: cover;
-        background-position: center;
-        text-align: center;
-        padding: 140px 0 100px;
-        border-bottom: 5px solid #d4af37;
-      "
-    >
-      <div class="container">
-        <h1
-          style="
-            color: #ffffff;
-            font-family: &quot;Montserrat&quot;, sans-serif;
-            font-size: 3rem;
-            margin-bottom: 20px;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-          "
-        >
-          INICIE SU PROCESO CON UN ABOGADO LABORAL HOY
-        </h1>
-        <p
-          style="
-            color: #ffffff;
-            font-size: 1.2rem;
-            max-width: 800px;
-            margin: 0 auto;
-            font-weight: 400;
-          "
-        >
-          La tranquilidad jurídica comienza con una primera consulta. Estamos
-          listos para escuchar su caso en Barranquilla o de manera virtual.
-        </p>
-      </div>
-    </section>
-    <meta
-      name="description"
-      content="Agende su cita con la Dra. Johana Manga. Expertos en Derecho Laboral, Pensiones e Insolvencia. Teléfono, WhatsApp y dirección en Barranquilla."
-    />
-    <link rel="icon" type="image/webp" href="img/favicon.webp" />
-
-    <link rel="stylesheet" href="css/style.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;700;900&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      crossorigin="anonymous"
-    />
-
-    <style>
-
-
-      /* CORRECCIÓN CRÍTICA PARA EL MENÚ EN MÓVILES */
-      @media (max-width: 768px) {
-        /* Fuerza al botón a mostrarse y lo posiciona correctamente */
-        header .menu-toggle {
-          display: block !important;
-          cursor: pointer;
-          position: absolute;
-          right: 20px;
-          top: 50%;
-          transform: translateY(-50%);
-          z-index: 1001;
-        }
-
-        /* Asegura que las barras tengan color visible */
-        header .menu-toggle .bar {
-          display: block;
-          width: 25px;
-          height: 3px;
-          margin: 5px auto;
-          background-color: #10214b !important; /* Azul oscuro forzado */
-          transition: all 0.3s ease-in-out;
-        }
-
-        /* Oculta el menú normal en móviles */
-        header nav ul.nav-menu {
-          display: none;
-          /* El JS se encarga de cambiar esto a flex o block cuando se active */
-          flex-direction: column;
-          width: 100%;
-          position: absolute;
-          top: 100%;
-          left: 0;
-          background-color: white;
-          padding: 20px 0;
-          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Clase que añade JS para mostrar el menú */
-        header nav ul.nav-menu.active {
-          display: flex !important;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="top-bar">
-      <div class="container">
-        <div class="info">
-          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
-        </div>
-      </div>
-    </div>
-    <header style="position: relative">
-      <div
-        class="container header-container"
+      <section
+        class="hero-interno"
         style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+          background:
+            linear-gradient(rgba(16, 33, 75, 0.85), rgba(16, 33, 75, 0.75)),
+            url(&quot;img/header-contacto.webp&quot;);
+          background-size: cover;
+          background-position: center;
+          text-align: center;
+          padding: 140px 0 100px;
+          border-bottom: 5px solid #d4af37;
         "
       >
-        <div class="logo">
-          <a href="index.html" aria-label="Inicio">
-            <img src="img/logo-principal.webp" alt="Logo" class="logo-img"
-          /></a>
-        </div>
-
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
-          <i class="fas fa-bars"></i>
-        </div>
-
-        <nav>
-          <ul class="nav-menu">
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="nosotros.html">Nosotros</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="blog.html" class="active">Herramientas</a></li>
-            <li><a href="contacto.html" class="btn-nav">Contacto</a></li>
-          </ul>
-        </nav>
-    </header>
-
-    <section
-      class="hero-interno"
-      style="
-        background:
-          linear-gradient(rgba(16, 33, 75, 0.85), rgba(16, 33, 75, 0.75)),
-          url(&quot;img/header-contacto.webp&quot;);
-        background-size: cover;
-        background-position: center;
-        text-align: center;
-        padding: 140px 0 100px;
-        border-bottom: 5px solid #d4af37;
-      "
-    >
-      <div class="container">
-        <h1
-          style="
-            color: #ffffff;
-            font-family: &quot;Montserrat&quot;, sans-serif;
-            font-size: 3rem;
-            margin-bottom: 20px;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-          "
-        >
-          INICIE SU PROCESO CON UN ABOGADO LABORAL HOY
-        </h1>
-        <p
-          style="
-            color: #ffffff;
-            font-size: 1.2rem;
-            max-width: 800px;
-            margin: 0 auto;
-            font-weight: 400;
-          "
-        >
-          La tranquilidad jurídica comienza con una primera consulta. Estamos
-          listos para escuchar su caso en Barranquilla o de manera virtual.
-        </p>
-      </div>
-    </section>
-
-    <section
-      class="seccion-contacto-principal"
-      style="padding: 80px 0; background-color: #f8f9fa"
-    >
-      <div class="container">
-        <div
-          class="section-title center"
-          style="text-align: center; margin-bottom: 60px"
-        >
-          <h2
+        <div class="container">
+          <h1
             style="
-              color: var(--azul-oscuro);
+              color: #ffffff;
               font-family: &quot;Montserrat&quot;, sans-serif;
-              font-size: 2.2rem;
-              position: relative;
-              display: inline-block;
+              font-size: 3rem;
+              margin-bottom: 20px;
+              font-weight: 700;
+              text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             "
           >
-            Canales de Atención
-            <span
-              style="
-                display: block;
-                width: 60px;
-                height: 3px;
-                background: var(--dorado);
-                margin: 15px auto 0;
-              "
-            ></span>
-          </h2>
-        </div>
-
-        <div
-          class="contact-grid-layout"
-          style="
-            display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 50px;
-            align-items: start;
-          "
-        >
-          <div
-            class="info-column-left"
+            INICIE SU PROCESO CON UN ABOGADO LABORAL HOY
+          </h1>
+          <p
             style="
-              background: white;
-              padding: 30px;
-              border-radius: 8px;
-              box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-              border-top: 4px solid var(--dorado);
+              color: #ffffff;
+              font-size: 1.2rem;
+              max-width: 800px;
+              margin: 0 auto;
+              font-weight: 400;
             "
           >
-            <h3
+            La tranquilidad jurídica comienza con una primera consulta. Estamos
+            listos para escuchar su caso en Barranquilla o de manera virtual.
+          </p>
+        </div>
+      </section>
+
+      <section
+        class="seccion-contacto-principal"
+        style="padding: 80px 0; background-color: #f8f9fa"
+      >
+        <div class="container">
+          <div
+            class="section-title center"
+            style="text-align: center; margin-bottom: 60px"
+          >
+            <h2
               style="
                 color: var(--azul-oscuro);
                 font-family: &quot;Montserrat&quot;, sans-serif;
-                font-size: 1.5rem;
-                margin-bottom: 25px;
-                padding-bottom: 10px;
-                border-bottom: 2px solid #f0f0f0;
+                font-size: 2.2rem;
+                position: relative;
+                display: inline-block;
               "
             >
-              Sede Principal
-            </h3>
-            <p style="margin-bottom: 25px; color: #666; font-size: 0.95rem">
-              Visítenos para una asesoría personalizada en nuestras oficinas.
-            </p>
-
-            <div
-              class="contact-item-pro"
-              style="
-                display: flex;
-                align-items: flex-start;
-                margin-bottom: 25px;
-              "
-            >
-              <div
-                class="icon-circle"
+              Canales de Atención
+              <span
                 style="
-                  width: 45px;
-                  height: 45px;
-                  background-color: var(--azul-oscuro);
-                  color: var(--dorado);
-                  border-radius: 50%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  font-size: 1.2rem;
-                  margin-right: 15px;
-                  flex-shrink: 0;
+                  display: block;
+                  width: 60px;
+                  height: 3px;
+                  background: var(--dorado);
+                  margin: 15px auto 0;
                 "
-              >
-                <i class="fas fa-map-marker-alt"></i>
-              </div>
-              <div>
-                <h4
-                  style="
-                    color: var(--azul-oscuro);
-                    font-family: &quot;Montserrat&quot;, sans-serif;
-                    margin-bottom: 5px;
-                    font-size: 1rem;
-                  "
-                >
-                  Ubicación Física
-                </h4>
-                <p style="margin: 0; color: #555; line-height: 1.5">
-                  Edificio Las Flores<br />Calle 39 No. 43-123, Piso 11.<br />Barranquilla,
-                  Atlántico.
-                </p>
-              </div>
-            </div>
-
-            <div
-              class="contact-item-pro"
-              style="
-                display: flex;
-                align-items: flex-start;
-                margin-bottom: 25px;
-              "
-            >
-              <div
-                class="icon-circle"
-                style="
-                  width: 45px;
-                  height: 45px;
-                  background-color: var(--azul-oscuro);
-                  color: var(--dorado);
-                  border-radius: 50%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  font-size: 1.2rem;
-                  margin-right: 15px;
-                  flex-shrink: 0;
-                "
-              >
-                <i class="fab fa-whatsapp"></i>
-              </div>
-              <div>
-                <h4
-                  style="
-                    color: var(--azul-oscuro);
-                    font-family: &quot;Montserrat&quot;, sans-serif;
-                    margin-bottom: 5px;
-                    font-size: 1rem;
-                  "
-                >
-                  WhatsApp Directo
-                </h4>
-                <p style="margin: 0">
-                  <a
-                    href="https://wa.me/573217927495"
-                    target="_blank"
-                    style="
-                      color: #444;
-                      text-decoration: none;
-                      font-weight: 700;
-                      font-size: 1.1rem;
-                    "
-                    >+57 321 792 7495</a
-                  >
-                </p>
-              </div>
-            </div>
-
-            <div
-              class="contact-item-pro"
-              style="
-                display: flex;
-                align-items: flex-start;
-                margin-bottom: 25px;
-              "
-            >
-              <div
-                class="icon-circle"
-                style="
-                  width: 45px;
-                  height: 45px;
-                  background-color: var(--azul-oscuro);
-                  color: var(--dorado);
-                  border-radius: 50%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  font-size: 1.2rem;
-                  margin-right: 15px;
-                  flex-shrink: 0;
-                "
-              >
-                <i class="fas fa-envelope"></i>
-              </div>
-              <div>
-                <h4
-                  style="
-                    color: var(--azul-oscuro);
-                    font-family: &quot;Montserrat&quot;, sans-serif;
-                    margin-bottom: 5px;
-                    font-size: 1rem;
-                  "
-                >
-                  Correo Electrónico
-                </h4>
-                <p style="margin: 0">
-                  <a
-                    href="mailto:tuabogadolaboral@outlook.com"
-                    style="color: #444; text-decoration: none; font-weight: 600"
-                    >tuabogadolaboral@outlook.com</a
-                  >
-                </p>
-              </div>
-            </div>
-
-            <div
-              class="horarios-box"
-              style="
-                margin-top: 30px;
-                padding-top: 20px;
-                border-top: 1px dashed #ddd;
-              "
-            >
-              <h4
-                style="
-                  color: var(--azul-oscuro);
-                  font-family: &quot;Montserrat&quot;, sans-serif;
-                  margin-bottom: 15px;
-                  font-size: 1rem;
-                "
-              >
-                <i
-                  class="fas fa-clock"
-                  style="color: var(--dorado); margin-right: 8px"
-                ></i
-                >Horarios de Atención
-              </h4>
-              <ul
-                style="
-                  list-style: none;
-                  padding: 0;
-                  margin: 0;
-                  font-size: 0.95rem;
-                  color: #555;
-                "
-              >
-                <li style="margin-bottom: 8px">
-                  <strong>Lunes a Viernes:</strong> 8:00 AM - 12:00 M / 1:00 PM
-                  - 6:00 PM
-                </li>
-                <li style="margin-bottom: 8px">
-                  <strong>Sábados:</strong> 8:00 AM - 12:00 M
-                </li>
-              </ul>
-              <div
-                class="cita-badge"
-                style="
-                  display: inline-block;
-                  background: rgba(212, 175, 55, 0.1);
-                  color: #b08d2b;
-                  padding: 8px 12px;
-                  border-radius: 4px;
-                  font-weight: 700;
-                  font-size: 0.85rem;
-                  margin-top: 15px;
-                "
-              >
-                Atención exclusivamente con cita previa.
-              </div>
-            </div>
+              ></span>
+            </h2>
           </div>
 
           <div
-            class="form-column-right"
+            class="contact-grid-layout"
             style="
-              background: white;
-              padding: 40px;
-              border-radius: 8px;
-              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+              display: grid;
+              grid-template-columns: 1fr 1.5fr;
+              gap: 50px;
+              align-items: start;
             "
           >
-            <div class="form-header" style="margin-bottom: 30px">
+            <div
+              class="info-column-left"
+              style="
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                border-top: 4px solid var(--dorado);
+              "
+            >
               <h3
                 style="
                   color: var(--azul-oscuro);
                   font-family: &quot;Montserrat&quot;, sans-serif;
-                  font-size: 1.8rem;
-                  margin-bottom: 10px;
-                  font-weight: 700;
+                  font-size: 1.5rem;
+                  margin-bottom: 25px;
+                  padding-bottom: 10px;
+                  border-bottom: 2px solid #f0f0f0;
                 "
               >
-                Solicitud de Cita
+                Sede Principal
               </h3>
-              <p style="color: #666; font-size: 1rem">
-                La Dra. Manga revisará su información preliminar.
+              <p style="margin-bottom: 25px; color: #666; font-size: 0.95rem">
+                Visítenos para una asesoría personalizada en nuestras oficinas.
               </p>
-            </div>
 
-            <form
-              action="#"
-              method="POST"
-              class="form-pro-style"
-              id="contactForm"
-            >
-              <div class="form-group" style="margin-bottom: 20px">
-                <label
-                  for="nombre"
+              <div
+                class="contact-item-pro"
+                style="
+                  display: flex;
+                  align-items: flex-start;
+                  margin-bottom: 25px;
+                "
+              >
+                <div
+                  class="icon-circle"
                   style="
-                    display: block;
-                    margin-bottom: 8px;
-                    font-weight: 700;
-                    color: var(--azul-oscuro);
-                    font-size: 0.95rem;
+                    width: 45px;
+                    height: 45px;
+                    background-color: var(--azul-oscuro);
+                    color: var(--dorado);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.2rem;
+                    margin-right: 15px;
+                    flex-shrink: 0;
                   "
-                  >Nombre Completo *</label
                 >
-                <div class="input-with-icon" style="position: relative">
-                  <i
-                    class="fas fa-user"
+                  <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div>
+                  <h4
                     style="
-                      position: absolute;
-                      left: 15px;
-                      top: 50%;
-                      transform: translateY(-50%);
-                      color: #aaa;
-                    "
-                  ></i>
-                  <input
-                    type="text"
-                    id="nombre"
-                    name="nombre"
-                    required
-                    placeholder="Ej: Juan Pérez"
-                    style="
-                      width: 100%;
-                      padding: 12px 15px 12px 45px;
-                      border: 1px solid #ddd;
-                      border-radius: 6px;
-                      font-family: &quot;Lato&quot;, sans-serif;
+                      color: var(--azul-oscuro);
+                      font-family: &quot;Montserrat&quot;, sans-serif;
+                      margin-bottom: 5px;
                       font-size: 1rem;
-                      color: #333;
-                      background-color: #f9f9f9;
-                      transition: all 0.3s ease;
                     "
-                  />
+                  >
+                    Ubicación Física
+                  </h4>
+                  <p style="margin: 0; color: #555; line-height: 1.5">
+                    Edificio Las Flores<br />Calle 39 No. 43-123, Piso 11.<br />Barranquilla,
+                    Atlántico.
+                  </p>
                 </div>
               </div>
 
               <div
-                class="form-row-dbl"
+                class="contact-item-pro"
                 style="
-                  display: grid;
-                  grid-template-columns: 1fr 1fr;
-                  gap: 20px;
-                  margin-bottom: 20px;
+                  display: flex;
+                  align-items: flex-start;
+                  margin-bottom: 25px;
                 "
               >
-                <div class="form-group">
-                  <label
-                    for="telefono"
-                    style="
-                      display: block;
-                      margin-bottom: 8px;
-                      font-weight: 700;
-                      color: var(--azul-oscuro);
-                      font-size: 0.95rem;
-                    "
-                    >Celular / WhatsApp *</label
-                  >
-                  <div class="input-with-icon" style="position: relative">
-                    <i
-                      class="fab fa-whatsapp"
-                      style="
-                        position: absolute;
-                        left: 15px;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        color: #aaa;
-                      "
-                    ></i>
-                    <input
-                      type="tel"
-                      id="telefono"
-                      name="telefono"
-                      required
-                      placeholder="+57 300 123 4567"
-                      style="
-                        width: 100%;
-                        padding: 12px 15px 12px 45px;
-                        border: 1px solid #ddd;
-                        border-radius: 6px;
-                        font-family: &quot;Lato&quot;, sans-serif;
-                        font-size: 1rem;
-                        color: #333;
-                        background-color: #f9f9f9;
-                        transition: all 0.3s ease;
-                      "
-                    />
-                  </div>
+                <div
+                  class="icon-circle"
+                  style="
+                    width: 45px;
+                    height: 45px;
+                    background-color: var(--azul-oscuro);
+                    color: var(--dorado);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.2rem;
+                    margin-right: 15px;
+                    flex-shrink: 0;
+                  "
+                >
+                  <i class="fab fa-whatsapp"></i>
                 </div>
-                <div class="form-group">
-                  <label
-                    for="email"
+                <div>
+                  <h4
                     style="
-                      display: block;
-                      margin-bottom: 8px;
-                      font-weight: 700;
                       color: var(--azul-oscuro);
-                      font-size: 0.95rem;
+                      font-family: &quot;Montserrat&quot;, sans-serif;
+                      margin-bottom: 5px;
+                      font-size: 1rem;
                     "
-                    >Correo Electrónico *</label
                   >
-                  <div class="input-with-icon" style="position: relative">
-                    <i
-                      class="fas fa-envelope"
+                    WhatsApp Directo
+                  </h4>
+                  <p style="margin: 0">
+                    <a
+                      href="https://wa.me/573217927495"
+                      target="_blank"
                       style="
-                        position: absolute;
-                        left: 15px;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        color: #aaa;
+                        color: #444;
+                        text-decoration: none;
+                        font-weight: 700;
+                        font-size: 1.1rem;
                       "
-                    ></i>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      required
-                      placeholder="juan@ejemplo.com"
-                      style="
-                        width: 100%;
-                        padding: 12px 15px 12px 45px;
-                        border: 1px solid #ddd;
-                        border-radius: 6px;
-                        font-family: &quot;Lato&quot;, sans-serif;
-                        font-size: 1rem;
-                        color: #333;
-                        background-color: #f9f9f9;
-                        transition: all 0.3s ease;
-                      "
-                    />
-                  </div>
+                      >+57 321 792 7495</a
+                    >
+                  </p>
                 </div>
               </div>
 
-              <div class="form-group" style="margin-bottom: 20px">
-                <label
-                  for="asunto"
+              <div
+                class="contact-item-pro"
+                style="
+                  display: flex;
+                  align-items: flex-start;
+                  margin-bottom: 25px;
+                "
+              >
+                <div
+                  class="icon-circle"
                   style="
-                    display: block;
-                    margin-bottom: 8px;
-                    font-weight: 700;
-                    color: var(--azul-oscuro);
-                    font-size: 0.95rem;
+                    width: 45px;
+                    height: 45px;
+                    background-color: var(--azul-oscuro);
+                    color: var(--dorado);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.2rem;
+                    margin-right: 15px;
+                    flex-shrink: 0;
                   "
-                  >Tipo de Caso *</label
                 >
-                <div class="input-with-icon" style="position: relative">
-                  <i
-                    class="fas fa-list-ul"
+                  <i class="fas fa-envelope"></i>
+                </div>
+                <div>
+                  <h4
                     style="
-                      position: absolute;
-                      left: 15px;
-                      top: 50%;
-                      transform: translateY(-50%);
-                      color: #aaa;
-                    "
-                  ></i>
-                  <select
-                    id="asunto"
-                    name="asunto"
-                    required
-                    style="
-                      width: 100%;
-                      padding: 12px 15px 12px 45px;
-                      border: 1px solid #ddd;
-                      border-radius: 6px;
-                      font-family: &quot;Lato&quot;, sans-serif;
+                      color: var(--azul-oscuro);
+                      font-family: &quot;Montserrat&quot;, sans-serif;
+                      margin-bottom: 5px;
                       font-size: 1rem;
-                      color: #333;
-                      background-color: #f9f9f9;
-                      transition: all 0.3s ease;
-                      appearance: none;
                     "
                   >
-                    <option value="" disabled selected>
-                      Seleccione una opción...
-                    </option>
-                    <option value="Laboral">Laboral</option>
-                    <option value="Pensional">Pensional</option>
-                    <option value="Seguridad Social">Seguridad Social</option>
-                    <option value="Ley de Insolvencia">
-                      Ley de Insolvencia (Deudas)
-                    </option>
-                    <option value="Asesoría Empresarial">
-                      Asesoría Empresarial
-                    </option>
-                    <option value="Otro">Otro ¿Cuál?</option>
-                  </select>
+                    Correo Electrónico
+                  </h4>
+                  <p style="margin: 0">
+                    <a
+                      href="mailto:tuabogadolaboral@outlook.com"
+                      style="
+                        color: #444;
+                        text-decoration: none;
+                        font-weight: 600;
+                      "
+                      >tuabogadolaboral@outlook.com</a
+                    >
+                  </p>
                 </div>
+              </div>
 
-                <div id="campo-otro-asunto">
+              <div
+                class="horarios-box"
+                style="
+                  margin-top: 30px;
+                  padding-top: 20px;
+                  border-top: 1px dashed #ddd;
+                "
+              >
+                <h4
+                  style="
+                    color: var(--azul-oscuro);
+                    font-family: &quot;Montserrat&quot;, sans-serif;
+                    margin-bottom: 15px;
+                    font-size: 1rem;
+                  "
+                >
+                  <i
+                    class="fas fa-clock"
+                    style="color: var(--dorado); margin-right: 8px"
+                  ></i
+                  >Horarios de Atención
+                </h4>
+                <ul
+                  style="
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+                    font-size: 0.95rem;
+                    color: #555;
+                  "
+                >
+                  <li style="margin-bottom: 8px">
+                    <strong>Lunes a Viernes:</strong> 8:00 AM - 12:00 M / 1:00
+                    PM - 6:00 PM
+                  </li>
+                  <li style="margin-bottom: 8px">
+                    <strong>Sábados:</strong> 8:00 AM - 12:00 M
+                  </li>
+                </ul>
+                <div
+                  class="cita-badge"
+                  style="
+                    display: inline-block;
+                    background: rgba(212, 175, 55, 0.1);
+                    color: #b08d2b;
+                    padding: 8px 12px;
+                    border-radius: 4px;
+                    font-weight: 700;
+                    font-size: 0.85rem;
+                    margin-top: 15px;
+                  "
+                >
+                  Atención exclusivamente con cita previa.
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="form-column-right"
+              style="
+                background: white;
+                padding: 40px;
+                border-radius: 8px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+              "
+            >
+              <div class="form-header" style="margin-bottom: 30px">
+                <h3
+                  style="
+                    color: var(--azul-oscuro);
+                    font-family: &quot;Montserrat&quot;, sans-serif;
+                    font-size: 1.8rem;
+                    margin-bottom: 10px;
+                    font-weight: 700;
+                  "
+                >
+                  Solicitud de Cita
+                </h3>
+                <p style="color: #666; font-size: 1rem">
+                  La Dra. Manga revisará su información preliminar.
+                </p>
+              </div>
+
+              <form
+                action="#"
+                method="POST"
+                class="form-pro-style"
+                id="contactForm"
+              >
+                <div class="form-group" style="margin-bottom: 20px">
                   <label
-                    for="otro_asunto_detalle"
+                    for="nombre"
                     style="
                       display: block;
                       margin-bottom: 8px;
                       font-weight: 700;
                       color: var(--azul-oscuro);
-                      font-size: 0.9rem;
-                      margin-top: 10px;
+                      font-size: 0.95rem;
                     "
-                    >Por favor, especifique el asunto *</label
+                    >Nombre Completo *</label
                   >
-                  <input
-                    type="text"
-                    id="otro_asunto_detalle"
-                    name="otro_asunto_detalle"
-                    placeholder="Escriba aquí el tipo de caso..."
+                  <div class="input-with-icon" style="position: relative">
+                    <i
+                      class="fas fa-user"
+                      style="
+                        position: absolute;
+                        left: 15px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        color: #aaa;
+                      "
+                    ></i>
+                    <input
+                      type="text"
+                      id="nombre"
+                      name="nombre"
+                      required
+                      placeholder="Ej: Juan Pérez"
+                      style="
+                        width: 100%;
+                        padding: 12px 15px 12px 45px;
+                        border: 1px solid #ddd;
+                        border-radius: 6px;
+                        font-family: &quot;Lato&quot;, sans-serif;
+                        font-size: 1rem;
+                        color: #333;
+                        background-color: #f9f9f9;
+                        transition: all 0.3s ease;
+                      "
+                    />
+                  </div>
+                </div>
+
+                <div
+                  class="form-row-dbl"
+                  style="
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    margin-bottom: 20px;
+                  "
+                >
+                  <div class="form-group">
+                    <label
+                      for="telefono"
+                      style="
+                        display: block;
+                        margin-bottom: 8px;
+                        font-weight: 700;
+                        color: var(--azul-oscuro);
+                        font-size: 0.95rem;
+                      "
+                      >Celular / WhatsApp *</label
+                    >
+                    <div class="input-with-icon" style="position: relative">
+                      <i
+                        class="fab fa-whatsapp"
+                        style="
+                          position: absolute;
+                          left: 15px;
+                          top: 50%;
+                          transform: translateY(-50%);
+                          color: #aaa;
+                        "
+                      ></i>
+                      <input
+                        type="tel"
+                        id="telefono"
+                        name="telefono"
+                        required
+                        placeholder="+57 300 123 4567"
+                        style="
+                          width: 100%;
+                          padding: 12px 15px 12px 45px;
+                          border: 1px solid #ddd;
+                          border-radius: 6px;
+                          font-family: &quot;Lato&quot;, sans-serif;
+                          font-size: 1rem;
+                          color: #333;
+                          background-color: #f9f9f9;
+                          transition: all 0.3s ease;
+                        "
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label
+                      for="email"
+                      style="
+                        display: block;
+                        margin-bottom: 8px;
+                        font-weight: 700;
+                        color: var(--azul-oscuro);
+                        font-size: 0.95rem;
+                      "
+                      >Correo Electrónico *</label
+                    >
+                    <div class="input-with-icon" style="position: relative">
+                      <i
+                        class="fas fa-envelope"
+                        style="
+                          position: absolute;
+                          left: 15px;
+                          top: 50%;
+                          transform: translateY(-50%);
+                          color: #aaa;
+                        "
+                      ></i>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required
+                        placeholder="juan@ejemplo.com"
+                        style="
+                          width: 100%;
+                          padding: 12px 15px 12px 45px;
+                          border: 1px solid #ddd;
+                          border-radius: 6px;
+                          font-family: &quot;Lato&quot;, sans-serif;
+                          font-size: 1rem;
+                          color: #333;
+                          background-color: #f9f9f9;
+                          transition: all 0.3s ease;
+                        "
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px">
+                  <label
+                    for="asunto"
+                    style="
+                      display: block;
+                      margin-bottom: 8px;
+                      font-weight: 700;
+                      color: var(--azul-oscuro);
+                      font-size: 0.95rem;
+                    "
+                    >Tipo de Caso *</label
+                  >
+                  <div class="input-with-icon" style="position: relative">
+                    <i
+                      class="fas fa-list-ul"
+                      style="
+                        position: absolute;
+                        left: 15px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        color: #aaa;
+                      "
+                    ></i>
+                    <select
+                      id="asunto"
+                      name="asunto"
+                      required
+                      style="
+                        width: 100%;
+                        padding: 12px 15px 12px 45px;
+                        border: 1px solid #ddd;
+                        border-radius: 6px;
+                        font-family: &quot;Lato&quot;, sans-serif;
+                        font-size: 1rem;
+                        color: #333;
+                        background-color: #f9f9f9;
+                        transition: all 0.3s ease;
+                        appearance: none;
+                      "
+                    >
+                      <option value="" disabled selected>
+                        Seleccione una opción...
+                      </option>
+                      <option value="Laboral">Laboral</option>
+                      <option value="Pensional">Pensional</option>
+                      <option value="Seguridad Social">Seguridad Social</option>
+                      <option value="Ley de Insolvencia">
+                        Ley de Insolvencia (Deudas)
+                      </option>
+                      <option value="Asesoría Empresarial">
+                        Asesoría Empresarial
+                      </option>
+                      <option value="Otro">Otro ¿Cuál?</option>
+                    </select>
+                  </div>
+
+                  <div id="campo-otro-asunto">
+                    <label
+                      for="otro_asunto_detalle"
+                      style="
+                        display: block;
+                        margin-bottom: 8px;
+                        font-weight: 700;
+                        color: var(--azul-oscuro);
+                        font-size: 0.9rem;
+                        margin-top: 10px;
+                      "
+                      >Por favor, especifique el asunto *</label
+                    >
+                    <input
+                      type="text"
+                      id="otro_asunto_detalle"
+                      name="otro_asunto_detalle"
+                      placeholder="Escriba aquí el tipo de caso..."
+                      style="
+                        width: 100%;
+                        padding: 12px 15px;
+                        border: 1px solid #ddd;
+                        border-radius: 6px;
+                        font-family: &quot;Lato&quot;, sans-serif;
+                        font-size: 1rem;
+                        color: #333;
+                        background-color: #f9f9f9;
+                        transition: all 0.3s ease;
+                      "
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 25px">
+                  <label
+                    for="mensaje"
+                    style="
+                      display: block;
+                      margin-bottom: 8px;
+                      font-weight: 700;
+                      color: var(--azul-oscuro);
+                      font-size: 0.95rem;
+                    "
+                    >Breve Descripción *</label
+                  >
+                  <textarea
+                    id="mensaje"
+                    name="mensaje"
+                    rows="5"
+                    required
+                    placeholder="Describa los hechos principales..."
                     style="
                       width: 100%;
                       padding: 12px 15px;
@@ -821,86 +728,52 @@
                       color: #333;
                       background-color: #f9f9f9;
                       transition: all 0.3s ease;
+                      resize: vertical;
                     "
-                  />
+                  ></textarea>
                 </div>
-              </div>
 
-              <div class="form-group" style="margin-bottom: 25px">
-                <label
-                  for="mensaje"
-                  style="
-                    display: block;
-                    margin-bottom: 8px;
-                    font-weight: 700;
-                    color: var(--azul-oscuro);
-                    font-size: 0.95rem;
-                  "
-                  >Breve Descripción *</label
-                >
-                <textarea
-                  id="mensaje"
-                  name="mensaje"
-                  rows="5"
-                  required
-                  placeholder="Describa los hechos principales..."
+                <button
+                  type="submit"
+                  class="btn-gold"
                   style="
                     width: 100%;
-                    padding: 12px 15px;
-                    border: 1px solid #ddd;
-                    border-radius: 6px;
-                    font-family: &quot;Lato&quot;, sans-serif;
-                    font-size: 1rem;
-                    color: #333;
-                    background-color: #f9f9f9;
-                    transition: all 0.3s ease;
-                    resize: vertical;
+                    padding: 15px;
+                    font-size: 1.1rem;
+                    border: none;
+                    cursor: pointer;
+                    font-weight: 700;
+                    color: var(--azul-oscuro);
                   "
-                ></textarea>
-              </div>
-
-              <button
-                type="submit"
-                class="btn-gold"
-                style="
-                  width: 100%;
-                  padding: 15px;
-                  font-size: 1.1rem;
-                  border: none;
-                  cursor: pointer;
-                  font-weight: 700;
-                  color: var(--azul-oscuro);
-                "
-              >
-                ENVIAR SOLICITUD
-                <i class="fas fa-paper-plane" style="margin-left: 10px"></i>
-              </button>
-            </form>
+                >
+                  ENVIAR SOLICITUD
+                  <i class="fas fa-paper-plane" style="margin-left: 10px"></i>
+                </button>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section
-      class="mapa-full-width"
-      style="
-        width: 100%;
-        height: 450px;
-        border-top: 1px solid #eee;
-        border-bottom: 1px solid #eee;
-      "
-    >
-      <iframe
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.368013011745!2d-74.79042732416668!3d11.01100115481986!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8ef42d7455555555%3A0x5555555555555555!2sCl.%2039%20%2343-123%2C%20Barranquilla%2C%20Atl%C3%A1ntico%2C%20Colombia!5e0!3m2!1ses!2sco!4v1708547000000!5m2!1ses!2sco"
-        width="100%"
-        height="100%"
-        style="border: 0"
-        allowfullscreen=""
-        loading="lazy"
-        title="Mapa de ubicación Tu Abogado Laboral"
-      ></iframe>
-    </section>
-
+      <section
+        class="mapa-full-width"
+        style="
+          width: 100%;
+          height: 450px;
+          border-top: 1px solid #eee;
+          border-bottom: 1px solid #eee;
+        "
+      >
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.368013011745!2d-74.79042732416668!3d11.01100115481986!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8ef42d7455555555%3A0x5555555555555555!2sCl.%2039%20%2343-123%2C%20Barranquilla%2C%20Atl%C3%A1ntico%2C%20Colombia!5e0!3m2!1ses!2sco!4v1708547000000!5m2!1ses!2sco"
+          width="100%"
+          height="100%"
+          style="border: 0"
+          allowfullscreen=""
+          loading="lazy"
+          title="Mapa de ubicación Tu Abogado Laboral"
+        ></iframe>
+      </section>
     </main>
     <footer>
       <div class="container">
@@ -971,7 +844,7 @@
         </div>
       </div>
     </footer>
-    
+
     <a href="https://wa.me/573217927495" class="whatsapp-btn" target="_blank"
       ><i class="fab fa-whatsapp"></i
     ></a>

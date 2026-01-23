@@ -1,12 +1,12 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Seguridad: CSP Básico -->
+    <!-- Seguridad: CSP BÃ¡sico -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
 
-    <title>Calculadora de Retención en la Fuente | Tu Abogado Laboral</title>
+    <title>Calculadora de RetenciÃ³n en la Fuente | Tu Abogado Laboral</title>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
     <link rel="stylesheet" href="css/style.css" />
     <link
@@ -18,7 +18,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <style>
-      /* --- ESTILOS ESPECÍFICOS --- */
+      /* --- ESTILOS ESPECÃFICOS --- */
       body {
         font-family: "Lato", sans-serif;
         background-color: #f4f8fb;
@@ -218,12 +218,12 @@
         font-weight: 900;
         color: #0056b3;
       }
-      /* --- CORRECCIÓN MENÚ QUIRÚRGICA PARA MÓVILES --- */
+      /* --- CORRECCIÃ“N MENÃš QUIRÃšRGICA PARA MÃ“VILES --- */
       @media (max-width: 768px) {
         header .header-container {
-          position: relative; /* Referencia de posición */
+          position: relative; /* Referencia de posiciÃ³n */
         }
-        /* 1. Posición Extrema Derecha y Color Azul */
+        /* 1. PosiciÃ³n Extrema Derecha y Color Azul */
         header .menu-toggle {
           position: absolute !important;
           right: 20px !important;
@@ -236,7 +236,7 @@
           cursor: pointer;
         }
 
-        /* 2. Menú Desplegable (Fondo Blanco) */
+        /* 2. MenÃº Desplegable (Fondo Blanco) */
         header nav ul.nav-menu {
           display: none;
           flex-direction: column;
@@ -265,7 +265,7 @@
     <div class="top-bar">
       <div class="container">
         <div class="info">
-          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+          Herramientas JurÃ­dicas Gratuitas | Tu Abogado Laboral
         </div>
       </div>
     </div>
@@ -276,7 +276,7 @@
             <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
           /></a>
         </div>
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+        <div class="menu-toggle" id="mobile-menu" aria-label="MenÃº principal" role="button" tabindex="0">
           <i class="fas fa-bars"></i>
         </div>
         <nav>
@@ -292,299 +292,15 @@
     </header>
 
     <main>
-    <section class="bg-light" style="padding: 40px 0">
-    <link rel="icon" href="img/favicon.webp" type="image/webp" />
-    <link rel="stylesheet" href="css/style.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <style>
-      /* --- ESTILOS ESPECÍFICOS --- */
-      body {
-        font-family: "Lato", sans-serif;
-        background-color: #f4f8fb;
-        margin: 0;
-      }
-      .calc-wrapper {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-      .calc-card {
-        background: white;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(16, 33, 75, 0.08);
-        border: 1px solid #eee;
-        margin-bottom: 30px;
-      }
-      .section-title {
-        color: #10214b;
-        font-size: 1.1rem;
-        font-weight: 700;
-        border-bottom: 2px solid #e8f5e9;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-        margin-top: 0;
-      }
-      .form-grid-2 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-      }
-      @media (max-width: 800px) {
-        .form-grid-2 {
-          grid-template-columns: 1fr;
-        }
-      }
-      .form-group label {
-        display: block;
-        font-weight: 700;
-        color: #10214b;
-        margin-bottom: 5px;
-        font-size: 0.9rem;
-      }
-      .form-group small {
-        display: block;
-        color: #666;
-        font-size: 0.75rem;
-        margin-bottom: 5px;
-      }
-      .input-group {
-        position: relative;
-        display: flex;
-        align-items: center;
-      }
-      .input-icon {
-        position: absolute;
-        left: 15px;
-        color: #10214b;
-        z-index: 10;
-      }
-      .form-control {
-        width: 100%;
-        padding: 12px 15px 12px 40px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 1rem;
-        background: #f9f9f9;
-        box-sizing: border-box;
-      }
-      .form-control:focus {
-        border-color: #10214b;
-        background: #fff;
-        outline: none;
-      }
-      select.form-control {
-        cursor: pointer;
-        font-weight: bold;
-      }
-      .checkbox-wrapper {
-        background: #f0f4f8;
-        padding: 10px 15px;
-        border-radius: 8px;
-        border: 1px solid #dce4ec;
-        margin-bottom: 20px;
-      }
-      .checkbox-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .btn-calculate {
-        background-color: #10214b;
-        color: white;
-        border: none;
-        width: 100%;
-        padding: 15px;
-        font-size: 1.1rem;
-        font-weight: bold;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s;
-        margin-top: 30px;
-        text-transform: uppercase;
-      }
-      .btn-calculate:hover {
-        background-color: #25d366;
-        transform: translateY(-2px);
-      }
-
-      /* RESULTADOS */
-      .result-container {
-        display: none;
-        background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        border: 1px solid #eee;
-        margin-top: 20px;
-      }
-      .result-header {
-        background: linear-gradient(90deg, #10214b 0%, #004494 100%);
-        color: white;
-        padding: 25px 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .header-title h3 {
-        margin: 0;
-        font-size: 1.4rem;
-        font-weight: 800;
-      }
-      .header-uvt {
-        font-size: 0.9rem;
-        opacity: 0.9;
-        margin-top: 5px;
-      }
-      .result-body {
-        padding: 30px;
-      }
-      .res-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 40px;
-        margin-bottom: 20px;
-      }
-      @media (max-width: 700px) {
-        .res-grid {
-          grid-template-columns: 1fr;
-          gap: 20px;
-        }
-      }
-      .res-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid #f0f0f0;
-      }
-      .res-item label {
-        color: #333;
-        font-weight: 600;
-        font-size: 0.9rem;
-      }
-      .res-item small {
-        display: block;
-        color: #888;
-        font-size: 0.75rem;
-        font-weight: normal;
-      }
-      .res-item span {
-        font-weight: 700;
-        font-size: 1rem;
-        color: #10214b;
-      }
-      .text-red {
-        color: #dc3545 !important;
-      }
-      .final-result {
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 8px;
-        margin-top: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border: 1px solid #e9ecef;
-      }
-      .final-label {
-        font-size: 1.2rem;
-        font-weight: 800;
-        color: #10214b;
-      }
-      .final-value {
-        font-size: 2rem;
-        font-weight: 900;
-        color: #0056b3;
-      }
-      /* --- CORRECCIÓN MENÚ QUIRÚRGICA PARA MÓVILES --- */
-      @media (max-width: 768px) {
-        header .header-container {
-          position: relative; /* Referencia de posición */
-        }
-        /* 1. Posición Extrema Derecha y Color Azul */
-        header .menu-toggle {
-          position: absolute !important;
-          right: 20px !important;
-          top: 50% !important;
-          transform: translateY(-50%) !important;
-          display: block !important;
-          z-index: 9999;
-          font-size: 1.5rem;
-          color: #10214b !important; /* Azul oscuro obligatorio */
-          cursor: pointer;
-        }
-
-        /* 2. Menú Desplegable (Fondo Blanco) */
-        header nav ul.nav-menu {
-          display: none;
-          flex-direction: column;
-          width: 100%;
-          position: absolute;
-          top: 100%;
-          left: 0;
-          background-color: white;
-          padding: 20px 0;
-          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-          text-align: center;
-        }
-
-        header nav ul.nav-menu.active {
-          display: flex !important;
-        }
-
-        /* 3. Color de los enlaces */
-        header nav ul.nav-menu li a {
-          color: #10214b !important;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="top-bar">
-      <div class="container">
-        <div class="info">
-          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
-        </div>
-      </div>
-    </div>
-    <header>
-      <div class="container header-container">
-        <div class="logo">
-          <a href="index.html" aria-label="Inicio">
-            <img src="img/logo-principal.webp" alt="Logo" class="logo-img"
-          /></a>
-        </div>
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
-          <i class="fas fa-bars"></i>
-        </div>
-        <nav>
-          <ul class="nav-menu">
-            <li>
-              <a href="blog.html" style="color: #10214b; font-weight: bold"
-                ><i class="fas fa-arrow-left"></i> Volver a Herramientas</a
-              >
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </header>
 
     <section class="bg-light" style="padding: 40px 0">
       <div class="calc-wrapper">
         <div class="text-center mb-5">
           <h1 style="color: #10214b; font-size: 2.2rem; margin-bottom: 10px">
-            Calculadora de Retención en la Fuente
+            Calculadora de RetenciÃ³n en la Fuente
           </h1>
           <p style="color: #666">
-            Cálculo preciso para Empleados e Independientes (Normativa DIAN).
+            CÃ¡lculo preciso para Empleados e Independientes (Normativa DIAN).
           </p>
         </div>
 
@@ -601,7 +317,7 @@
             >
               <label
                 style="font-size: 0.9rem; color: #10214b; font-weight: bold"
-                ><i class="fas fa-cog"></i> Configuración UVT</label
+                ><i class="fas fa-cog"></i> ConfiguraciÃ³n UVT</label
               >
               <div
                 style="
@@ -612,7 +328,7 @@
                 "
               >
                 <div style="flex: 1">
-                  <small>Valor UVT (Año Vigente):</small>
+                  <small>Valor UVT (AÃ±o Vigente):</small>
                   <div class="input-group">
                     <i class="fas fa-chart-bar input-icon"></i>
                     <input
@@ -626,7 +342,7 @@
                 </div>
                 <div style="flex: 2">
                   <small style="color: #666; font-style: italic"
-                    >* UVT 2026 proyectada (o ajuste al año que
+                    >* UVT 2026 proyectada (o ajuste al aÃ±o que
                     necesite).</small
                   >
                 </div>
@@ -709,13 +425,13 @@
                         "
                       />
                       <span style="font-size: 0.9rem; margin-left: 10px"
-                        >Sí, incluir en base</span
+                        >SÃ­, incluir en base</span
                       >
                     </div>
                   </div>
                 </div>
                 <div class="form-group">
-                  <label>Aportes Voluntarios (Pensión/AFC)</label>
+                  <label>Aportes Voluntarios (PensiÃ³n/AFC)</label>
                   <div class="input-group">
                     <i class="fas fa-piggy-bank input-icon"></i>
                     <input
@@ -774,7 +490,7 @@
             </div>
 
             <button type="submit" class="btn-calculate">
-              <i class="fas fa-calculator"></i> Calcular Retención
+              <i class="fas fa-calculator"></i> Calcular RetenciÃ³n
             </button>
           </form>
         </div>
@@ -782,7 +498,7 @@
         <div id="resultCard" class="result-container">
           <div class="result-header">
             <div class="header-title">
-              <h3>Resumen de Retención en la Fuente</h3>
+              <h3>Resumen de RetenciÃ³n en la Fuente</h3>
               <div class="header-uvt" id="headerUvtText">
                 Valor UVT Utilizado: $52.374
               </div>
@@ -810,7 +526,7 @@
                 <div class="res-item">
                   <div>
                     <label id="lblAportes">Aportes a Seguridad Social</label>
-                    <small id="smallAportes">(Salud + Pensión)</small>
+                    <small id="smallAportes">(Salud + PensiÃ³n)</small>
                   </div>
                   <span id="resSeguridadSocial" class="text-red">$0</span>
                 </div>
@@ -849,7 +565,7 @@
                 </div>
                 <div class="res-item">
                   <div>
-                    <label>Deducción Dependientes</label
+                    <label>DeducciÃ³n Dependientes</label
                     ><small>10% del ingreso (Tope 32 UVT)</small>
                   </div>
                   <span id="resDependientes">$0</span>
@@ -893,13 +609,13 @@
           <strong style="color: #10214b">Aviso Legal:</strong>
           Esta herramienta realiza proyecciones basadas en la normativa laboral
           vigente en Colombia. Los resultados son
-          <strong>aproximaciones ilustrativas</strong> y pueden variar según
+          <strong>aproximaciones ilustrativas</strong> y pueden variar segÃºn
           convenciones colectivas o interpretaciones judiciales. El uso de este
-          simulador no crea una relación abogado-cliente ni sustituye una
-          liquidación oficial.
+          simulador no crea una relaciÃ³n abogado-cliente ni sustituye una
+          liquidaciÃ³n oficial.
           <span style="display: block; margin-top: 5px; font-style: italic">
             Tu Abogado Laboral no se hace responsable por decisiones tomadas
-            basándose exclusivamente en estos datos.
+            basÃ¡ndose exclusivamente en estos datos.
           </span>
         </p>
       </div>
@@ -912,7 +628,7 @@
           <div class="footer-col">
             <div class="footer-logo">Tu Abogado <span>Laboral</span></div>
             <p style="color: #ccc; margin-bottom: 20px; font-size: 0.9rem">
-              Defensa experta y estratégica en Derecho Laboral y Pensional.
+              Defensa experta y estratÃ©gica en Derecho Laboral y Pensional.
               Barranquilla, Colombia.
             </p>
             <div class="social-icons-footer">
@@ -938,11 +654,11 @@
           </div>
 
           <div class="footer-col links-col">
-            <h4>Enlaces Rápidos</h4>
+            <h4>Enlaces RÃ¡pidos</h4>
             <ul>
               <li><a href="index.html">Inicio</a></li>
               <li><a href="nosotros.html">Sobre Nosotros</a></li>
-              <li><a href="servicios.html">Áreas de Práctica</a></li>
+              <li><a href="servicios.html">Ãreas de PrÃ¡ctica</a></li>
               <li><a href="blog.html">Herramientas</a></li>
               <li>
                 <a href="contacto.html" class="active-footer">Agendar Cita</a>
@@ -968,9 +684,9 @@
       </div>
       <div class="footer-bottom">
         <div class="container copyright-flex">
-          <p>© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
+          <p>Â© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
           <a href="politica-privacidad.html" class="privacy-link"
-            >Política de Privacidad</a
+            >PolÃ­tica de Privacidad</a
           >
         </div>
       </div>
@@ -984,7 +700,7 @@
         maximumFractionDigits: 0,
       });
 
-      // UI: Cambiar etiquetas según tipo
+      // UI: Cambiar etiquetas segÃºn tipo
       document
         .getElementById("tipoContribuyente")
         .addEventListener("change", function () {
@@ -1013,14 +729,14 @@
           let comisiones = getVal("comisiones");
           let ingresosTotales = salario + bonos + comisiones;
 
-          // --- CÁLCULO INCR (Seguridad Social) ---
+          // --- CÃLCULO INCR (Seguridad Social) ---
           let totalINCR = 0;
           let valorVisualAportes = 0;
           let salud = 0,
             pension = 0,
             fsp = 0,
             arl = 0;
-          let textoAportes = "Aportes Salud y Pensión (4%)";
+          let textoAportes = "Aportes Salud y PensiÃ³n (4%)";
 
           if (tipo === "empleado") {
             let baseSS = salario + comisiones;
@@ -1039,7 +755,7 @@
 
             totalINCR = salud + pension + arl + fsp;
             valorVisualAportes = totalINCR - fsp;
-            textoAportes = "SS Independiente (Salud, Pensión, ARL)";
+            textoAportes = "SS Independiente (Salud, PensiÃ³n, ARL)";
           }
 
           let ingresoNeto = ingresosTotales - totalINCR;
@@ -1062,7 +778,7 @@
           if (base25 < 0) base25 = 0;
           let renta25 = base25 * 0.25;
 
-          // --- LÍMITE 40% ---
+          // --- LÃMITE 40% ---
           let totalAlivios = totalDeducciones + voluntarias + renta25;
           let limite40 = ingresoNeto * 0.4;
           let topeAbsoluto40 = (1340 / 12) * UVT;
@@ -1094,7 +810,7 @@
             retencionUVT = 0;
           }
 
-          // Redondeo tributario oficial: Al múltiplo de 1000 más cercano
+          // Redondeo tributario oficial: Al mÃºltiplo de 1000 mÃ¡s cercano
           let retencionPesos = Math.round((retencionUVT * UVT) / 1000) * 1000;
 
           // --- RENDERIZADO ---
@@ -1106,8 +822,8 @@
           document.getElementById("lblAportes").textContent = textoAportes;
           document.getElementById("smallAportes").textContent =
             tipo === "empleado"
-              ? "(4% Salud + 4% Pensión)"
-              : "(Deducción total pagada)";
+              ? "(4% Salud + 4% PensiÃ³n)"
+              : "(DeducciÃ³n total pagada)";
           document.getElementById("resSeguridadSocial").textContent =
             "- " + formatoPeso.format(valorVisualAportes);
 
@@ -1139,7 +855,7 @@
       href="https://wa.me/573217927495"
       class="whatsapp-btn"
       target="_blank"
-      title="Contáctanos por WhatsApp"
+      title="ContÃ¡ctanos por WhatsApp"
     >
       <i class="fab fa-whatsapp"></i>
     </a>

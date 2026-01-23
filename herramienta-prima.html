@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Seguridad: CSP Básico -->
+    <!-- Seguridad: CSP BÃ¡sico -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
 
     <title>Calculadora de Prima de Servicios | Tu Abogado Laboral</title>
@@ -226,12 +226,12 @@
       .cta-whatsapp:hover {
         background: #c8e6c9;
       }
-      /* --- CORRECCIÓN MENÚ QUIRÚRGICA PARA MÓVILES --- */
+      /* --- CORRECCIÃ“N MENÃš QUIRÃšRGICA PARA MÃ“VILES --- */
       @media (max-width: 768px) {
         header .header-container {
-          position: relative; /* Referencia de posición */
+          position: relative; /* Referencia de posiciÃ³n */
         }
-        /* 1. Posición Extrema Derecha y Color Azul */
+        /* 1. PosiciÃ³n Extrema Derecha y Color Azul */
         header .menu-toggle {
           position: absolute !important;
           right: 20px !important;
@@ -244,7 +244,7 @@
           cursor: pointer;
         }
 
-        /* 2. Menú Desplegable (Fondo Blanco) */
+        /* 2. MenÃº Desplegable (Fondo Blanco) */
         header nav ul.nav-menu {
           display: none;
           flex-direction: column;
@@ -273,7 +273,7 @@
     <div class="top-bar">
       <div class="container">
         <div class="info">
-          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
+          Herramientas JurÃ­dicas Gratuitas | Tu Abogado Laboral
         </div>
       </div>
     </div>
@@ -284,7 +284,7 @@
             <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
           /></a>
         </div>
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+        <div class="menu-toggle" id="mobile-menu" aria-label="MenÃº principal" role="button" tabindex="0">
           <i class="fas fa-bars"></i>
         </div>
         <nav>
@@ -300,297 +300,6 @@
     </header>
 
     <main>
-    <link rel="icon" href="img/favicon.webp" type="image/webp" />
-    <meta
-      name="description"
-      content="Calcule correctamente la Prima de Servicios legal en Colombia. Herramienta gratuita ajustada a la normativa 2026."
-    />
-    <link rel="stylesheet" href="css/style.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <style>
-      /* ESTILOS DE LA CALCULADORA */
-      .calc-wrapper {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-      .calc-card {
-        background: white;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(16, 33, 75, 0.08);
-        border: 1px solid #eee;
-        margin-bottom: 30px;
-      }
-      .calc-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 25px;
-      }
-      @media (max-width: 768px) {
-        .calc-grid {
-          grid-template-columns: 1fr;
-        }
-        .calc-card {
-          padding: 20px;
-        }
-      }
-
-      .form-group label {
-        display: block;
-        font-weight: 700;
-        color: #10214b;
-        margin-bottom: 8px;
-        font-size: 0.95rem;
-      }
-      .form-group small {
-        display: block;
-        color: #888;
-        font-size: 0.8rem;
-        margin-bottom: 8px;
-      }
-
-      .input-group {
-        position: relative;
-        display: flex;
-        align-items: center;
-      }
-      .input-icon {
-        position: absolute;
-        left: 15px;
-        color: #10214b;
-      }
-      .form-control {
-        width: 100%;
-        padding: 12px 15px 12px 40px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: border-color 0.3s;
-        background: #f9f9f9;
-      }
-      .form-control:focus {
-        border-color: #10214b;
-        background: #fff;
-        outline: none;
-      }
-
-      /* Checkbox Auxilio */
-      .checkbox-wrapper {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #eee;
-      }
-      .checkbox-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-      }
-
-      .btn-calculate {
-        background-color: #10214b;
-        color: white;
-        border: none;
-        width: 100%;
-        padding: 15px;
-        font-size: 1.1rem;
-        font-weight: bold;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s;
-        margin-top: 20px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-      }
-      .btn-calculate:hover {
-        background-color: #25d366;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
-      }
-
-      /* RESULTADOS */
-      .result-container {
-        display: none;
-        background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        border: 1px solid #eee;
-        animation: slideDown 0.5s ease;
-      }
-      @keyframes slideDown {
-        from {
-          opacity: 0;
-          transform: translateY(-20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .result-header {
-        background: #10214b;
-        color: white;
-        padding: 20px 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .result-body {
-        padding: 30px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        border-bottom: 1px solid #eee;
-      }
-      @media (max-width: 600px) {
-        .result-body {
-          grid-template-columns: 1fr;
-          gap: 15px;
-        }
-      }
-
-      .result-item label {
-        font-size: 0.85rem;
-        color: #666;
-        display: block;
-        margin-bottom: 5px;
-      }
-      .result-item span {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #333;
-      }
-
-      /* Estilos para el desglose */
-      .sub-result {
-        font-size: 0.95rem !important;
-        color: #555 !important;
-        font-weight: normal !important;
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 5px;
-        padding-bottom: 5px;
-        border-bottom: 1px dashed #eee;
-      }
-
-      .result-total {
-        background: #f4f8fb;
-        padding: 25px;
-        text-align: right;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .total-label {
-        font-size: 1.2rem;
-        color: #10214b;
-        font-weight: bold;
-      }
-      .total-value {
-        font-size: 2rem;
-        color: #25d366;
-        font-weight: 900;
-      }
-
-      .cta-whatsapp {
-        display: block;
-        text-align: center;
-        background: #e8f5e9;
-        color: #2e7d32;
-        padding: 15px;
-        margin: 20px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
-        border: 1px dashed #25d366;
-        transition: 0.3s;
-      }
-      .cta-whatsapp:hover {
-        background: #c8e6c9;
-      }
-      /* --- CORRECCIÓN MENÚ QUIRÚRGICA PARA MÓVILES --- */
-      @media (max-width: 768px) {
-        header .header-container {
-          position: relative; /* Referencia de posición */
-        }
-        /* 1. Posición Extrema Derecha y Color Azul */
-        header .menu-toggle {
-          position: absolute !important;
-          right: 20px !important;
-          top: 50% !important;
-          transform: translateY(-50%) !important;
-          display: block !important;
-          z-index: 9999;
-          font-size: 1.5rem;
-          color: #10214b !important; /* Azul oscuro obligatorio */
-          cursor: pointer;
-        }
-
-        /* 2. Menú Desplegable (Fondo Blanco) */
-        header nav ul.nav-menu {
-          display: none;
-          flex-direction: column;
-          width: 100%;
-          position: absolute;
-          top: 100%;
-          left: 0;
-          background-color: white;
-          padding: 20px 0;
-          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-          text-align: center;
-        }
-
-        header nav ul.nav-menu.active {
-          display: flex !important;
-        }
-
-        /* 3. Color de los enlaces */
-        header nav ul.nav-menu li a {
-          color: #10214b !important;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="top-bar">
-      <div class="container">
-        <div class="info">
-          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
-        </div>
-      </div>
-    </div>
-    <header>
-      <div class="container header-container">
-        <div class="logo">
-          <a href="index.html" aria-label="Inicio">
-            <img src="img/logo-principal.webp" alt="Logo" class="logo-img"
-          /></a>
-        </div>
-        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
-          <i class="fas fa-bars"></i>
-        </div>
-        <nav>
-          <ul class="nav-menu">
-            <li>
-              <a href="blog.html" style="color: #10214b; font-weight: bold"
-                ><i class="fas fa-arrow-left"></i> Volver a Herramientas</a
-              >
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </header>
 
     <section class="bg-light" style="padding: 40px 0">
       <div class="container">
@@ -599,7 +308,7 @@
             Calculadora de Prima de Servicios
           </h1>
           <p style="color: #666; max-width: 600px; margin: 0 auto">
-            Cálculo oficial con desglose semestral según el Art. 306 del CST.
+            CÃ¡lculo oficial con desglose semestral segÃºn el Art. 306 del CST.
           </p>
         </div>
 
@@ -692,7 +401,7 @@
                         id="boxValorAuxilio"
                         style="display: none; margin-top: 10px"
                       >
-                        <small>Ingrese valor del Auxilio del año actual:</small>
+                        <small>Ingrese valor del Auxilio del aÃ±o actual:</small>
                         <div class="input-group">
                           <i class="fas fa-bus input-icon"></i>
                           <input
@@ -718,7 +427,7 @@
             <div class="result-header">
               <div>
                 <h3 style="margin: 0; font-size: 1.2rem">
-                  Liquidación Detallada
+                  LiquidaciÃ³n Detallada
                 </h3>
                 <small id="periodoTexto" style="opacity: 0.8"
                   >Periodo: -- a --</small
@@ -750,8 +459,8 @@
                   <span id="resBase">$0</span>
                 </div>
                 <div class="result-item">
-                  <label>Días Totales Trabajados</label>
-                  <span id="resDias" style="color: #10214b">0 días</span>
+                  <label>DÃ­as Totales Trabajados</label>
+                  <span id="resDias" style="color: #10214b">0 dÃ­as</span>
                 </div>
               </div>
 
@@ -791,7 +500,7 @@
                   "
                 >
                   <i class="fas fa-info-circle"></i> <strong>Nota:</strong> Si
-                  el periodo abarca ambos semestres, aquí ve el valor
+                  el periodo abarca ambos semestres, aquÃ­ ve el valor
                   correspondiente a cada corte (30 Jun / 30 Dic).
                 </p>
               </div>
@@ -803,11 +512,11 @@
             </div>
 
             <a
-              href="https://wa.me/573217927495?text=Hola%20Tu%20Abogado%20Laboral,%20calculé%20mi%20prima%20y%20el%20valor%20no%20coincide%20con%20lo%20que%20me%20pagaron."
+              href="https://wa.me/573217927495?text=Hola%20Tu%20Abogado%20Laboral,%20calculÃ©%20mi%20prima%20y%20el%20valor%20no%20coincide%20con%20lo%20que%20me%20pagaron."
               target="_blank"
               class="cta-whatsapp"
             >
-              <i class="fab fa-whatsapp"></i> ¿No le pagaron lo correcto?
+              <i class="fab fa-whatsapp"></i> Â¿No le pagaron lo correcto?
               Contactar a Tu Abogado Laboral
             </a>
           </div>
@@ -820,8 +529,8 @@
               margin-top: 20px;
             "
           >
-            * Esta herramienta es informativa. Los cálculos pueden variar por
-            novedades de nómina (incapacidades, suspensiones) no incluidas aquí.
+            * Esta herramienta es informativa. Los cÃ¡lculos pueden variar por
+            novedades de nÃ³mina (incapacidades, suspensiones) no incluidas aquÃ­.
           </p>
         </div>
       </div>
@@ -846,13 +555,13 @@
           <strong style="color: #10214b">Aviso Legal:</strong>
           Esta herramienta realiza proyecciones basadas en la normativa laboral
           vigente en Colombia. Los resultados son
-          <strong>aproximaciones ilustrativas</strong> y pueden variar según
+          <strong>aproximaciones ilustrativas</strong> y pueden variar segÃºn
           convenciones colectivas o interpretaciones judiciales. El uso de este
-          simulador no crea una relación abogado-cliente ni sustituye una
-          liquidación oficial.
+          simulador no crea una relaciÃ³n abogado-cliente ni sustituye una
+          liquidaciÃ³n oficial.
           <span style="display: block; margin-top: 5px; font-style: italic">
             Tu Abogado Laboral no se hace responsable por decisiones tomadas
-            basándose exclusivamente en estos datos.
+            basÃ¡ndose exclusivamente en estos datos.
           </span>
         </p>
       </div>
@@ -865,7 +574,7 @@
           <div class="footer-col">
             <div class="footer-logo">Tu Abogado <span>Laboral</span></div>
             <p style="color: #ccc; margin-bottom: 20px; font-size: 0.9rem">
-              Defensa experta y estratégica en Derecho Laboral y Pensional.
+              Defensa experta y estratÃ©gica en Derecho Laboral y Pensional.
               Barranquilla, Colombia.
             </p>
             <div class="social-icons-footer">
@@ -891,11 +600,11 @@
           </div>
 
           <div class="footer-col links-col">
-            <h4>Enlaces Rápidos</h4>
+            <h4>Enlaces RÃ¡pidos</h4>
             <ul>
               <li><a href="index.html">Inicio</a></li>
               <li><a href="nosotros.html">Sobre Nosotros</a></li>
-              <li><a href="servicios.html">Áreas de Práctica</a></li>
+              <li><a href="servicios.html">Ãreas de PrÃ¡ctica</a></li>
               <li><a href="blog.html">Herramientas</a></li>
               <li>
                 <a href="contacto.html" class="active-footer">Agendar Cita</a>
@@ -921,9 +630,9 @@
       </div>
       <div class="footer-bottom">
         <div class="container copyright-flex">
-          <p>© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
+          <p>Â© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
           <a href="politica-privacidad.html" class="privacy-link"
-            >Política de Privacidad</a
+            >PolÃ­tica de Privacidad</a
           >
         </div>
       </div>
@@ -950,7 +659,7 @@
         maximumFractionDigits: 0,
       });
 
-      // CALCULO DÍAS 360 (Entre dos fechas específicas)
+      // CALCULO DÃAS 360 (Entre dos fechas especÃ­ficas)
       function calcularDias360(fechaInicio, fechaFin) {
         let inicio = new Date(fechaInicio);
         let fin = new Date(fechaFin);
@@ -1008,9 +717,9 @@
           inicio.setMinutes(inicio.getMinutes() + inicio.getTimezoneOffset());
           fin.setMinutes(fin.getMinutes() + fin.getTimezoneOffset());
 
-          // LÓGICA DE DESGLOSE SEMESTRAL
-          // Definimos el corte del primer semestre del año de inicio
-          // (Asumimos cálculo dentro de un año o cruzando a lo sumo 1 año para simplicidad web)
+          // LÃ“GICA DE DESGLOSE SEMESTRAL
+          // Definimos el corte del primer semestre del aÃ±o de inicio
+          // (Asumimos cÃ¡lculo dentro de un aÃ±o o cruzando a lo sumo 1 aÃ±o para simplicidad web)
           let anio = inicio.getFullYear();
           let corteSemestre1 = new Date(anio, 5, 30); // 30 de Junio (Mes 5 es Junio)
 
@@ -1021,7 +730,7 @@
           if (fin <= corteSemestre1) {
             diasSem1 = calcularDias360(fechaInicioStr, fechaFinStr);
           }
-          // CASO 2: Todo en Semestre 2 (Inicio después de 30 Jun)
+          // CASO 2: Todo en Semestre 2 (Inicio despuÃ©s de 30 Jun)
           else if (inicio > corteSemestre1) {
             diasSem2 = calcularDias360(fechaInicioStr, fechaFinStr);
           }
@@ -1039,7 +748,7 @@
 
           let diasTotales = diasSem1 + diasSem2;
 
-          // FORMULA PRIMA: (Base * Días) / 360
+          // FORMULA PRIMA: (Base * DÃ­as) / 360
           let baseLiquidacion = salario + otros + valorAuxilioDigitado;
 
           let valorSem1 = (baseLiquidacion * diasSem1) / 360;
@@ -1050,7 +759,7 @@
           document.getElementById("resBase").textContent =
             formatoPeso.format(baseLiquidacion);
           document.getElementById("resDias").textContent =
-            diasTotales + " días";
+            diasTotales + " dÃ­as";
           document.getElementById("periodoTexto").textContent =
             "Periodo: " + fechaInicioStr + " a " + fechaFinStr;
 
@@ -1064,7 +773,7 @@
           document.getElementById("valTotal").textContent =
             formatoPeso.format(total);
 
-          // ANIMACIÓN
+          // ANIMACIÃ“N
           let resultCard = document.getElementById("resultCard");
           resultCard.style.display = "block";
           resultCard.scrollIntoView({ behavior: "smooth" });
@@ -1074,7 +783,7 @@
       href="https://wa.me/573217927495"
       class="whatsapp-btn"
       target="_blank"
-      title="Contáctanos por WhatsApp"
+      title="ContÃ¡ctanos por WhatsApp"
       aria-label="Contactar por WhatsApp"
     >
       <i class="fab fa-whatsapp"></i>
