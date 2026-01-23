@@ -1,9 +1,9 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Seguridad: CSP BÃ¡sico -->
+    <!-- Seguridad: CSP Básico -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
 
     <title>
@@ -17,7 +17,7 @@
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"
     />
     <style>
       /* --- ESTILOS BASE --- */
@@ -236,12 +236,12 @@
         font-weight: bold;
         margin-left: 5px;
       }
-      /* --- CORRECCIÃ“N MENÃš QUIRÃšRGICA PARA MÃ“VILES --- */
+      /* --- CORRECCIÓN MENÚ QUIRÚRGICA PARA MÓVILES --- */
       @media (max-width: 768px) {
         header .header-container {
-          position: relative; /* Referencia de posiciÃ³n */
+          position: relative; /* Referencia de posición */
         }
-        /* 1. PosiciÃ³n Extrema Derecha y Color Azul */
+        /* 1. Posición Extrema Derecha y Color Azul */
         header .menu-toggle {
           position: absolute !important;
           right: 20px !important;
@@ -254,7 +254,7 @@
           cursor: pointer;
         }
 
-        /* 2. MenÃº Desplegable (Fondo Blanco) */
+        /* 2. Menú Desplegable (Fondo Blanco) */
         header nav ul.nav-menu {
           display: none;
           flex-direction: column;
@@ -283,7 +283,7 @@
     <div class="top-bar">
       <div class="container">
         <div class="info">
-          Herramientas JurÃ­dicas Gratuitas | Tu Abogado Laboral
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
         </div>
       </div>
     </div>
@@ -294,7 +294,7 @@
             <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55"
           /></a>
         </div>
-        <div class="menu-toggle" id="mobile-menu" aria-label="MenÃº principal" role="button" tabindex="0">
+        <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
           <i class="fas fa-bars"></i>
         </div>
         <nav>
@@ -318,7 +318,7 @@
             Calculadora de Costos para Empleador
           </h1>
           <p style="color: #666">
-            Calcule el costo real de nÃ³mina incluyendo prestaciones, seguridad
+            Calcule el costo real de nómina incluyendo prestaciones, seguridad
             social y parafiscales.
           </p>
         </div>
@@ -336,7 +336,7 @@
             >
               <label
                 style="font-size: 0.9rem; color: #10214b; font-weight: bold"
-                ><i class="fas fa-briefcase"></i> Datos de ContrataciÃ³n y
+                ><i class="fas fa-briefcase"></i> Datos de Contratación y
                 Riesgos</label
               >
 
@@ -360,17 +360,17 @@
                         Nivel III (2.436%) - Riesgo medio
                       </option>
                       <option value="0.04350">
-                        Nivel IV (4.350%) - Transporte/QuÃ­micos
+                        Nivel IV (4.350%) - Transporte/Químicos
                       </option>
                       <option value="0.06960">
-                        Nivel V (6.960%) - ConstrucciÃ³n/MinerÃ­a
+                        Nivel V (6.960%) - Construcción/Minería
                       </option>
                     </select>
                   </div>
                 </div>
 
                 <div class="form-group" style="grid-column: span 2">
-                  <label>Beneficio Tributario (ExoneraciÃ³n Aportes)</label>
+                  <label>Beneficio Tributario (Exoneración Aportes)</label>
                   <div class="input-group">
                     <i class="fas fa-hand-holding-usd input-icon"></i>
                     <select
@@ -413,7 +413,7 @@
                       id="checkAux"
                       style="width: 18px; height: 18px; accent-color: #10214b"
                     />
-                    <span>Â¿Paga Auxilio?</span>
+                    <span>¿Paga Auxilio?</span>
                   </div>
                   <div
                     id="inputAuxContainer"
@@ -488,7 +488,7 @@
                     color: #10214b;
                   "
                 >
-                  <strong>Total NÃ³mina:</strong>
+                  <strong>Total Nómina:</strong>
                   <strong id="resNominaBasica">$0</strong>
                 </div>
               </div>
@@ -497,11 +497,11 @@
                 Provisiones Prestaciones:
               </h5>
               <div class="item-row">
-                <label>CesantÃ­as (8.33%):</label
+                <label>Cesantías (8.33%):</label
                 ><span id="resCesantias">$0</span>
               </div>
               <div class="item-row">
-                <label>Int. CesantÃ­as (1%):</label
+                <label>Int. Cesantías (1%):</label
                 ><span id="resIntereses">$0</span>
               </div>
               <div class="item-row">
@@ -531,7 +531,7 @@
                 <span id="resSalud">$0</span>
               </div>
               <div class="item-row">
-                <label>PensiÃ³n (12%):</label>
+                <label>Pensión (12%):</label>
                 <span id="resPension">$0</span>
               </div>
               <div class="item-row">
@@ -555,7 +555,7 @@
                 "
               >
                 * Nota: El empleado aporta un 4% adicional a Salud y 4% a
-                PensiÃ³n, que se descuentan de su nÃ³mina, no son costo extra
+                Pensión, que se descuentan de su nómina, no son costo extra
                 empresa.
               </p>
             </div>
@@ -592,7 +592,7 @@
             <div>
               <div class="total-label">COSTO TOTAL PARA LA EMPRESA</div>
               <small style="opacity: 0.7"
-                >(NÃ³mina + Prestaciones + SS + Parafiscales)</small
+                >(Nómina + Prestaciones + SS + Parafiscales)</small
               >
             </div>
             <div class="total-value" id="valGranTotal">$0</div>
@@ -607,7 +607,7 @@
             color: #888;
           "
         >
-          * CÃ¡lculo de provisiones basado en dÃ­as calendario (30). La base de
+          * Cálculo de provisiones basado en días calendario (30). La base de
           vacaciones excluye auxilio de transporte.
         </p>
       </div>
@@ -632,13 +632,13 @@
           <strong style="color: #10214b">Aviso Legal:</strong>
           Esta herramienta realiza proyecciones basadas en la normativa laboral
           vigente en Colombia. Los resultados son
-          <strong>aproximaciones ilustrativas</strong> y pueden variar segÃºn
+          <strong>aproximaciones ilustrativas</strong> y pueden variar según
           convenciones colectivas o interpretaciones judiciales. El uso de este
-          simulador no crea una relaciÃ³n abogado-cliente ni sustituye una
-          liquidaciÃ³n oficial.
+          simulador no crea una relación abogado-cliente ni sustituye una
+          liquidación oficial.
           <span style="display: block; margin-top: 5px; font-style: italic">
             Tu Abogado Laboral no se hace responsable por decisiones tomadas
-            basÃ¡ndose exclusivamente en estos datos.
+            basándose exclusivamente en estos datos.
           </span>
         </p>
       </div>
@@ -651,7 +651,7 @@
           <div class="footer-col">
             <div class="footer-logo">Tu Abogado <span>Laboral</span></div>
             <p style="color: #ccc; margin-bottom: 20px; font-size: 0.9rem">
-              Defensa experta y estratÃ©gica en Derecho Laboral y Pensional.
+              Defensa experta y estratégica en Derecho Laboral y Pensional.
               Barranquilla, Colombia.
             </p>
             <div class="social-icons-footer">
@@ -677,11 +677,11 @@
           </div>
 
           <div class="footer-col links-col">
-            <h4>Enlaces RÃ¡pidos</h4>
+            <h4>Enlaces Rápidos</h4>
             <ul>
               <li><a href="index.html">Inicio</a></li>
               <li><a href="nosotros.html">Sobre Nosotros</a></li>
-              <li><a href="servicios.html">Ãreas de PrÃ¡ctica</a></li>
+              <li><a href="servicios.html">Áreas de Práctica</a></li>
               <li><a href="blog.html">Herramientas</a></li>
               <li>
                 <a href="contacto.html" class="active-footer">Agendar Cita</a>
@@ -707,9 +707,9 @@
       </div>
       <div class="footer-bottom">
         <div class="container copyright-flex">
-          <p>Â© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
+          <p>© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
           <a href="politica-privacidad.html" class="privacy-link"
-            >PolÃ­tica de Privacidad</a
+            >Política de Privacidad</a
           >
         </div>
       </div>
@@ -739,7 +739,7 @@
         maximumFractionDigits: 0,
       });
 
-      // 2. LÃ“GICA DE CÃLCULO
+      // 2. LÓGICA DE CÁLCULO
       document
         .getElementById("costosForm")
         .addEventListener("submit", function (e) {
@@ -756,7 +756,7 @@
           let porcentajeARL = parseFloat(
             document.getElementById("nivelArl").value,
           );
-          // LÃ³gica simplificada: Si value es "si", es true. Si es "no", es false.
+          // Lógica simplificada: Si value es "si", es true. Si es "no", es false.
           let exonerado =
             document.getElementById("selectExonerado").value === "si";
 
@@ -765,9 +765,9 @@
           let basePrestacional = baseSalarial + valorAuxilio;
           let ibc = baseSalarial;
 
-          // C. CÃLCULOS
+          // C. CÁLCULOS
 
-          // 1. NÃ³mina BÃ¡sica
+          // 1. Nómina Básica
           let nominaBasica = basePrestacional;
 
           // 2. Provisiones Prestaciones
@@ -872,7 +872,7 @@
       href="https://wa.me/573217927495"
       class="whatsapp-btn"
       target="_blank"
-      title="ContÃ¡ctanos por WhatsApp"
+      title="Contáctanos por WhatsApp"
     >
       <i class="fab fa-whatsapp"></i>
     </a>

@@ -1,16 +1,16 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Seguridad: CSP BÃ¡sico -->
+    <!-- Seguridad: CSP Básico -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
 
     <title>Calculadora de Incapacidades Laborales | Tu Abogado Laboral</title>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
     <meta
       name="description"
-      content="Liquidador de incapacidades 2026. Calcula pagos por EPS, ARL y Empleador con validaciÃ³n de prÃ³rrogas y piso legal."
+      content="Liquidador de incapacidades 2026. Calcula pagos por EPS, ARL y Empleador con validación de prórrogas y piso legal."
     />
 
     <link rel="stylesheet" href="css/style.css" />
@@ -21,7 +21,7 @@
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"
     />
 
     <style>
@@ -32,7 +32,7 @@
     <div class="top-bar">
       <div class="container">
         <div class="info">
-          Herramientas JurÃ­dicas Gratuitas | Tu Abogado Laboral
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
         </div>
       </div>
     </div>
@@ -46,7 +46,7 @@
         <div
           class="menu-toggle"
           id="mobile-menu"
-          aria-label="MenÃº principal"
+          aria-label="Menú principal"
           role="button"
           tabindex="0"
         >
@@ -73,7 +73,7 @@
             Calculadora de Incapacidades
           </h1>
           <p style="color: #666">
-            Liquide correctamente enfermedad general, laboral y prÃ³rrogas
+            Liquide correctamente enfermedad general, laboral y prórrogas
             (Vigencia 2026).
           </p>
         </div>
@@ -99,7 +99,7 @@
                   font-weight: bold;
                   color: #10214b;
                 "
-                >ParÃ¡metros SMLV:</small
+                >Parámetros SMLV:</small
               >
               <div style="display: flex; align-items: center; gap: 5px">
                 <label style="margin: 0; font-size: 0.8rem">SMMLV</label>
@@ -140,7 +140,7 @@
                   <i class="fas fa-file-medical input-icon"></i>
                   <select id="tipoIncapacidad" class="form-control">
                     <option value="comun">
-                      Enfermedad General / Accidente ComÃºn
+                      Enfermedad General / Accidente Común
                     </option>
                     <option value="laboral">
                       Accidente de Trabajo / Enfermedad Laboral
@@ -152,7 +152,7 @@
 
             <div class="form-grid-2" style="margin-top: 20px">
               <div class="form-group">
-                <label>DÃ­as de Incapacidad (Actual)</label>
+                <label>Días de Incapacidad (Actual)</label>
                 <div class="input-group">
                   <i class="far fa-clock input-icon"></i>
                   <input
@@ -165,7 +165,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <label>DÃ­as Acumulados (PrÃ³rroga)</label>
+                <label>Días Acumulados (Prórroga)</label>
                 <div class="input-group">
                   <i class="fas fa-history input-icon"></i>
                   <input
@@ -176,14 +176,14 @@
                   />
                 </div>
                 <small style="font-size: 0.75rem"
-                  >Si es continuaciÃ³n de una anterior, ingrese cuÃ¡ntos dÃ­as
+                  >Si es continuación de una anterior, ingrese cuántos días
                   lleva. Si es nueva, deje en 0.</small
                 >
               </div>
             </div>
 
             <button type="submit" id="btnCalcular" class="btn-calculate">
-              <i class="fas fa-calculator"></i> Calcular PrestaciÃ³n
+              <i class="fas fa-calculator"></i> Calcular Prestación
             </button>
           </form>
         </div>
@@ -193,7 +193,7 @@
             <div class="result-header">
               <div>
                 <h3 style="margin: 0; font-size: 1.3rem">
-                  LiquidaciÃ³n de Incapacidad
+                  Liquidación de Incapacidad
                 </h3>
                 <small style="opacity: 0.9"
                   >Detalle de pagos y responsables</small
@@ -216,7 +216,7 @@
                   <label>IBC:</label><span id="resIBC">--</span>
                 </div>
                 <div class="input-item">
-                  <label>DÃ­as a Pagar:</label><span id="resDias">--</span>
+                  <label>Días a Pagar:</label><span id="resDias">--</span>
                 </div>
               </div>
 
@@ -233,7 +233,7 @@
                 <thead>
                   <tr>
                     <th>Entidad Responsable</th>
-                    <th style="text-align: center">DÃ­as</th>
+                    <th style="text-align: center">Días</th>
                     <th>Detalle</th>
                     <th style="text-align: right">Valor</th>
                   </tr>
@@ -262,7 +262,7 @@
                 "
               >
                 <i class="fas fa-exclamation-triangle"></i> Durante la
-                incapacidad, se debe cotizar Salud y PensiÃ³n sobre el valor
+                incapacidad, se debe cotizar Salud y Pensión sobre el valor
                 recibido.
               </div>
               <table class="simple-table">
@@ -274,7 +274,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <td>Aporte PensiÃ³n (4%)</td>
+                    <td>Aporte Pensión (4%)</td>
                     <td
                       id="resPension"
                       style="text-align: right; color: #c62828"
@@ -299,8 +299,8 @@
                 color: #999;
               "
             >
-              * CÃ¡lculo basado en Art. 227 CST, Ley 776/2002 y Sentencia
-              C-543/2007 (Piso MÃ­nimo).
+              * Cálculo basado en Art. 227 CST, Ley 776/2002 y Sentencia
+              C-543/2007 (Piso Mínimo).
             </p>
           </div>
 
@@ -318,7 +318,7 @@
           <div class="footer-col">
             <div class="footer-logo">Tu Abogado <span>Laboral</span></div>
             <p style="color: #ccc; margin-bottom: 20px; font-size: 0.9rem">
-              Defensa experta y estratÃ©gica en Derecho Laboral y Pensional.
+              Defensa experta y estratégica en Derecho Laboral y Pensional.
               Barranquilla, Colombia.
             </p>
             <div class="social-icons-footer">
@@ -344,11 +344,11 @@
           </div>
 
           <div class="footer-col links-col">
-            <h4>Enlaces RÃ¡pidos</h4>
+            <h4>Enlaces Rápidos</h4>
             <ul>
               <li><a href="index.html">Inicio</a></li>
               <li><a href="nosotros.html">Sobre Nosotros</a></li>
-              <li><a href="servicios.html">Ãreas de PrÃ¡ctica</a></li>
+              <li><a href="servicios.html">Áreas de Práctica</a></li>
               <li><a href="blog.html">Herramientas</a></li>
               <li>
                 <a href="contacto.html" class="active-footer">Agendar Cita</a>
@@ -374,9 +374,9 @@
       </div>
       <div class="footer-bottom">
         <div class="container copyright-flex">
-          <p>Â© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
+          <p>© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
           <a href="politica-privacidad.html" class="privacy-link"
-            >PolÃ­tica de Privacidad</a
+            >Política de Privacidad</a
           >
         </div>
       </div>

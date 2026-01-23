@@ -1,12 +1,12 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Seguridad: CSP BÃ¡sico -->
+    <!-- Seguridad: CSP Básico -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
 
-    <title>Calculadora de LiquidaciÃ³n PRO | Tu Abogado Laboral</title>
+    <title>Calculadora de Liquidación PRO | Tu Abogado Laboral</title>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link
@@ -15,7 +15,7 @@
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="css/style.css" />
@@ -24,7 +24,7 @@
     <div class="top-bar">
       <div class="container">
         <div class="info">
-          Herramientas JurÃ­dicas Gratuitas | Tu Abogado Laboral
+          Herramientas Jurídicas Gratuitas | Tu Abogado Laboral
         </div>
       </div>
     </div>
@@ -38,7 +38,7 @@
         <div
           class="menu-toggle"
           id="mobile-menu"
-          aria-label="MenÃº principal"
+          aria-label="Menú principal"
           role="button"
           tabindex="0"
         >
@@ -68,11 +68,11 @@
               margin-bottom: 10px;
             "
           >
-            Calculadora de LiquidaciÃ³n PRO
+            Calculadora de Liquidación PRO
           </h1>
           <p style="color: #666">
-            CÃ¡lculo exacto con
-            <strong>Promedios EspecÃ­ficos por PrestaciÃ³n</strong> (Art 253 CST).
+            Cálculo exacto con
+            <strong>Promedios Específicos por Prestación</strong> (Art 253 CST).
           </p>
         </div>
 
@@ -121,8 +121,8 @@
               <div class="form-group">
                 <label>Tipo de Contrato</label>
                 <select id="tipoContrato" class="form-control">
-                  <option value="indefinido">TÃ©rmino Indefinido</option>
-                  <option value="fijo">TÃ©rmino Fijo</option>
+                  <option value="indefinido">Término Indefinido</option>
+                  <option value="fijo">Término Fijo</option>
                   <option value="obra">Obra o Labor</option>
                 </select>
               </div>
@@ -163,8 +163,8 @@
             </div>
             <div class="period-body">
               <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px">
-                Ingrese cada cambio de salario. El sistema usarÃ¡ estos datos
-                para calcular la base exacta de cada prestaciÃ³n segÃºn su
+                Ingrese cada cambio de salario. El sistema usará estos datos
+                para calcular la base exacta de cada prestación según su
                 periodo.
               </p>
 
@@ -206,7 +206,7 @@
                 <thead>
                   <tr>
                     <th>Periodo</th>
-                    <th>DÃ­as Calc.</th>
+                    <th>Días Calc.</th>
                     <th>Salario Mes</th>
                     <th></th>
                   </tr>
@@ -222,16 +222,16 @@
           >
             <h3 class="section-title">
               <i class="fas fa-calendar-alt"></i> 2. Periodos a Liquidar
-              (EspecÃ­ficos)
+              (Específicos)
             </h3>
             <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px">
-              El sistema calcularÃ¡ el salario promedio
+              El sistema calculará el salario promedio
               <strong>exclusivamente dentro de estas fechas</strong> para cada
               concepto.
             </p>
             <div class="form-grid-3">
               <div class="form-group">
-                <label>CesantÃ­as Desde:</label
+                <label>Cesantías Desde:</label
                 ><input type="date" id="inicioCesantias" class="form-control" />
               </div>
               <div class="form-group">
@@ -268,14 +268,14 @@
                 readonly
               />
               <small
-                >Se toma automÃ¡ticamente del Ãºltimo periodo ingresado en el
+                >Se toma automáticamente del último periodo ingresado en el
                 historial.</small
               >
             </div>
           </div>
 
           <button type="submit" id="btnCalcular" class="btn-calculate">
-            <i class="fas fa-calculator"></i> Calcular LiquidaciÃ³n
+            <i class="fas fa-calculator"></i> Calcular Liquidación
           </button>
         </form>
 
@@ -289,10 +289,10 @@
                 onerror="this.style.display = 'none'"
               />
               <h2 style="color: var(--primary); margin: 0">
-                LIQUIDACIÃ“N FINAL DE CONTRATO
+                LIQUIDACIÓN FINAL DE CONTRATO
               </h2>
               <p style="color: #666; font-size: 0.9rem">
-                CÃ¡lculo de bases independientes por concepto
+                Cálculo de bases independientes por concepto
               </p>
             </div>
 
@@ -312,7 +312,7 @@
                   >
                 </div>
                 <div class="input-item">
-                  <label>Ãšltimo Salario:</label
+                  <label>Último Salario:</label
                   ><span id="rUltimoSalario">$0</span>
                 </div>
               </div>
@@ -333,8 +333,8 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td><strong>CesantÃ­as</strong></td>
-                    <td><span id="diasCesantias">0</span> dÃ­as</td>
+                    <td><strong>Cesantías</strong></td>
+                    <td><span id="diasCesantias">0</span> días</td>
                     <td style="font-size: 0.85rem">
                       <span id="baseCesantias">$0</span> <br /><small
                         style="color: #666"
@@ -350,11 +350,11 @@
                   </tr>
                   <tr>
                     <td>
-                      <strong>Intereses CesantÃ­as</strong><br /><small
+                      <strong>Intereses Cesantías</strong><br /><small
                         >12% proporcional</small
                       >
                     </td>
-                    <td><span id="diasIntereses">0</span> dÃ­as</td>
+                    <td><span id="diasIntereses">0</span> días</td>
                     <td>--</td>
                     <td
                       id="valIntereses"
@@ -365,7 +365,7 @@
                   </tr>
                   <tr>
                     <td><strong>Prima de Servicios</strong></td>
-                    <td><span id="diasPrima">0</span> dÃ­as</td>
+                    <td><span id="diasPrima">0</span> días</td>
                     <td style="font-size: 0.85rem">
                       <span id="basePrima">$0</span> <br /><small
                         style="color: #666"
@@ -381,7 +381,7 @@
                   </tr>
                   <tr>
                     <td><strong>Vacaciones</strong></td>
-                    <td><span id="diasVacaciones">0</span> dÃ­as</td>
+                    <td><span id="diasVacaciones">0</span> días</td>
                     <td style="font-size: 0.85rem">
                       <span id="baseVacaciones">$0</span> <br /><small
                         style="color: #c62828"
@@ -400,7 +400,7 @@
                     style="display: none; background: #fff3e0"
                   >
                     <td>
-                      <strong>IndemnizaciÃ³n Despido</strong><br /><small
+                      <strong>Indemnización Despido</strong><br /><small
                         style="color: #e65100"
                         id="descIndem"
                         >--</small
@@ -409,7 +409,7 @@
                     <td><span id="diasIndemnizacion">--</span></td>
                     <td style="font-size: 0.85rem">
                       <span id="baseIndem">$0</span> <br /><small
-                        >(Ãšltimo Salario)</small
+                        >(Último Salario)</small
                       >
                     </td>
                     <td
@@ -429,7 +429,7 @@
 
             <div class="report-section">
               <div class="report-header-strip">
-                Deducciones (SS Ãšltimo Periodo)
+                Deducciones (SS Último Periodo)
               </div>
               <table class="simple-table">
                 <tr>
@@ -439,7 +439,7 @@
                   </td>
                 </tr>
                 <tr>
-                  <td>PensiÃ³n (4%)</td>
+                  <td>Pensión (4%)</td>
                   <td id="dedPension" style="text-align: right; color: #c62828">
                     $0
                   </td>
@@ -488,7 +488,7 @@
       >
         <p style="margin: 0">
           <strong style="color: #10214b">Aviso Legal:</strong> Herramienta de
-          simulaciÃ³n. No reemplaza liquidaciÃ³n oficial.
+          simulación. No reemplaza liquidación oficial.
         </p>
       </div>
     </div>
@@ -500,7 +500,7 @@
           <div class="footer-col">
             <div class="footer-logo">Tu Abogado <span>Laboral</span></div>
             <p style="color: #ccc; margin-bottom: 20px; font-size: 0.9rem">
-              Defensa experta y estratÃ©gica en Derecho Laboral y Pensional.
+              Defensa experta y estratégica en Derecho Laboral y Pensional.
               Barranquilla, Colombia.
             </p>
             <div class="social-icons-footer">
@@ -526,11 +526,11 @@
           </div>
 
           <div class="footer-col links-col">
-            <h4>Enlaces RÃ¡pidos</h4>
+            <h4>Enlaces Rápidos</h4>
             <ul>
               <li><a href="index.html">Inicio</a></li>
               <li><a href="nosotros.html">Sobre Nosotros</a></li>
-              <li><a href="servicios.html">Ãreas de PrÃ¡ctica</a></li>
+              <li><a href="servicios.html">Áreas de Práctica</a></li>
               <li><a href="blog.html">Herramientas</a></li>
               <li>
                 <a href="contacto.html" class="active-footer">Agendar Cita</a>
@@ -556,9 +556,9 @@
       </div>
       <div class="footer-bottom">
         <div class="container copyright-flex">
-          <p>Â© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
+          <p>© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
           <a href="politica-privacidad.html" class="privacy-link"
-            >PolÃ­tica de Privacidad</a
+            >Política de Privacidad</a
           >
         </div>
       </div>
@@ -592,7 +592,7 @@
         html2pdf().set(opt).from(element).save();
       }
 
-      // --- ENGINE DE FECHAS (360 DÃ­as Laborales) ---
+      // --- ENGINE DE FECHAS (360 Días Laborales) ---
       function calcularDias360(f1Str, f2Str) {
         if (!f1Str || !f2Str) return 0;
         const f1 = new Date(f1Str + "T00:00:00");
@@ -610,8 +610,8 @@
       }
 
       // --- ENGINE DE PROMEDIOS SALARIALES ---
-      // Esta funciÃ³n es el corazÃ³n del ajuste. Calcula el salario promedio ponderado
-      // SOLO dentro del rango de fechas que le pidas (ej: solo el Ãºltimo semestre).
+      // Esta función es el corazón del ajuste. Calcula el salario promedio ponderado
+      // SOLO dentro del rango de fechas que le pidas (ej: solo el último semestre).
       function obtenerPromedioEnRango(
         fechaInicioRango,
         fechaFinRango,
@@ -622,7 +622,7 @@
         let sumaSalarios = 0;
         let diasTotalesRango = 0;
 
-        // Convertir strings a Dates para comparaciÃ³n
+        // Convertir strings a Dates para comparación
         const rangoIni = new Date(fechaInicioRango + "T00:00:00");
         const rangoFin = new Date(fechaFinRango + "T00:00:00");
 
@@ -630,14 +630,14 @@
           const pIni = new Date(p.ini + "T00:00:00");
           const pFin = new Date(p.fin + "T00:00:00");
 
-          // Verificar IntersecciÃ³n de Periodos
-          // El periodo debe terminar despuÃ©s de que el rango empiece Y empezar antes de que el rango termine
+          // Verificar Intersección de Periodos
+          // El periodo debe terminar después de que el rango empiece Y empezar antes de que el rango termine
           if (pFin >= rangoIni && pIni <= rangoFin) {
-            // Determinar los lÃ­mites reales de la intersecciÃ³n
+            // Determinar los límites reales de la intersección
             const inicioReal = pIni < rangoIni ? rangoIni : pIni;
             const finReal = pFin > rangoFin ? rangoFin : pFin;
 
-            // Calcular dÃ­as de ese fragmento
+            // Calcular días de ese fragmento
             const diasFragmento = calcularDias360(
               inicioReal.toISOString().split("T")[0],
               finReal.toISOString().split("T")[0],
@@ -733,7 +733,7 @@
       domMotivo.addEventListener("change", checkUI);
       domTipo.addEventListener("change", checkUI);
 
-      // --- CÃLCULO INDEMNIZACIÃ“N ---
+      // --- CÁLCULO INDEMNIZACIÓN ---
       function calcularIndemnizacion(
         tipo,
         salarioBase,
@@ -795,10 +795,10 @@
             const iniCes = document.getElementById("inicioCesantias").value;
             const iniPri = document.getElementById("inicioPrima").value;
             const iniVac = document.getElementById("inicioVacaciones").value;
-            // Fecha inicio total para indemnizaciÃ³n y datos generales
+            // Fecha inicio total para indemnización y datos generales
             const iniTotal = periodos[0].ini;
 
-            // 2. CALCULAR PROMEDIOS ESPECÃFICOS (AquÃ­ estÃ¡ la correcciÃ³n clave)
+            // 2. CALCULAR PROMEDIOS ESPECÍFICOS (Aquí está la corrección clave)
             const salarioPromedioCes = obtenerPromedioEnRango(
               iniCes,
               fRetiro,
@@ -815,7 +815,7 @@
               periodos,
             );
 
-            // Ãšltimo salario (para indemnizaciÃ³n y deducciones)
+            // Último salario (para indemnización y deducciones)
             const ultimoSalario = periodos[periodos.length - 1].sal;
 
             // 3. DETERMINAR BASES CON AUXILIO
@@ -842,7 +842,7 @@
             const valPri = (basePri * diasPri) / 360;
             const valVac = (baseVac * diasVac) / 720;
 
-            // IndemnizaciÃ³n (Base Ãšltimo Salario)
+            // Indemnización (Base Último Salario)
             let valIndem = 0;
             if (domMotivo.value === "injusta") {
               document.getElementById("rowIndemnizacion").style.display =
@@ -867,8 +867,8 @@
 
             const subtotal = valCes + valInt + valPri + valVac + valIndem;
 
-            // Deducciones (Sobre Ãºltimo salario real proporcional al mes de retiro)
-            // Asumimos mes de 30 dÃ­as para la proporciÃ³n de seguridad social de salida
+            // Deducciones (Sobre último salario real proporcional al mes de retiro)
+            // Asumimos mes de 30 días para la proporción de seguridad social de salida
             const dateRetiro = new Date(fRetiro);
             const diaRetiro =
               dateRetiro.getDate() === 31 ? 30 : dateRetiro.getDate();
