@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
         header.classList.toggle("scrolled", window.scrollY > 50);
       });
     },
-    { passive: true }
+    { passive: true },
   );
 
   // =======================================================
@@ -92,5 +92,41 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
     });
+  }
+
+  // =======================================================
+  // 4. NUEVO CÓDIGO (MAPA DEFERRIDO / FACADE)
+  // =======================================================
+  const mapPlaceholder = document.getElementById("map-placeholder");
+
+  if (mapPlaceholder) {
+    // Función para cargar el mapa
+    const loadMap = function () {
+      // URL del iframe
+      const iframeSrc =
+        "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.368013011745!2d-74.79042732416668!3d11.01100115481986!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8ef42d7455555555%3A0x5555555555555555!2sCl.%2039%20%2343-123%2C%20Barranquilla%2C%20Atl%C3%A1ntico%2C%20Colombia!5e0!3m2!1ses!2sco!4v1708547000000!5m2!1ses!2sco";
+
+      // Crear iframe
+      const iframe = document.createElement("iframe");
+      iframe.setAttribute("src", iframeSrc);
+      iframe.setAttribute("width", "100%");
+      iframe.setAttribute("height", "100%");
+      iframe.setAttribute("style", "border:0;");
+      iframe.setAttribute("allowfullscreen", "");
+      iframe.setAttribute("loading", "lazy");
+      iframe.setAttribute("title", "Mapa de ubicación Tu Abogado Laboral");
+
+      // Limpiar placeholder y agregar iframe
+      mapPlaceholder.innerHTML = "";
+      mapPlaceholder.style.backgroundImage = "none";
+      mapPlaceholder.style.cursor = "default";
+      mapPlaceholder.appendChild(iframe);
+
+      // Remover listener para que no se ejecute de nuevo
+      mapPlaceholder.removeEventListener("click", loadMap);
+    };
+
+    // Agregar listener al clic
+    mapPlaceholder.addEventListener("click", loadMap);
   }
 });
