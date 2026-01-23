@@ -1913,6 +1913,7 @@ select.form-control {
   margin-bottom: 20px;
   text-transform: uppercase;
   letter-spacing: 1px;
+  color: #ffffff;
 }
 .services-hero p {
   font-size: 1.2rem;
