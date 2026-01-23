@@ -44,9 +44,9 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Performance: display=swap añadido -->
+    <!-- Performance: display=optional para prevenir CLS estricto -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=optional"
       rel="stylesheet"
     />
     <link
@@ -235,6 +235,17 @@
     <!-- SEO Semántico: <main> envuelve el contenido principal -->
     <main>
       <section class="hero">
+        <!-- LCP Optimization: Imagen cargada directamente en DOM con alta prioridad -->
+        <img
+          src="img/hero-banner.webp"
+          alt="Abogados Laborales en Barranquilla"
+          class="hero-bg-image"
+          fetchpriority="high"
+          width="1920"
+          height="1080"
+        />
+        <!-- Overlay oscuro para legibilidad (manejado vía CSS o aquí si fuera necesario, pero usaremos CSS ::after en .hero) -->
+
         <div class="container hero-content text-center" style="margin: 0 auto">
           <span class="subtitle">Defensa Jurídica Experta</span>
           <h1>TU ABOGADO LABORAL <br />EN BARRANQUILLA</h1>

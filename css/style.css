@@ -117,10 +117,6 @@ header {
   position: relative;
 }
 
-.menu-toggle {
-  display: none; /* En computadora, el botón no se ve */
-}
-
 .logo-img {
   height: 55px;
   width: auto;
@@ -164,20 +160,38 @@ header {
    HERO SECTION
    ========================================= */
 .hero {
-  /* Degradado usando el azul primario de la paleta */
-  background:
-    linear-gradient(rgba(16, 33, 75, 0.85), rgba(16, 33, 75, 0.75)),
-    url("../img/hero-banner.webp");
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+  position: relative;
+  /* Eliminado background-image para LCP */
   height: 85vh;
   display: flex;
   align-items: center;
   color: var(--white);
   text-align: left;
-  position: relative;
   border-bottom: 5px solid var(--secondary);
+  overflow: hidden; /* Asegura que la imagen no se salga */
+}
+
+/* Imagen de fondo optimizada */
+.hero-bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* Overlay degradado (reemplaza el gradient anterior) */
+.hero::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(16, 33, 75, 0.85), rgba(16, 33, 75, 0.75));
+  z-index: 1;
 }
 
 .hero-content {
@@ -608,11 +622,17 @@ footer {
 
   /* 2. Botón Hamburguesa: Hacerlo visible */
   .menu-toggle {
-    display: block; /* Visible solo en móvil */
+    display: flex; /* Flex para centrar icono */
+    justify-content: center;
+    align-items: center;
     font-size: 1.8rem;
     cursor: pointer;
     color: var(--primary);
     z-index: 1001;
+    /* Accesibilidad: Área táctil mínima de 44x44px */
+    min-width: 44px;
+    min-height: 44px;
+    padding: 5px;
   }
 
   /* 3. Menú Cajón (Drawer): Oculto a la derecha */
@@ -700,11 +720,7 @@ textarea:focus {
   color: rgba(255, 255, 255, 0.85); /* Aumentado de 0.4 a 0.85 */
 }
 
-/* 3. MEJORA DE CONTRASTE EN FOOTER */
-/* El texto original era muy transparente (0.4), difícil de leer */
-.footer-bottom {
-  color: rgba(255, 255, 255, 0.85); /* Aumentado de 0.4 a 0.85 */
-}
+/* Bloque duplicado eliminado */
 
 /* 4. UTILIDAD PARA LECTORES DE PANTALLA (SEO SEMÁNTICO) */
 /* Usa la clase .sr-only para esconder texto visualmente pero que Google lo lea.
