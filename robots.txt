@@ -1,6 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /css/
-Disallow: /js/
-Disallow: /img/
+
 Sitemap: https://tuabogadolaboral.com.co/sitemap.xml
