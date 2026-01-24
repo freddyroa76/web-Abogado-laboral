@@ -2258,3 +2258,18 @@ select.form-control {
   opacity: 0.9;
   color: white;
 }
+/* =========================================
+   CLS FIX: INNER HERO STABILITY
+   ========================================= */
+.inner-hero {
+  position: relative;
+  min-height: 600px;
+  background-color: var(--primary); /* Fallback color prior to image load */
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .inner-hero {
+    min-height: 400px;
+  }
+}
