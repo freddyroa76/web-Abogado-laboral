@@ -49,48 +49,80 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // =======================================================
-  // 3. NUEVO CÓDIGO (MENÚ HAMBURGUESA - PASO 4)
+  // 3. OPTIMIZACIÓN MENÚ MÓVIL (A11Y + UX + PERFORMANCE)
   // =======================================================
-
-  // Seleccionamos los elementos creados en el HTML
   const menuToggle = document.getElementById("mobile-menu");
   const navMenu = document.querySelector(".nav-menu");
-  // Buscamos el ícono (<i>) dentro del botón para cambiarlo luego
-  const menuIcon = menuToggle ? menuToggle.querySelector("i") : null;
+  const body = document.body;
 
-  // Verificamos que existan para evitar errores
   if (menuToggle && navMenu) {
-    // A) Evento al hacer clic en el botón hamburguesa
-    menuToggle.addEventListener("click", function () {
-      // 1. Ponemos o quitamos la clase 'active' al menú (CSS hace el resto)
-      navMenu.classList.toggle("active");
+    // 3.1. Inyectar Overlay dinámicamente (Evita editar 19 HTMLs)
+    let overlay = document.querySelector(".menu-overlay");
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.className = "menu-overlay";
+      overlay.setAttribute("aria-hidden", "true"); // Decorativo para lectores
+      body.appendChild(overlay);
+    }
 
-      // 2. Cambiamos el dibujito del ícono (de Rayitas a X)
-      if (menuIcon) {
-        if (navMenu.classList.contains("active")) {
-          menuIcon.classList.remove("fa-bars");
-          menuIcon.classList.add("fa-times");
-        } else {
-          menuIcon.classList.remove("fa-times");
-          menuIcon.classList.add("fa-bars");
-        }
+    // 3.2. Configuración Inicial ARIA
+    menuToggle.setAttribute("aria-expanded", "false");
+    menuToggle.setAttribute("aria-controls", "nav-menu"); // ID que asignaremos al nav
+    navMenu.setAttribute("id", "nav-menu");
+
+    // Función para cerrar el menú
+    const closeMenu = () => {
+      navMenu.classList.remove("active");
+      overlay.classList.remove("active");
+      body.classList.remove("no-scroll");
+      menuToggle.setAttribute("aria-expanded", "false");
+
+      const icon = menuToggle.querySelector("i");
+      if (icon) {
+        icon.classList.remove("fa-times");
+        icon.classList.add("fa-bars");
+      }
+      menuToggle.focus(); // Retornar foco al botón
+    };
+
+    // Función para abrir el menú
+    const openMenu = () => {
+      navMenu.classList.add("active");
+      overlay.classList.add("active");
+      body.classList.add("no-scroll");
+      menuToggle.setAttribute("aria-expanded", "true");
+
+      const icon = menuToggle.querySelector("i");
+      if (icon) {
+        icon.classList.remove("fa-bars");
+        icon.classList.add("fa-times");
+      }
+      // Foco al primer enlace para accesibilidad
+      const firstLink = navMenu.querySelector("a");
+      if (firstLink) setTimeout(() => firstLink.focus(), 100);
+    };
+
+    // 3.3. Event Listeners
+    // Toggle Click
+    menuToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
+      isExpanded ? closeMenu() : openMenu();
+    });
+
+    // Clic en Overlay para cerrar
+    overlay.addEventListener("click", closeMenu);
+
+    // Tecla ESC para cerrar
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && navMenu.classList.contains("active")) {
+        closeMenu();
       }
     });
 
-    // B) Cerrar el menú automáticamente al tocar un enlace
-    // (Esto mejora la experiencia: el usuario elige una opción y el menú se quita)
-    const navLinks = document.querySelectorAll(".nav-menu a");
-    navLinks.forEach(function (link) {
-      link.addEventListener("click", function () {
-        if (navMenu.classList.contains("active")) {
-          navMenu.classList.remove("active");
-          // Devolvemos el ícono a su estado original (Rayitas)
-          if (menuIcon) {
-            menuIcon.classList.remove("fa-times");
-            menuIcon.classList.add("fa-bars");
-          }
-        }
-      });
+    // Cerrar al hacer clic en enlaces
+    navMenu.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", closeMenu);
     });
   }
 
