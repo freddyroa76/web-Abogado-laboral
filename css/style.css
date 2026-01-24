@@ -248,6 +248,11 @@ header {
   box-shadow: 0 4px 15px rgba(215, 189, 136, 0.3);
 }
 
+/* Ocultar botón hamburguesa en desktop (por defecto) */
+.menu-toggle {
+  display: none;
+}
+
 .btn-primary:hover {
   background-color: #c4aa76; /* Un poco más oscuro */
   transform: translateY(-3px);
@@ -743,7 +748,7 @@ footer {
     padding: 16px 10px;
     border-radius: 0;
     width: 100%;
-    text-align: left; /* Estandarizar alineación */
+    text-align: center; /* Centrado como el resto del menú */
     box-shadow: none;
     font-weight: 600;
   }
