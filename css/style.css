@@ -702,7 +702,7 @@ footer {
     padding: 10px 0;
     border-radius: 0;
     width: 100%;
-    text-align: left; /* Alinear con el resto del menú */
+    text-align: center; /* Alineación centrada corregida */
     box-shadow: none;
   }
   .nav-menu .btn-nav:hover {
