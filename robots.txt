@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
-
-Sitemap: https://freddyroa76.github.io/web-Abogado-laboral/sitemap.xml
+Disallow: /css/
+Disallow: /js/
+Disallow: /img/
+Sitemap: https://tuabogadolaboral.com.co/sitemap.xml
