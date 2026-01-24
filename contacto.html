@@ -62,8 +62,8 @@
     <!-- Critical CSS Inlined (Fix Render Blocking) -->
     <style>
       /* =========================================
-   CRITICAL CSS (Loading First)
-   ========================================= */
+      CRITICAL CSS (Loading First)
+      ========================================= */
       :root {
         --primary: #10214b;
         --secondary: #d7bd88;
@@ -399,6 +399,26 @@
           display: none;
         }
       }
+
+      /* CRITICAL HERO STYLES (Moved from inline for Responsive support) */
+      .inner-hero {
+        position: relative;
+        background-color: var(--primary);
+        overflow: hidden;
+        aspect-ratio: 1920/600;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+      }
+
+      @media (max-width: 768px) {
+        .inner-hero {
+          aspect-ratio: auto !important;
+          min-height: 450px;
+          padding: 0 20px;
+        }
+      }
     </style>
 
     <!-- Defer Non-Critical CSS -->
@@ -414,14 +434,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;700;900&display=optional"
       rel="stylesheet"
       media="print"
       onload="this.media = 'all'"
     />
     <noscript>
       <link
-        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;700;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;700;900&display=optional"
         rel="stylesheet"
       />
     </noscript>
@@ -564,14 +584,7 @@
     <main>
       <!-- WPO Optimization: LCP & CLS Fix -->
       <!-- Added explicit position relative and min-height to prevent CLS -->
-      <section
-        class="inner-hero"
-        style="
-          background-color: var(--primary); /* Fallback */
-          overflow: hidden;
-          aspect-ratio: 1920/600;
-        "
-      >
+      <section class="inner-hero">
         <!-- LCP Image: Inline, Eager, High Priority -->
         <img
           src="img/header-contacto.webp"

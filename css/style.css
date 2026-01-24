@@ -1949,6 +1949,19 @@ select.form-control {
   aspect-ratio: 1920/600; /* Replaces fixed min-height for perfect responsiveness */
   background-color: var(--primary); /* Fallback color prior to image load */
   overflow: hidden;
+  /* Centering Content */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
-/* Query removed as aspect-ratio handles scaling automatically */
+/* Responsive Override: Mobile needs height, not aspect ratio */
+@media (max-width: 768px) {
+  .inner-hero {
+    aspect-ratio: auto !important;
+    min-height: 450px;
+    padding: 0 20px;
+  }
+}
