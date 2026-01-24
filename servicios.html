@@ -68,6 +68,26 @@
       />
     </noscript>
     <script src="js/main.js" defer></script>
+    <style>
+      /* CRITICAL HERO STYLES (Injected for Responsive Fix) */
+      .inner-hero {
+        position: relative;
+        background-color: var(--primary);
+        overflow: hidden;
+        aspect-ratio: 1920/600;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+      }
+      @media (max-width: 768px) {
+        .inner-hero {
+          aspect-ratio: auto !important;
+          min-height: 450px;
+          padding: 0 20px;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="top-bar">
