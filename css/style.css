@@ -386,6 +386,7 @@ footer {
     transition:
       opacity 0.3s ease,
       visibility 0.3s ease;
+    will-change: opacity, visibility; /* WPO: Composited Animation */
   }
 
   .menu-overlay.active {
