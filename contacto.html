@@ -55,48 +55,6 @@
     <script src="js/main.js" defer></script>
 
     <style>
-      /* CORRECCIÓN CRÍTICA PARA EL MENÚ EN MÓVILES */
-      @media (max-width: 768px) {
-        /* Fuerza al botón a mostrarse y lo posiciona correctamente */
-        header .menu-toggle {
-          display: block !important;
-          cursor: pointer;
-          position: absolute;
-          right: 20px;
-          top: 50%;
-          transform: translateY(-50%);
-          z-index: 1001;
-        }
-
-        /* Asegura que las barras tengan color visible */
-        header .menu-toggle .bar {
-          display: block;
-          width: 25px;
-          height: 3px;
-          margin: 5px auto;
-          background-color: #10214b !important; /* Azul oscuro forzado */
-          transition: all 0.3s ease-in-out;
-        }
-
-        /* Oculta el menú normal en móviles */
-        header nav ul.nav-menu {
-          display: none;
-          /* El JS se encarga de cambiar esto a flex o block cuando se active */
-          flex-direction: column;
-          width: 100%;
-          position: absolute;
-          top: 100%;
-          left: 0;
-          background-color: white;
-          padding: 20px 0;
-          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Clase que añade JS para mostrar el menú */
-        header nav ul.nav-menu.active {
-          display: flex !important;
-        }
-      }
     </style>
   </head>
   <body>

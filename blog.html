@@ -203,64 +203,7 @@
         border-radius: 2px;
       }
 
-      /* ==========================================================================
-         CORRECCIONES MÓVILES (Menú y Grilla)
-         ========================================================================== */
-      @media (max-width: 768px) {
-        /* Ajuste Título en Móvil */
-        .section-title h2 {
-          font-size: 1.5rem; /* Un poco más pequeño en celular */
-        }
-
-        /* Ajuste Grilla en Móvil para evitar desbordes */
-        .tools-grid {
-          gap: 20px;
-          /* En pantallas muy angostas, asegura 1 sola columna */
-          grid-template-columns: 1fr;
-        }
-
-        /* Menú Hamburguesa */
-        header .menu-toggle {
-          display: block !important;
-          cursor: pointer;
-          position: absolute;
-          right: 20px;
-          top: 50%;
-          transform: translateY(-50%);
-          z-index: 1001;
-        }
-
-        header .menu-toggle .bar {
-          display: block;
-          width: 25px;
-          height: 3px;
-          margin: 5px auto;
-          background-color: #10214b !important;
-          transition: all 0.3s ease-in-out;
-        }
-
-        header nav ul.nav-menu {
-          display: none;
-          flex-direction: column;
-          width: 100%;
-          position: absolute;
-          top: 100%;
-          left: 0;
-          background-color: white;
-          padding: 20px 0;
-          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-          text-align: center;
-        }
-
-        header nav ul.nav-menu.active {
-          display: flex !important;
-        }
-
-        header nav ul.nav-menu li {
-          margin: 15px 0;
-        }
-      }
-    </style>
+      </style>
   </head>
   <body>
     <div class="top-bar">
@@ -294,9 +237,7 @@
           role="button"
           tabindex="0"
         >
-          <span class="bar"></span>
-          <span class="bar"></span>
-          <span class="bar"></span>
+          <i class="fas fa-bars"></i>
         </div>
 
         <nav aria-label="NavegaciÃ³n principal">
@@ -629,4 +570,6 @@
     </a>
   </body>
 </html>
+
+
 

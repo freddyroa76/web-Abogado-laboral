@@ -636,7 +636,7 @@ footer {
     align-items: center;
     font-size: 1.8rem;
     cursor: pointer;
-    color: var(--primary);
+    color: #10214b !important; /* Forzar color visible */
     z-index: 2000; /* Por encima del overlay y menú */
     width: 48px; /* Touch target óptimo */
     height: 48px;
@@ -681,7 +681,7 @@ footer {
     background: var(--white);
     flex-direction: column;
     justify-content: flex-start;
-    padding: 80px 20px 20px; /* Espacio superior para no tapar botón */
+    padding: 90px 20px 20px; /* Espacio superior para no tapar botón */
     box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
     z-index: 999;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Animación suave */
@@ -733,8 +733,13 @@ footer {
     display: block;
     font-size: 1.1rem;
     padding: 16px 10px; /* Espaciado generoso */
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Linea sutil separadora */
     color: var(--primary);
+  }
+
+  /* Quitar borde al último elemento para limpieza visual */
+  .nav-menu li:last-child a {
+    border-bottom: none;
   }
 
   .nav-menu li a:active {
