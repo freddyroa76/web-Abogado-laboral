@@ -6,7 +6,7 @@
     <!-- Seguridad: CSP Básico (Actualizado y Estricto) -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://maps.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; frame-src 'self' https://www.google.com https://maps.google.com;"
+      content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://maps.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; frame-src 'self' https://www.google.com https://maps.google.com;"
     />
 
     <title>Contacto y Agendamiento | Tu Abogado Laboral Barranquilla</title>
@@ -145,7 +145,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: -1;
+            z-index: 0;
           "
         />
         <!-- Overlay -->
@@ -160,11 +160,11 @@
               rgba(16, 33, 75, 0.85),
               rgba(16, 33, 75, 0.75)
             );
-            z-index: -1;
+            z-index: 1;
           "
         ></div>
 
-        <div class="container" style="position: relative; z-index: 1">
+        <div class="container" style="position: relative; z-index: 2">
           <h1
             style="
               color: #ffffff;
@@ -778,64 +778,6 @@
             </div>
           </div>
         </div>
-      </section>
-
-      <section
-        class="mapa-full-width"
-        style="
-          width: 100%;
-          height: 450px;
-          border-top: 1px solid #eee;
-          border-bottom: 1px solid #eee;
-          position: relative;
-          background-color: #f0f0f0;
-        "
-        id="map-container"
-      >
-        <!-- Facade: Imagen estática para evitar cookies de terceros al inicio -->
-        <div
-          id="map-facade"
-          style="
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            background: url(&quot;img/map-preview.webp&quot;) center/cover
-              no-repeat;
-          "
-          onclick="loadMap()"
-          title="Haga clic para cargar el mapa interactivo"
-        >
-          <button
-            style="
-              background: var(--primary);
-              color: white;
-              border: none;
-              padding: 15px 30px;
-              font-size: 1.1rem;
-              border-radius: 5px;
-              cursor: pointer;
-              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-              display: flex;
-              align-items: center;
-              font-family: &quot;Montserrat&quot;, sans-serif;
-              font-weight: 700;
-            "
-          >
-            <i class="fas fa-map-marked-alt" style="margin-right: 10px"></i> Ver
-            Mapa de Ubicación
-          </button>
-        </div>
-
-        <script>
-          function loadMap() {
-            var container = document.getElementById("map-container");
-            container.innerHTML =
-              '<iframe src="https://maps.google.com/maps?q=Calle+39+%2343-123+Barranquilla&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" title="Mapa de ubicación de la oficina"></iframe>';
-          }
-        </script>
       </section>
     </main>
     <footer>
