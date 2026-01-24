@@ -2214,3 +2214,43 @@ select.form-control {
     url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.ttf")
       format("truetype");
 }
+
+/* Unified Inner Hero Style (Standardized based on Services Page) */
+.inner-hero {
+  padding: 100px 0 80px;
+  text-align: center;
+  color: white;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  /* Ensure it doesn't inherit fixed height from .hero if mixed */
+  height: auto;
+  min-height: auto;
+  border-bottom: 5px solid var(--secondary);
+}
+
+.inner-hero h1 {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  font-size: 2.5rem !important; /* Force override for consistency */
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #ffffff;
+  text-shadow: none; /* Clean look like services */
+}
+
+/* Responsive adjustment for inner hero */
+@media (max-width: 768px) {
+  .inner-hero h1 {
+    font-size: 1.8rem !important;
+  }
+}
+
+.inner-hero p {
+  font-size: 1.2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  opacity: 0.9;
+  color: white;
+}
