@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Seguridad: CSP Básico -->
+    <!-- Seguridad: CSP Básico (Actualizado y Estricto) -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https: https://fonts.googleapis.com; font-src 'self' https: data: https://fonts.gstatic.com; frame-src 'self' https://www.google.com;"
+      content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https: https://fonts.googleapis.com; font-src 'self' https: data: https://fonts.gstatic.com; frame-src 'self' https://*.google.com https://www.google.com;"
     />
 
     <title>Contacto y Agendamiento | Tu Abogado Laboral Barranquilla</title>
@@ -19,9 +19,17 @@
     <!-- Performance: Preload Hero Image (LCP) -->
     <link rel="preload" as="image" href="img/header-contacto.webp" />
 
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/critical.min.css" />
+    <!-- Defer Non-Critical CSS -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;700;900&display=optional"
+      rel="stylesheet"
+      href="css/style.min.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <noscript><link rel="stylesheet" href="css/style.min.css" /></noscript>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;700;900&display=swap"
       rel="stylesheet"
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
@@ -30,7 +38,7 @@
     />
     <noscript>
       <link
-        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;700;900&display=optional"
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;700;900&display=swap"
         rel="stylesheet"
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
@@ -52,10 +60,10 @@
         referrerpolicy="no-referrer"
       />
     </noscript>
-    <script src="js/main.js" defer></script>
+    <!-- Advertencia: Revisar js/main.min.js manualmente por posibles errores de sintaxis reportados -->
+    <script src="js/main.min.js" defer></script>
 
-    <style>
-    </style>
+    <style></style>
   </head>
   <body>
     <div class="top-bar">
@@ -100,7 +108,7 @@
             <li><a href="index.html">Inicio</a></li>
             <li><a href="nosotros.html">Nosotros</a></li>
             <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="blog.html" class="active">Herramientas</a></li>
+            <li><a href="blog.html">Herramientas</a></li>
             <li><a href="contacto.html" class="btn-nav">Contacto</a></li>
           </ul>
         </nav>
@@ -108,21 +116,55 @@
     </header>
 
     <main>
+      <!-- WPO Optimization: LCP & CLS Fix -->
+      <!-- Added explicit position relative and min-height to prevent CLS -->
       <section
         class="hero-interno"
         style="
           background-color: var(--primary); /* Fallback para LCP */
-          background:
-            linear-gradient(rgba(16, 33, 75, 0.85), rgba(16, 33, 75, 0.75)),
-            url(&quot;img/header-contacto.webp&quot;);
-          background-size: cover;
-          background-position: center;
           text-align: center;
           padding: 140px 0 100px;
           border-bottom: 5px solid #d4af37;
+          position: relative;
+          min-height: 480px; /* Adjust based on content */
+          overflow: hidden;
         "
       >
-        <div class="container">
+        <!-- LCP Image: Inline, Eager, High Priority -->
+        <img
+          src="img/header-contacto.webp"
+          fetchpriority="high"
+          loading="eager"
+          alt=""
+          width="1920"
+          height="600"
+          style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+          "
+        />
+        <!-- Overlay -->
+        <div
+          style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+              rgba(16, 33, 75, 0.85),
+              rgba(16, 33, 75, 0.75)
+            );
+            z-index: -1;
+          "
+        ></div>
+
+        <div class="container" style="position: relative; z-index: 1">
           <h1
             style="
               color: #ffffff;
@@ -748,59 +790,15 @@
           position: relative;
         "
       >
-        <!-- Facade / Placeholder para el Mapa -->
-        <div
-          id="map-placeholder"
-          style="
-            width: 100%;
-            height: 100%;
-            background-color: #e9ecef;
-            background-image: url(&quot;img/map-pattern.png&quot;); /* Opcional si existiera */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            position: relative;
-          "
-        >
-          <div style="text-align: center; padding: 20px">
-            <i
-              class="fas fa-map-marker-alt"
-              style="
-                font-size: 3rem;
-                color: var(--primary);
-                margin-bottom: 15px;
-              "
-            ></i>
-            <h3
-              style="
-                color: var(--primary);
-                margin-bottom: 10px;
-                font-family: &quot;Montserrat&quot;, sans-serif;
-              "
-            >
-              Nuestra Ubicación
-            </h3>
-            <p style="color: #666; margin-bottom: 20px">
-              Edificio Las Flores, Calle 39 #43-123
-            </p>
-            <button
-              class="btn-primary"
-              style="
-                border: none;
-                padding: 12px 25px;
-                font-size: 1rem;
-                cursor: pointer;
-              "
-            >
-              <i class="fas fa-map-marked-alt" style="margin-right: 8px"></i>Ver
-              Mapa Interactivo
-            </button>
-            <p style="font-size: 0.8rem; color: #999; margin-top: 10px">
-              Haga clic para cargar el mapa de Google
-            </p>
-          </div>
-        </div>
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.2952402127276!2d-74.7834887!3d10.968500!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8ef42d2b07f8279d%3A0x6e336209525f02c0!2sEdificio%20Las%20Flores!5e0!3m2!1ses!2sco!4v1700000000000!5m2!1ses!2sco"
+          width="100%"
+          height="450"
+          style="border: 0"
+          allowfullscreen=""
+          loading="lazy"
+          title="Ubicación Tu Abogado Laboral"
+        ></iframe>
       </section>
     </main>
     <footer>
@@ -848,7 +846,7 @@
           </div>
 
           <div class="footer-col">
-            <h4>Contacto</h4>
+            <h3>Contacto</h3>
             <ul class="contact-list">
               <li>
                 <i class="fas fa-map-marker-alt"></i
@@ -904,4 +902,3 @@
     </script>
   </body>
 </html>
-

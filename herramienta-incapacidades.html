@@ -16,8 +16,11 @@
       content="Liquidador de incapacidades 2026. Calcula pagos por EPS, ARL y Empleador con validación de prórrogas y piso legal."
     />
 
-    <link rel="stylesheet" href="css/style.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="css/critical.min.css" />
+    <!-- Defer Non-Critical CSS -->
+    <link rel="stylesheet" href="css/style.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="css/style.min.css" /></noscript>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=optional"
       rel="stylesheet"
@@ -50,7 +53,7 @@
         referrerpolicy="no-referrer"
       />
     </noscript>
-    <script src="js/main.js" defer></script>
+    <script src="js/main.min.js" defer></script>
 
     <style>
       /* --- ESTILOS ELIMINADOS (Movidos a css/style.css) --- */
@@ -391,7 +394,7 @@
           </div>
 
           <div class="footer-col">
-            <h4>Contacto</h4>
+            <h3>Contacto</h3>
             <ul class="contact-list">
               <li>
                 <i class="fas fa-map-marker-alt"></i
@@ -424,7 +427,7 @@
       ><i class="fab fa-whatsapp"></i
     ></a>
 
-    <script src="js/calculadora-incapacidades.js" defer></script>
+    <script src="js/calculadora-incapacidades.min.js" defer></script>
 
     <script type="application/ld+json">
       {
@@ -454,4 +457,9 @@
     </script>
   </body>
 </html>
+
+
+
+
+
 

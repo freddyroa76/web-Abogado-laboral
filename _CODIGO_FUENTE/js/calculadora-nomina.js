@@ -1,16 +1,11 @@
-
-const formatoPeso = new Intl.NumberFormat("es-CO", {
+﻿const formatoPeso = new Intl.NumberFormat("es-CO", {
   style: "currency",
   currency: "COP",
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
 });
-
-// --- FUNCIÓN PDF ROBUSTA (Solución a hoja blanca) ---
 function downloadPDF() {
   const element = document.getElementById("printArea");
-
-  // Configuración para asegurar que todo se capture
   const opt = {
     margin: [0.3, 0.3, 0.3, 0.3], // Márgenes pequeños
     filename: "Liquidacion_Nomina_TuAbogadoLaboral.pdf",
@@ -27,20 +22,14 @@ function downloadPDF() {
       orientation: "portrait",
     },
   };
-
-  // Generar PDF
   html2pdf().set(opt).from(element).save();
 }
-
-// --- INTERACCIÓN UI ---
 const tipoContrato = document.getElementById("tipoContrato");
 const checkAux = document.getElementById("checkAux");
 const valAuxInput = document.getElementById("valAuxilioInput");
 const confAuxilio = document.getElementById("confAuxilio");
 const salarioBaseInput = document.getElementById("salarioBase");
 const confSalarioMin = document.getElementById("confSalarioMin");
-
-// Control Auxilio: Desmarcado por defecto
 checkAux.addEventListener("change", function () {
   if (this.checked) {
     valAuxInput.disabled = false;
@@ -50,14 +39,11 @@ checkAux.addEventListener("change", function () {
     valAuxInput.value = "";
   }
 });
-
-// LÓGICA: AUTO-DETECTAR AUXILIO TRANSPORTE
 function autoValidarAuxilio() {
   const salario = parseFloat(salarioBaseInput.value) || 0;
   const smmlv = parseFloat(confSalarioMin.value) || 0;
   const esServicios = tipoContrato.value === "servicios";
   const tope = smmlv * 2;
-
   if (!esServicios && salario > 0) {
     if (salario <= tope) {
       checkAux.checked = true;
@@ -67,14 +53,10 @@ function autoValidarAuxilio() {
     checkAux.dispatchEvent(new Event("change"));
   }
 }
-
 salarioBaseInput.addEventListener("input", autoValidarAuxilio);
-
-// Control Tipo Contrato
 tipoContrato.addEventListener("change", function () {
   const esServicios = this.value === "servicios";
   const panelLaboral = document.getElementById("panelLaboral");
-
   if (esServicios) {
     panelLaboral.style.opacity = "0.3";
     panelLaboral.style.pointerEvents = "none";
@@ -92,51 +74,35 @@ tipoContrato.addEventListener("change", function () {
     autoValidarAuxilio();
   }
 });
-
-// --- LÓGICA DE CÁLCULO ---
 document
   .getElementById("masterForm")
   .addEventListener("submit", function (e) {
     e.preventDefault();
-
-    // 1. Feedback Visual: Cambiar texto botón
     const btn = document.getElementById("btnCalcular");
     const originalText = btn.innerHTML;
     btn.innerHTML =
       '<i class="fas fa-spinner fa-spin"></i> Calculando...';
-
     try {
-      // FUNCIÓN SEGURA PARA ESCRIBIR EN HTML (Para evitar el error "null")
       const setText = (id, val) => {
         const el = document.getElementById(id);
         if (el) {
           el.textContent = val;
         }
       };
-
       const getVal = (id) =>
         parseFloat(document.getElementById(id).value) || 0;
-
-      // PARÁMETROS
       const SMMLV = getVal("confSalarioMin");
       const UVT = getVal("confUVT");
       const salarioContrato = getVal("salarioBase");
       const dias = getVal("diasLaborados");
       const otros = getVal("otrosIngresos");
       const tipo = tipoContrato.value;
-
-      // 1. CÁLCULO PROPORCIONAL
-      // Salario real ganado en los días
       const salarioDevengado = (salarioContrato / 30) * dias;
-
-      // Auxilio real ganado en los días (si aplica)
       const valAuxLegal = parseFloat(confAuxilio.value) || 0;
       let auxilioDevengado = 0;
       if (checkAux.checked) {
         auxilioDevengado = (valAuxLegal / 30) * dias;
       }
-
-      // RELLENAR DATOS DE ENTRADA EN EL PDF (NUEVO)
       setText("pSalarioBase", formatoPeso.format(salarioContrato));
       setText("pDiasLiq", dias);
       setText(
@@ -156,13 +122,10 @@ document
           : "No Aplica ($0)",
       );
       setText("pOtrosIngresos", formatoPeso.format(otros));
-
-      // CONFIG EMPRESA
       const arlPct = parseFloat(
         document.getElementById("nivelArl").value,
       );
       setText("pRiesgoArl", (arlPct * 100).toFixed(3) + "%");
-
       let exonerado = false;
       let txtExonerado = "No (Paga Todo)";
       if (tipo !== "servicios") {
@@ -178,8 +141,6 @@ document
         txtExonerado = "N/A (Independiente)";
       }
       setText("pExonerado", txtExonerado);
-
-      // CONFIG TRIBUTARIA
       const prepagada = Math.min(getVal("dedPrepagada"), 16 * UVT);
       const vivienda = Math.min(getVal("dedVivienda"), 100 * UVT);
       const voluntarios = getVal("dedVoluntarios");
@@ -188,8 +149,6 @@ document
         ? Math.min((salarioDevengado + otros) * 0.1, 32 * UVT)
         : 0;
       const leyFsp = document.getElementById("leyPensional").value;
-
-      // VARIABLES
       let empSalud = 0,
         empPension = 0,
         empFsp = 0;
@@ -203,18 +162,11 @@ document
         ciaCesantias = 0,
         ciaInt = 0,
         ciaVacaciones = 0;
-
-      // CÁLCULOS SOBRE LO DEVENGADO
       let baseSS = salarioDevengado + otros;
-
       if (tipo === "servicios") {
-        // OPS
       } else {
-        // Empleado
         empSalud = baseSS * 0.04;
         empPension = baseSS * 0.04;
-
-        // FSP
         if (salarioContrato + otros > SMMLV * 4) {
           let pct = 0;
           let nS = (salarioContrato + otros) / SMMLV;
@@ -240,15 +192,12 @@ document
           }
           empFsp = baseSS * (pct / 100);
         }
-
-        // Empresa
         ciaSalud = exonerado ? 0 : baseSS * 0.085;
         ciaPension = baseSS * 0.12;
         ciaArl = baseSS * arlPct;
         ciaCaja = baseSS * 0.04;
         ciaSena = exonerado ? 0 : baseSS * 0.02;
         ciaIcbf = exonerado ? 0 : baseSS * 0.03;
-
         let basePrest = salarioDevengado + otros + auxilioDevengado;
         ciaPrima = basePrest * 0.0833;
         ciaCesantias = basePrest * 0.0833;
@@ -256,8 +205,6 @@ document
         let baseVac = salarioDevengado + otros;
         ciaVacaciones = baseVac * 0.0417;
       }
-
-      // --- RETENCIÓN AJUSTADA (PROYECCIÓN MENSUAL) ---
       let totalIncr = 0;
       if (tipo === "servicios") {
         let ibc = (salarioDevengado + otros) * 0.4;
@@ -265,29 +212,20 @@ document
       } else {
         totalIncr = empSalud + empPension + empFsp;
       }
-
       let netoDepuracion = salarioDevengado + otros - totalIncr;
-
       let totalDeducciones = vivienda + prepagada + dependientes;
-
       let base25 = Math.max(
         0,
         netoDepuracion - totalDeducciones - voluntarios,
       );
       let renta25 = base25 * 0.25;
       let totalAlivios = totalDeducciones + voluntarios + renta25;
-
-      // Topes de ley (Mensuales)
       let tope40 = netoDepuracion * 0.4;
       let topeAbs = (1340 / 12) * UVT; // 1340 UVT anuales / 12
       let realAlivios = Math.min(totalAlivios, Math.min(tope40, topeAbs));
-
       let baseGravableReal = Math.max(0, netoDepuracion - realAlivios);
-
-      // AQUÍ LA CORRECCIÓN: Proyectar a 30 días para buscar en la tabla
       let baseGravableProyectada = (baseGravableReal / dias) * 30;
       let baseUVT = baseGravableProyectada / UVT;
-
       let retUVT = 0;
       if (baseUVT > 2300) retUVT = (baseUVT - 2300) * 0.39 + 770;
       else if (baseUVT > 945) retUVT = (baseUVT - 945) * 0.37 + 268;
@@ -295,14 +233,8 @@ document
       else if (baseUVT > 360) retUVT = (baseUVT - 360) * 0.33 + 69;
       else if (baseUVT > 150) retUVT = (baseUVT - 150) * 0.28 + 10;
       else if (baseUVT > 95) retUVT = (baseUVT - 95) * 0.19;
-
-      // Impuesto mensual teórico
       let valRetencionMensual = Math.round((retUVT * UVT) / 1000) * 1000;
-
-      // Impuesto prorrateado a los días trabajados
       let valRetencion = (valRetencionMensual / 30) * dias;
-
-      // RENDERIZADO (Usando setText para evitar errores)
       setText("cSalario", formatoPeso.format(salarioDevengado));
       setText("cAuxilio", formatoPeso.format(auxilioDevengado));
       setText("cDotacion", tipo === "servicios" ? "$0" : "S/D");
@@ -316,7 +248,6 @@ document
       setText("cCesantias", formatoPeso.format(ciaCesantias));
       setText("cIntereses", formatoPeso.format(ciaInt));
       setText("cVacaciones", formatoPeso.format(ciaVacaciones));
-
       let totalEmpresa =
         salarioDevengado +
         otros +
@@ -331,35 +262,23 @@ document
         ciaCesantias +
         ciaInt +
         ciaVacaciones;
-
       if (tipo === "servicios") totalEmpresa = salarioDevengado + otros;
-
-      // 1. Mostrar Total del Periodo (Lo que paga la empresa en esos días)
       setText("cTotalMensual", formatoPeso.format(totalEmpresa));
-
-      // 2. CORRECCIÓN PROYECCIÓN ANUAL (Fórmula exacta):
-      // (Costo del Periodo ÷ Días Trabajados) × 360 días
       let costoAnual = (totalEmpresa / dias) * 360;
-
       setText("cTotalAnual", formatoPeso.format(costoAnual));
-
       let devengado = salarioDevengado + otros + auxilioDevengado;
       setText("eSalario", formatoPeso.format(salarioDevengado));
       setText("eAuxilio", formatoPeso.format(auxilioDevengado));
       setText("eOtros", formatoPeso.format(otros));
       setText("eTotalDev", formatoPeso.format(devengado));
-
       setText("eSalud", formatoPeso.format(empSalud));
       setText("ePension", formatoPeso.format(empPension));
       setText("eFsp", formatoPeso.format(empFsp));
       setText("eRetefuente", formatoPeso.format(valRetencion));
-
       let dedTotal = empSalud + empPension + empFsp + valRetencion;
       if (tipo === "servicios") dedTotal = valRetencion;
-
       setText("eTotalDed", formatoPeso.format(dedTotal));
       setText("eNeto", formatoPeso.format(devengado - dedTotal));
-
       setText("rIngresos", formatoPeso.format(salarioDevengado + otros));
       setText("rSeguridad", "-" + formatoPeso.format(totalIncr));
       setText("rNeto", formatoPeso.format(netoDepuracion));
@@ -370,8 +289,6 @@ document
       );
       setText("rBase", formatoPeso.format(baseGravableReal));
       setText("rTotal", formatoPeso.format(valRetencion));
-
-      // MOSTRAR
       const results = document.getElementById("resultsContainer");
       results.style.display = "block";
       results.scrollIntoView({ behavior: "smooth" });
@@ -379,7 +296,6 @@ document
       console.error("Error en cálculo:", error);
       alert("Error de cálculo: " + error.message);
     } finally {
-      // Restaurar botón
       setTimeout(() => {
         btn.innerHTML = originalText;
       }, 500);

@@ -16,6 +16,29 @@
   --transition: all 0.3s ease;
 }
 
+/* =========================================
+   PERFORMANCE: FONT DISPLAY SWAP (CDN FIX)
+   ========================================= */
+@font-face {
+  font-family: "Font Awesome 6 Free";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2")
+    format("woff2");
+  unicode-range: U+0-10FFFF;
+}
+
+@font-face {
+  font-family: "Font Awesome 6 Brands";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2")
+    format("woff2");
+  unicode-range: U+0-10FFFF;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -539,6 +562,7 @@ footer {
   color: var(--primary);
 }
 
+.footer-col h3,
 .footer-col h4 {
   color: var(--white);
   margin-bottom: 25px;
@@ -546,6 +570,7 @@ footer {
   position: relative;
 }
 
+.footer-col h3::after,
 .footer-col h4::after {
   content: "";
   position: absolute;

@@ -19,7 +19,10 @@
     <!-- Performance: Preload Hero Image (LCP) -->
     <link rel="preload" as="image" href="img/header-firma-legal.webp" />
 
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/critical.min.css" />
+    <!-- Defer Non-Critical CSS -->
+    <link rel="stylesheet" href="css/style.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="css/style.min.css" /></noscript>
     <link
       href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=optional"
       rel="stylesheet"
@@ -52,7 +55,7 @@
         referrerpolicy="no-referrer"
       />
     </noscript>
-    <script src="js/main.js" defer></script>
+    <script src="js/main.min.js" defer></script>
 
     <style>
       /* ESTILOS ESPECÍFICOS DE ESTA PÁGINA */
@@ -454,7 +457,7 @@
           </div>
 
           <div class="footer-col">
-            <h4>Contacto</h4>
+            <h3>Contacto</h3>
             <ul class="contact-list">
               <li>
                 <i class="fas fa-map-marker-alt"></i
@@ -488,4 +491,8 @@
     ></a>
   </body>
 </html>
+
+
+
+
 
