@@ -240,7 +240,11 @@ header {
 }
 
 .hero h1 {
-  font-size: clamp(2.5rem, 5vw + 1rem, 4rem); /* Fluid sizing */
+  font-size: clamp(
+    2.2rem,
+    4.5vw,
+    3.5rem
+  ); /* Refined size: smaller max, elegant scaling */
   font-weight: 900;
   line-height: 1.1;
   color: var(--white);
