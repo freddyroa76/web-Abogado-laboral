@@ -569,6 +569,7 @@
         style="
           background-color: var(--primary); /* Fallback */
           overflow: hidden;
+          aspect-ratio: 1920/600;
         "
       >
         <!-- LCP Image: Inline, Eager, High Priority -->
@@ -576,6 +577,8 @@
           src="img/header-contacto.webp"
           fetchpriority="high"
           loading="eager"
+          decoding="sync"
+          sizes="100vw"
           alt=""
           width="1920"
           height="600"

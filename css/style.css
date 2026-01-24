@@ -1945,13 +1945,9 @@ select.form-control {
    ========================================= */
 .inner-hero {
   position: relative;
-  min-height: 600px;
+  aspect-ratio: 1920/600; /* Replaces fixed min-height for perfect responsiveness */
   background-color: var(--primary); /* Fallback color prior to image load */
   overflow: hidden;
 }
 
-@media (max-width: 768px) {
-  .inner-hero {
-    min-height: 400px;
-  }
-}
+/* Query removed as aspect-ratio handles scaling automatically */
