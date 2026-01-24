@@ -694,6 +694,21 @@ footer {
   .footer-grid {
     grid-template-columns: 1fr;
   }
+
+  /* 6. Fix visual para botón Contacto en móvil */
+  .nav-menu .btn-nav {
+    background-color: transparent;
+    color: var(--primary) !important; /* Texto azul visualmente consistente */
+    padding: 10px 0;
+    border-radius: 0;
+    width: 100%;
+    text-align: left; /* Alinear con el resto del menú */
+    box-shadow: none;
+  }
+  .nav-menu .btn-nav:hover {
+    background-color: transparent;
+    color: var(--secondary) !important;
+  }
 }
 
 /* =========================================
