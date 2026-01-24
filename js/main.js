@@ -86,7 +86,6 @@
       link.addEventListener("click", closeMenu);
     });
   }
-  const mapPlaceholder = document.getElementById("map-placeholder");
   if (mapPlaceholder) {
     const loadMap = function () {
       const iframeSrc =
@@ -106,5 +105,19 @@
       mapPlaceholder.removeEventListener("click", loadMap);
     };
     mapPlaceholder.addEventListener("click", loadMap);
+  }
+
+  // Registers Service Worker for Cache Policy
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").then(
+        function (registration) {
+          console.log("[Service Worker] Registered");
+        },
+        function (err) {
+          console.log("[Service Worker] Failed: ", err);
+        },
+      );
+    });
   }
 });
