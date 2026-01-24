@@ -9,40 +9,62 @@
       content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;"
     />
 
-        <title>Herramienta Liquidacion Contrato | Tu Abogado Laboral</title>
-    <meta name="description" content="Utilice nuestra herramienta de Liquidacion Contrato gratis. CÃ¡lculo actualizado 2026 bajo normativa laboral colombiana. AsesorÃ­a experta en Barranquilla." />
-    
+    <title>Herramienta Liquidacion Contrato | Tu Abogado Laboral</title>
+    <meta
+      name="description"
+      content="Utilice nuestra herramienta de Liquidacion Contrato gratis. CÃ¡lculo actualizado 2026 bajo normativa laboral colombiana. AsesorÃ­a experta en Barranquilla."
+    />
+
     <!-- Open Graph -->
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="Herramienta de Liquidacion Contrato | Tu Abogado Laboral" />
-    <meta property="og:description" content="Calculadora laboral gratuita y actualizada. Realice sus cuentas claras con Tu Abogado Laboral." />
-    <meta property="og:image" content="https://tuabogadolaboral.com.co/img/logo-principal.webp" />
-    <meta property="og:url" content="https://tuabogadolaboral.com.co/herramienta-liquidacion-contrato.html" />
-    
+    <meta
+      property="og:title"
+      content="Herramienta de Liquidacion Contrato | Tu Abogado Laboral"
+    />
+    <meta
+      property="og:description"
+      content="Calculadora laboral gratuita y actualizada. Realice sus cuentas claras con Tu Abogado Laboral."
+    />
+    <meta
+      property="og:image"
+      content="https://tuabogadolaboral.com.co/img/logo-principal.webp"
+    />
+    <meta
+      property="og:url"
+      content="https://tuabogadolaboral.com.co/herramienta-liquidacion-contrato.html"
+    />
+
     <!-- Schema Breadcrumb -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
-        "itemListElement": [{
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Inicio",
-          "item": "https://tuabogadolaboral.com.co"
-        },{
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Herramientas",
-          "item": "https://tuabogadolaboral.com.co/blog.html"
-        },{
-          "@type": "ListItem",
-          "position": 3,
-          "name": "Liquidacion Contrato"
-        }]
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://tuabogadolaboral.com.co"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Herramientas",
+            "item": "https://tuabogadolaboral.com.co/blog.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Liquidacion Contrato"
+          }
+        ]
       }
     </script>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+      defer
+    ></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Montserrat:wght@400;700;900&display=optional"
       rel="stylesheet"
@@ -78,7 +100,12 @@
     <script src="js/main.js" defer></script>
     <link rel="stylesheet" href="css/critical.css" />
     <!-- Defer Non-Critical CSS -->
-    <link rel="stylesheet" href="css/style.css" media="print" onload="this.media='all'" />
+    <link
+      rel="stylesheet"
+      href="css/style.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
     <noscript><link rel="stylesheet" href="css/style.css" /></noscript>
   </head>
   <body>
@@ -185,7 +212,7 @@
               </h3>
               <div class="form-grid-2">
                 <div class="form-group">
-                  <label>Tipo de Contrato</label>
+                  <label for="tipoContrato">Tipo de Contrato</label>
                   <select id="tipoContrato" class="form-control">
                     <option value="indefinido">Término Indefinido</option>
                     <option value="fijo">Término Fijo</option>
@@ -193,7 +220,7 @@
                   </select>
                 </div>
                 <div class="form-group">
-                  <label>Motivo Retiro</label>
+                  <label for="motivoRetiro">Motivo Retiro</label>
                   <select id="motivoRetiro" class="form-control">
                     <option value="voluntario">Renuncia / Mutuo Acuerdo</option>
                     <option value="justa">Despido con Justa Causa</option>
@@ -236,15 +263,16 @@
 
                 <div class="period-row">
                   <div class="form-group">
-                    <label style="font-size: 0.8rem">Desde</label
+                    <label for="pInicio" style="font-size: 0.8rem">Desde</label
                     ><input type="date" id="pInicio" class="form-control" />
                   </div>
                   <div class="form-group">
-                    <label style="font-size: 0.8rem">Hasta</label
+                    <label for="pFin" style="font-size: 0.8rem">Hasta</label
                     ><input type="date" id="pFin" class="form-control" />
                   </div>
                   <div class="form-group">
-                    <label style="font-size: 0.8rem">Salario Mes</label
+                    <label for="pSalario" style="font-size: 0.8rem"
+                      >Salario Mes</label
                     ><input
                       type="number"
                       id="pSalario"
@@ -297,7 +325,7 @@
               </p>
               <div class="form-grid-3">
                 <div class="form-group">
-                  <label>Cesantías Desde:</label
+                  <label for="inicioCesantias">Cesantías Desde:</label
                   ><input
                     type="date"
                     id="inicioCesantias"
@@ -305,11 +333,11 @@
                   />
                 </div>
                 <div class="form-group">
-                  <label>Prima Desde:</label
+                  <label for="inicioPrima">Prima Desde:</label
                   ><input type="date" id="inicioPrima" class="form-control" />
                 </div>
                 <div class="form-group">
-                  <label>Vacaciones Desde:</label
+                  <label for="inicioVacaciones">Vacaciones Desde:</label
                   ><input
                     type="date"
                     id="inicioVacaciones"
@@ -983,11 +1011,3 @@
     </script>
   </body>
 </html>
-
-
-
-
-
-
-
-

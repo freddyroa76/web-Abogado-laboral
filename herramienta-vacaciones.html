@@ -9,42 +9,66 @@
       content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;"
     />
 
-        <title>Herramienta Vacaciones | Tu Abogado Laboral</title>
-    <meta name="description" content="Utilice nuestra herramienta de Vacaciones gratis. CÃ¡lculo actualizado 2026 bajo normativa laboral colombiana. AsesorÃ­a experta en Barranquilla." />
-    
+    <title>Herramienta Vacaciones | Tu Abogado Laboral</title>
+    <meta
+      name="description"
+      content="Utilice nuestra herramienta de Vacaciones gratis. CÃ¡lculo actualizado 2026 bajo normativa laboral colombiana. AsesorÃ­a experta en Barranquilla."
+    />
+
     <!-- Open Graph -->
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="Herramienta de Vacaciones | Tu Abogado Laboral" />
-    <meta property="og:description" content="Calculadora laboral gratuita y actualizada. Realice sus cuentas claras con Tu Abogado Laboral." />
-    <meta property="og:image" content="https://tuabogadolaboral.com.co/img/logo-principal.webp" />
-    <meta property="og:url" content="https://tuabogadolaboral.com.co/herramienta-vacaciones.html" />
-    
+    <meta
+      property="og:title"
+      content="Herramienta de Vacaciones | Tu Abogado Laboral"
+    />
+    <meta
+      property="og:description"
+      content="Calculadora laboral gratuita y actualizada. Realice sus cuentas claras con Tu Abogado Laboral."
+    />
+    <meta
+      property="og:image"
+      content="https://tuabogadolaboral.com.co/img/logo-principal.webp"
+    />
+    <meta
+      property="og:url"
+      content="https://tuabogadolaboral.com.co/herramienta-vacaciones.html"
+    />
+
     <!-- Schema Breadcrumb -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
-        "itemListElement": [{
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Inicio",
-          "item": "https://tuabogadolaboral.com.co"
-        },{
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Herramientas",
-          "item": "https://tuabogadolaboral.com.co/blog.html"
-        },{
-          "@type": "ListItem",
-          "position": 3,
-          "name": "Vacaciones"
-        }]
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://tuabogadolaboral.com.co"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Herramientas",
+            "item": "https://tuabogadolaboral.com.co/blog.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Vacaciones"
+          }
+        ]
       }
     </script>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
     <link rel="stylesheet" href="css/critical.css" />
     <!-- Defer Non-Critical CSS -->
-    <link rel="stylesheet" href="css/style.css" media="print" onload="this.media='all'" />
+    <link
+      rel="stylesheet"
+      href="css/style.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
     <noscript><link rel="stylesheet" href="css/style.css" /></noscript>
     <link
       href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=optional"
@@ -333,7 +357,7 @@
                 <div class="calc-grid">
                   <div>
                     <div class="form-group">
-                      <label>Salario Base Mensual</label>
+                      <label for="salario">Salario Base Mensual</label>
                       <small>Ingrese su salario fijo mensual</small>
                       <div class="input-group">
                         <i class="fas fa-dollar-sign input-icon"></i>
@@ -348,7 +372,9 @@
                     </div>
 
                     <div class="form-group" style="margin-top: 20px">
-                      <label>Otros Ingresos Mensuales</label>
+                      <label for="otrosIngresos"
+                        >Otros Ingresos Mensuales</label
+                      >
                       <small
                         >Promedio de comisiones, recargos (Sin Aux.
                         Transporte)</small
@@ -374,6 +400,7 @@
                         <input
                           type="date"
                           id="fechaInicio"
+                          aria-label="Fecha Inicio"
                           class="form-control"
                           style="padding-left: 15px"
                           required
@@ -381,6 +408,7 @@
                         <input
                           type="date"
                           id="fechaFin"
+                          aria-label="Fecha Fin"
                           class="form-control"
                           style="padding-left: 15px"
                           required
@@ -389,7 +417,9 @@
                     </div>
 
                     <div class="form-group" style="margin-top: 20px">
-                      <label>Días de Vacaciones a Pagar</label>
+                      <label for="diasVacaciones"
+                        >Días de Vacaciones a Pagar</label
+                      >
                       <div class="input-group">
                         <i class="fas fa-calendar-day input-icon"></i>
                         <input
@@ -417,9 +447,16 @@
                               accent-color: #10214b;
                             "
                           />
-                          <span style="font-size: 0.85rem; color: #333">
+                          <label
+                            for="checkAutomatico"
+                            style="
+                              font-size: 0.85rem;
+                              color: #333;
+                              cursor: pointer;
+                            "
+                          >
                             Calcular automáticamente (15 días por año)
-                          </span>
+                          </label>
                         </div>
                       </div>
                     </div>
@@ -435,9 +472,16 @@
             <div id="resultCard" class="result-container">
               <div class="result-header">
                 <div>
-                  <h3 style="margin: 0; font-size: 1.2rem">
+                  <h2
+                    style="
+                      margin: 0;
+                      font-size: 1.2rem;
+                      font-weight: bold;
+                      color: white;
+                    "
+                  >
                     Resultado de la Liquidación
-                  </h3>
+                  </h2>
                   <small id="periodoTexto" style="opacity: 0.8"
                     >Periodo: -- a --</small
                   >
@@ -452,7 +496,7 @@
 
               <div class="result-body">
                 <div style="border-right: 1px solid #eee; padding-right: 20px">
-                  <h4
+                  <h3
                     style="
                       color: #10214b;
                       border-bottom: 2px solid #eee;
@@ -461,7 +505,7 @@
                     "
                   >
                     Datos Base
-                  </h4>
+                  </h3>
 
                   <div class="result-item" style="margin-bottom: 15px">
                     <label>Base Salarial (Sin Aux. Transporte)</label>
@@ -476,7 +520,7 @@
                 </div>
 
                 <div>
-                  <h4
+                  <h3
                     style="
                       color: #10214b;
                       border-bottom: 2px solid #eee;
@@ -485,7 +529,7 @@
                     "
                   >
                     Liquidación
-                  </h4>
+                  </h3>
 
                   <div class="result-item" style="margin-bottom: 15px">
                     <label>Días de Vacaciones Calculados</label>
@@ -751,10 +795,3 @@
     </a>
   </body>
 </html>
-
-
-
-
-
-
-

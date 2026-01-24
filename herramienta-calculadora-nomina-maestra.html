@@ -9,43 +9,70 @@
       content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;"
     />
 
-        <title>Herramienta Calculadora Nomina Maestra | Tu Abogado Laboral</title>
-    <meta name="description" content="Utilice nuestra herramienta de Calculadora Nomina Maestra gratis. CÃ¡lculo actualizado 2026 bajo normativa laboral colombiana. AsesorÃ­a experta en Barranquilla." />
-    
+    <title>Herramienta Calculadora Nomina Maestra | Tu Abogado Laboral</title>
+    <meta
+      name="description"
+      content="Utilice nuestra herramienta de Calculadora Nomina Maestra gratis. CÃ¡lculo actualizado 2026 bajo normativa laboral colombiana. AsesorÃ­a experta en Barranquilla."
+    />
+
     <!-- Open Graph -->
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="Herramienta de Calculadora Nomina Maestra | Tu Abogado Laboral" />
-    <meta property="og:description" content="Calculadora laboral gratuita y actualizada. Realice sus cuentas claras con Tu Abogado Laboral." />
-    <meta property="og:image" content="https://tuabogadolaboral.com.co/img/logo-principal.webp" />
-    <meta property="og:url" content="https://tuabogadolaboral.com.co/herramienta-calculadora-nomina-maestra.html" />
-    
+    <meta
+      property="og:title"
+      content="Herramienta de Calculadora Nomina Maestra | Tu Abogado Laboral"
+    />
+    <meta
+      property="og:description"
+      content="Calculadora laboral gratuita y actualizada. Realice sus cuentas claras con Tu Abogado Laboral."
+    />
+    <meta
+      property="og:image"
+      content="https://tuabogadolaboral.com.co/img/logo-principal.webp"
+    />
+    <meta
+      property="og:url"
+      content="https://tuabogadolaboral.com.co/herramienta-calculadora-nomina-maestra.html"
+    />
+
     <!-- Schema Breadcrumb -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
-        "itemListElement": [{
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Inicio",
-          "item": "https://tuabogadolaboral.com.co"
-        },{
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Herramientas",
-          "item": "https://tuabogadolaboral.com.co/blog.html"
-        },{
-          "@type": "ListItem",
-          "position": 3,
-          "name": "Calculadora Nomina Maestra"
-        }]
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://tuabogadolaboral.com.co"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Herramientas",
+            "item": "https://tuabogadolaboral.com.co/blog.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Calculadora Nomina Maestra"
+          }
+        ]
       }
     </script>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+      defer
+    ></script>
     <link rel="stylesheet" href="css/critical.css" />
     <!-- Defer Non-Critical CSS -->
-    <link rel="stylesheet" href="css/style.css" media="print" onload="this.media='all'" />
+    <link
+      rel="stylesheet"
+      href="css/style.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
     <noscript><link rel="stylesheet" href="css/style.css" /></noscript>
     <link
       href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=optional"
@@ -224,7 +251,7 @@
                 </h3>
 
                 <div class="form-group">
-                  <label>Tipo de Vinculación</label>
+                  <label for="tipoContrato">Tipo de Vinculación</label>
                   <div class="input-group">
                     <i class="fas fa-file-contract input-icon"></i>
                     <select id="tipoContrato" class="form-control">
@@ -294,7 +321,9 @@
                 </div>
 
                 <div class="form-group">
-                  <label>Otros Ingresos (Bonos/Comisiones)</label>
+                  <label for="otrosIngresos"
+                    >Otros Ingresos (Bonos/Comisiones)</label
+                  >
                   <div class="input-group">
                     <i class="fas fa-plus-circle input-icon"></i>
                     <input
@@ -314,7 +343,9 @@
 
                 <div id="panelLaboral">
                   <div class="form-group">
-                    <label>Exoneración Aportes (Empresa)</label>
+                    <label for="selectExonerado"
+                      >Exoneración Aportes (Empresa)</label
+                    >
                     <div class="input-group">
                       <i class="fas fa-hand-holding-usd input-icon"></i>
                       <select id="selectExonerado" class="form-control">
@@ -325,7 +356,7 @@
                   </div>
                   <div class="form-grid-2">
                     <div class="form-group">
-                      <label>Riesgo ARL</label>
+                      <label for="nivelArl">Riesgo ARL</label>
                       <select id="nivelArl" class="form-control">
                         <option value="0.00522">I (0.522%)</option>
                         <option value="0.01044">II (1.044%)</option>
@@ -335,7 +366,7 @@
                       </select>
                     </div>
                     <div class="form-group">
-                      <label>Ley Pensional (FSP)</label>
+                      <label for="leyPensional">Ley Pensional (FSP)</label>
                       <select id="leyPensional" class="form-control">
                         <option value="ley100">Ley 100</option>
                         <option value="ley2381" selected>
@@ -368,7 +399,7 @@
                   >
                   <div class="form-grid-2">
                     <div class="form-group">
-                      <small>Medicina Prepagada</small>
+                      <label for="dedPrepagada">Medicina Prepagada</label>
                       <input
                         type="number"
                         id="dedPrepagada"
@@ -377,14 +408,14 @@
                       />
                     </div>
                     <div class="form-group">
-                      <small>Dependientes</small>
+                      <label>Dependientes</label>
                       <div class="check-group" style="height: 38px">
                         <input type="checkbox" id="checkDependientes" />
                         <label for="checkDependientes">Sí (10%)</label>
                       </div>
                     </div>
                     <div class="form-group">
-                      <small>Intereses Vivienda</small>
+                      <label for="dedVivienda">Intereses Vivienda</label>
                       <input
                         type="number"
                         id="dedVivienda"
@@ -393,7 +424,7 @@
                       />
                     </div>
                     <div class="form-group">
-                      <small>Aportes Voluntarios</small>
+                      <label for="dedVoluntarios">Aportes Voluntarios</label>
                       <input
                         type="number"
                         id="dedVoluntarios"
@@ -889,11 +920,3 @@
     <script src="js/calculadora-nomina.js"></script>
   </body>
 </html>
-
-
-
-
-
-
-
-

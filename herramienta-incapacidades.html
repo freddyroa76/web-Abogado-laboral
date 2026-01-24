@@ -9,36 +9,55 @@
       content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;"
     />
 
-        <title>Herramienta Incapacidades | Tu Abogado Laboral</title>
-    <meta name="description" content="Utilice nuestra herramienta de Incapacidades gratis. CÃ¡lculo actualizado 2026 bajo normativa laboral colombiana. AsesorÃ­a experta en Barranquilla." />
-    
+    <title>Herramienta Incapacidades | Tu Abogado Laboral</title>
+    <meta
+      name="description"
+      content="Utilice nuestra herramienta de Incapacidades gratis. CÃ¡lculo actualizado 2026 bajo normativa laboral colombiana. AsesorÃ­a experta en Barranquilla."
+    />
+
     <!-- Open Graph -->
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="Herramienta de Incapacidades | Tu Abogado Laboral" />
-    <meta property="og:description" content="Calculadora laboral gratuita y actualizada. Realice sus cuentas claras con Tu Abogado Laboral." />
-    <meta property="og:image" content="https://tuabogadolaboral.com.co/img/logo-principal.webp" />
-    <meta property="og:url" content="https://tuabogadolaboral.com.co/herramienta-incapacidades.html" />
-    
+    <meta
+      property="og:title"
+      content="Herramienta de Incapacidades | Tu Abogado Laboral"
+    />
+    <meta
+      property="og:description"
+      content="Calculadora laboral gratuita y actualizada. Realice sus cuentas claras con Tu Abogado Laboral."
+    />
+    <meta
+      property="og:image"
+      content="https://tuabogadolaboral.com.co/img/logo-principal.webp"
+    />
+    <meta
+      property="og:url"
+      content="https://tuabogadolaboral.com.co/herramienta-incapacidades.html"
+    />
+
     <!-- Schema Breadcrumb -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
-        "itemListElement": [{
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Inicio",
-          "item": "https://tuabogadolaboral.com.co"
-        },{
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Herramientas",
-          "item": "https://tuabogadolaboral.com.co/blog.html"
-        },{
-          "@type": "ListItem",
-          "position": 3,
-          "name": "Incapacidades"
-        }]
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://tuabogadolaboral.com.co"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Herramientas",
+            "item": "https://tuabogadolaboral.com.co/blog.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Incapacidades"
+          }
+        ]
       }
     </script>
     <link rel="icon" href="img/favicon.webp" type="image/webp" />
@@ -49,9 +68,17 @@
 
     <link rel="stylesheet" href="css/critical.css" />
     <!-- Defer Non-Critical CSS -->
-    <link rel="stylesheet" href="css/style.css" media="print" onload="this.media='all'" />
+    <link
+      rel="stylesheet"
+      href="css/style.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
     <noscript><link rel="stylesheet" href="css/style.css" /></noscript>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+      defer
+    ></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;700;900&display=optional"
       rel="stylesheet"
@@ -168,7 +195,11 @@
                   >Parámetros SMLV:</small
                 >
                 <div style="display: flex; align-items: center; gap: 5px">
-                  <label style="margin: 0; font-size: 0.8rem">SMMLV</label>
+                  <label
+                    for="confSalarioMin"
+                    style="margin: 0; font-size: 0.8rem"
+                    >SMMLV</label
+                  >
                   <input
                     type="number"
                     id="confSalarioMin"
@@ -188,7 +219,7 @@
 
               <div class="form-grid-2">
                 <div class="form-group">
-                  <label>Salario Base (IBC)</label>
+                  <label for="salarioBase">Salario Base (IBC)</label>
                   <div class="input-group">
                     <i class="fas fa-dollar-sign input-icon"></i>
                     <input
@@ -201,7 +232,7 @@
                   </div>
                 </div>
                 <div class="form-group">
-                  <label>Origen de la Incapacidad</label>
+                  <label for="tipoIncapacidad">Origen de la Incapacidad</label>
                   <div class="input-group">
                     <i class="fas fa-file-medical input-icon"></i>
                     <select id="tipoIncapacidad" class="form-control">
@@ -218,7 +249,9 @@
 
               <div class="form-grid-2" style="margin-top: 20px">
                 <div class="form-group">
-                  <label>Días de Incapacidad (Actual)</label>
+                  <label for="diasSolicitados"
+                    >Días de Incapacidad (Actual)</label
+                  >
                   <div class="input-group">
                     <i class="far fa-clock input-icon"></i>
                     <input
@@ -231,7 +264,7 @@
                   </div>
                 </div>
                 <div class="form-group">
-                  <label>Días Acumulados (Prórroga)</label>
+                  <label for="diasAcumulados">Días Acumulados (Prórroga)</label>
                   <div class="input-group">
                     <i class="fas fa-history input-icon"></i>
                     <input
@@ -258,9 +291,16 @@
             <div class="result-container" id="printArea">
               <div class="result-header">
                 <div>
-                  <h3 style="margin: 0; font-size: 1.3rem">
+                  <h2
+                    style="
+                      margin: 0;
+                      font-size: 1.3rem;
+                      font-weight: bold;
+                      color: white;
+                    "
+                  >
                     Liquidación de Incapacidad
-                  </h3>
+                  </h2>
                   <small style="opacity: 0.9"
                     >Detalle de pagos y responsables</small
                   >
@@ -488,11 +528,3 @@
     </script>
   </body>
 </html>
-
-
-
-
-
-
-
-

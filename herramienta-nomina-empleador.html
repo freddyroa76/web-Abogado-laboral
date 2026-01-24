@@ -395,7 +395,7 @@
 
                 <div class="form-grid-3" style="margin-top: 15px">
                   <div class="form-group">
-                    <label>Nivel de Riesgo ARL</label>
+                    <label for="nivelArl">Nivel de Riesgo ARL</label>
                     <div class="input-group">
                       <i class="fas fa-hard-hat input-icon"></i>
                       <select
@@ -423,7 +423,9 @@
                   </div>
 
                   <div class="form-group" style="grid-column: span 2">
-                    <label>Beneficio Tributario (Exoneración Aportes)</label>
+                    <label for="selectExonerado"
+                      >Beneficio Tributario (Exoneración Aportes)</label
+                    >
                     <div class="input-group">
                       <i class="fas fa-hand-holding-usd input-icon"></i>
                       <select
@@ -439,12 +441,12 @@
                 </div>
               </div>
 
-              <h3 class="section-title">
+              <h2 class="section-title">
                 <i class="fas fa-money-bill-wave"></i> Datos Salariales
-              </h3>
+              </h2>
               <div class="form-grid-3">
                 <div class="form-group">
-                  <label>Salario Base Mensual</label>
+                  <label for="salario">Salario Base Mensual</label>
                   <div class="input-group">
                     <i class="fas fa-dollar-sign input-icon"></i>
                     <input
@@ -466,7 +468,15 @@
                         id="checkAux"
                         style="width: 18px; height: 18px; accent-color: #10214b"
                       />
-                      <span>¿Paga Auxilio?</span>
+                      <label
+                        for="checkAux"
+                        style="
+                          font-weight: normal;
+                          margin-bottom: 0;
+                          cursor: pointer;
+                        "
+                        >¿Paga Auxilio?</label
+                      >
                     </div>
                     <div
                       id="inputAuxContainer"
@@ -483,7 +493,7 @@
                 </div>
 
                 <div class="form-group">
-                  <label>Total Otros Salariales</label>
+                  <label for="otrosSalariales">Total Otros Salariales</label>
                   <div class="input-group">
                     <i class="fas fa-plus-circle input-icon"></i>
                     <input
