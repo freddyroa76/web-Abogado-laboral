@@ -8,6 +8,10 @@
   --tertiary: #d0c3ba; /* Taupe / Gris Cálido */
   --bg-page: #ebe7e1; /* Crema Suave (Fondo) */
 
+  /* Typography Variables */
+  --font-heading: "Montserrat", sans-serif;
+  --font-body: "Lato", sans-serif;
+
   /* Colores neutros de apoyo */
   --white: #ffffff; /* Blanco puro (para tarjetas) */
   --text-body: #333333; /* Gris oscuro para lectura */
@@ -46,7 +50,7 @@
 }
 
 body {
-  font-family: "Lato", sans-serif;
+  font-family: var(--font-body);
   color: var(--text-body);
   line-height: 1.6;
   /* Aplicamos el color crema suave de fondo general */
@@ -60,7 +64,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Montserrat", sans-serif;
+  font-family: var(--font-heading);
   color: var(--primary);
   font-weight: 700;
 }
@@ -157,7 +161,8 @@ header {
 
 .nav-menu a {
   color: var(--primary);
-  font-weight: 600;
+  font-family: var(--font-heading);
+  font-weight: 700;
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -225,6 +230,7 @@ header {
 
 .subtitle {
   color: var(--secondary);
+  font-family: var(--font-heading);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 3px;
@@ -235,6 +241,7 @@ header {
 
 .hero h1 {
   font-size: 3.5rem;
+  font-weight: 900; /* Extra Bold para impacto de marca */
   line-height: 1.2;
   color: var(--white);
   margin-bottom: 25px;
@@ -254,6 +261,7 @@ header {
   display: inline-block;
   padding: 15px 35px;
   border-radius: 4px;
+  font-family: var(--font-heading);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
