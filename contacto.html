@@ -420,11 +420,20 @@
         }
       }
 
-      /* CLS FIXES (Mobile) */
+      /* CLS FIXES (Mobile & Header) */
+      header {
+        min-height: 85px; /* Reserve Header Height */
+      }
+      .header-container {
+        min-height: 85px; /* Ensure flex container also has height */
+      }
       #mobile-menu {
+        width: 48px;
+        height: 48px;
         min-width: 48px;
         min-height: 48px;
-        display: flex; /* Ensure flex behavior matches loading */
+        display: flex !important; /* Ensure it doesn't pop in */
+        contain: layout size; /* Browser Optimization */
       }
       .section-title h2 {
         min-height: 80px; /* Reserve space for 2 lines if needed */
