@@ -431,16 +431,24 @@
           height: 450px !important;
           min-height: 450px !important; /* Reserve space before image loads */
           padding: 0 20px;
+          /* CLS FIX: Pin content to top instead of centering */
+          justify-content: flex-start !important;
+          padding-top: 100px !important;
         }
 
         /* Font Loading Stability: Reserve height for text */
         .inner-hero h1 {
           min-height: 80px;
           font-size: 2.2rem;
+          margin-bottom: 10px;
         }
         .subtitle {
           display: block;
           min-height: 24px;
+        }
+        /* Lock description height */
+        .inner-hero p {
+          min-height: 80px;
         }
       }
 
