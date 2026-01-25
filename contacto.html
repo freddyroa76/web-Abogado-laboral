@@ -424,19 +424,30 @@
       }
 
       /* CLS FIXES (Mobile & Header) */
+      /* CLS FIXES (Mobile & Header) */
       header {
         min-height: 85px; /* Reserve Header Height */
       }
       .header-container {
         min-height: 85px; /* Ensure flex container also has height */
       }
+      /* Hide mobile menu on desktop by default */
       #mobile-menu {
-        width: 48px;
-        height: 48px;
-        min-width: 48px;
-        min-height: 48px;
-        display: flex !important; /* Ensure it doesn't pop in */
-        contain: layout size; /* Browser Optimization */
+        display: none !important;
+      }
+      .section-title h2 {
+        min-height: 80px; /* Reserve space for 2 lines if needed */
+      }
+
+      @media (max-width: 768px) {
+        #mobile-menu {
+          width: 48px;
+          height: 48px;
+          min-width: 48px;
+          min-height: 48px;
+          display: flex !important; /* Show on mobile with containment */
+          contain: layout size;
+        }
       }
       .section-title h2 {
         min-height: 80px; /* Reserve space for 2 lines if needed */
