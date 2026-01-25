@@ -1,86 +1,17 @@
-# ----------------------------------------------------------------------
-# | Error Page (404)                                                   |
-# ----------------------------------------------------------------------
-ErrorDocument 404 /404.html
-
-# ----------------------------------------------------------------------
-# | Compression                                                        |
-# ----------------------------------------------------------------------
-
-<IfModule mod_deflate.c>
-    # Force compression for mangled headers
-    <IfModule mod_setenvif.c>
-        <IfModule mod_headers.c>
-            SetEnvIfNoCase ^(Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$ ^((gzip|deflate)\s*,?\s*)+|[X~-]{4,13}$ HAVE_Accept-Encoding
-            RequestHeader append Accept-Encoding "gzip,deflate" env=HAVE_Accept-Encoding
-        </IfModule>
-    </IfModule>
-
-    # Compress all output labeled with the following MIME-types
-    <IfModule mod_filter.c>
-        AddOutputFilterByType DEFLATE application/atom+xml \
-                                      application/javascript \
-                                      application/json \
-                                      application/rss+xml \
-                                      application/vnd.ms-fontobject \
-                                      application/x-font-ttf \
-                                      application/x-web-app-manifest+json \
-                                      application/xhtml+xml \
-                                      application/xml \
-                                      font/opentype \
-                                      image/svg+xml \
-                                      image/x-icon \
-                                      text/css \
-                                      text/html \
-                                      text/plain \
-                                      text/x-component \
-                                      text/xml
-    </IfModule>
-</IfModule>
-
-# ----------------------------------------------------------------------
-# | Browser Caching                                                    |
-# ----------------------------------------------------------------------
-
-<IfModule mod_expires.c>
-    ExpiresActive On
-    ExpiresDefault "access plus 1 month"
-
-  # CSS and JavaScript
-    ExpiresByType text/css "access plus 1 year"
-    ExpiresByType application/javascript "access plus 1 year"
-
-  # Images
-    ExpiresByType image/gif "access plus 1 month"
-    ExpiresByType image/png "access plus 1 month"
-    ExpiresByType image/jpg "access plus 1 month"
-    ExpiresByType image/jpeg "access plus 1 month"
-    ExpiresByType image/webp "access plus 1 month"
-    ExpiresByType image/svg+xml "access plus 1 month"
-    ExpiresByType image/x-icon "access plus 1 year"
-
-  # Fonts
-    ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
-    ExpiresByType application/x-font-ttf "access plus 1 year"
-    ExpiresByType font/opentype "access plus 1 year"
-    ExpiresByType font/woff "access plus 1 year"
-    ExpiresByType font/woff2 "access plus 1 year"
-    ExpiresByType font/woff "access plus 1 year"
-    ExpiresByType font/woff2 "access plus 1 year"
-</IfModule>
-
 <IfModule mod_headers.c>
-    # HTML Caching: Allow bfcache (back/forward cache)
-    # "no-cache" means "check with server before showing", but allows storing in bfcache.
-    # "no-store" would BREAK bfcache.
+    # Cache Control for Static Assets
+    <FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|webp|js|css|swf)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    
+    # HTML Caching (short duration or no-cache usually, but setting brief cache for performance if content doesn't change often)
+    # Using 1 hour for HTML
     <FilesMatch "\.(html|htm)$">
-        Header set Cache-Control "public, max-age=0, must-revalidate, no-cache"
+        Header set Cache-Control "public, max-age=3600"
     </FilesMatch>
 </IfModule>
 
-# ----------------------------------------------------------------------
-# | Persistent Connections (Keep-Alive)                                |
-# ----------------------------------------------------------------------
-<IfModule mod_headers.c>
-    Header set Connection keep-alive
+# Enable Gzip Compression if available
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
 </IfModule>

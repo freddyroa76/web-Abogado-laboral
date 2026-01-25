@@ -194,6 +194,7 @@ header {
   line-height: 1.2;
   color: var(--white);
   margin-bottom: 25px;
+  min-height: 4.2rem; /* CLS Prevention */
 }
 .hero p {
   font-size: 1.25rem;
@@ -210,6 +211,7 @@ header {
   font-size: 0.9rem;
   display: block;
   margin-bottom: 15px;
+  min-height: 1.2rem; /* CLS Prevention */
 }
 
 /* Critical Buttons */
