@@ -427,7 +427,9 @@
       header {
         height: 85px; /* STRICT height */
         min-height: 85px;
-        contain: layout; /* Isolate header layout */
+        position: relative !important; /* Force flow, no overlap */
+        z-index: 1000;
+        /* contain: layout; Removed to ensure standard stacking context behavior */
       }
       .header-container {
         height: 85px;
