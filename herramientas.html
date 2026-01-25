@@ -80,10 +80,7 @@
     <script src="js/main.js" defer></script>
 
     <style>
-      :root {
-        --primary: #10214b;
-        --secondary: #d4af37; /* Dorado Corporativo */
-      }
+      /* :root removed to inherit correct variables from critical.css */
 
       /* CORRECCIÓN 1: Evitar el scroll horizontal (Margen blanco a la derecha) */
       html,
@@ -284,9 +281,38 @@
     <div class="top-bar">
       <div class="container">
         <div class="info">
-          <i class="fas fa-phone-alt"></i> (+57) 321 792 7495
+          <a href="tel:+573217927495" style="margin-right: 15px"
+            ><i class="fas fa-phone-alt"></i> (+57) 321 792 7495</a
+          >
           <span class="separador">|</span>
-          <i class="fas fa-envelope"></i> tuabogadolaboral@outlook.com
+          <a href="mailto:tuabogadolaboral@outlook.com"
+            ><i class="fas fa-envelope"></i> tuabogadolaboral@outlook.com</a
+          >
+        </div>
+        <div class="social-icons">
+          <a
+            href="https://web.facebook.com/profile.php?id=100064878228146"
+            target="_blank"
+            aria-label="Facebook"
+          >
+            <i class="fab fa-facebook-f"></i>
+          </a>
+
+          <a
+            href="https://www.instagram.com/tuabogadolaboralbq/"
+            target="_blank"
+            aria-label="Instagram"
+          >
+            <i class="fab fa-instagram"></i>
+          </a>
+
+          <a
+            href="https://www.linkedin.com/in/dra-johana-manga-padilla-5745b542/"
+            target="_blank"
+            aria-label="LinkedIn"
+          >
+            <i class="fab fa-linkedin-in"></i>
+          </a>
         </div>
       </div>
     </div>

@@ -62,8 +62,8 @@
     <!-- Critical CSS Inlined (Fix Render Blocking) -->
     <style>
       /* =========================================
-      CRITICAL CSS (Loading First)
-      ========================================= */
+        CRITICAL CSS (Loading First)
+        ========================================= */
       :root {
         --primary: #10214b;
         --secondary: #d7bd88;
@@ -400,7 +400,17 @@
         }
       }
 
-      /* CRITICAL HERO STYLES (Moved from inline for Responsive support) */
+      /* CRITICAL HERO STYLES (Fixed Overlap & CLS) */
+      /* 1. Header Isolation: Force it to sit in flow */
+      header {
+        position: relative !important;
+        background: white !important;
+        z-index: 1005 !important;
+        width: 100%;
+        top: 0;
+      }
+
+      /* 2. Hero container: Must push DOWN, not pull up */
       .inner-hero {
         position: relative;
         background-color: var(--primary);
@@ -410,69 +420,40 @@
         flex-direction: column;
         justify-content: center;
         text-align: center;
+        margin-top: 0 !important; /* Prevent negative margin overlap */
+        z-index: 1;
       }
 
+      /* 3. Mobile Stability (CLS) */
       @media (max-width: 768px) {
         .inner-hero {
           aspect-ratio: auto !important;
-          height: 450px !important; /* Force override for CLS */
-          min-height: 450px !important;
+          height: 450px !important;
+          min-height: 450px !important; /* Reserve space before image loads */
           padding: 0 20px;
-          overflow: hidden !important; /* clipped content */
-          contain: content; /* strict isolation */
+        }
+
+        /* Font Loading Stability: Reserve height for text */
+        .inner-hero h1 {
+          min-height: 80px;
+          font-size: 2.2rem;
+        }
+        .subtitle {
+          display: block;
+          min-height: 24px;
         }
       }
 
-      /* CLS FIXES (Mobile & Header) */
-      header {
-        height: 85px; /* STRICT height */
-        min-height: 85px;
-        position: relative !important; /* Force flow, no overlap */
-        z-index: 1000;
-        /* contain: layout; Removed to ensure standard stacking context behavior */
-      }
-      .header-container {
-        height: 85px;
-        min-height: 85px;
-      }
-
-      /* Hide mobile menu on desktop by default */
-      #mobile-menu {
-        display: none !important;
-      }
-
-      .section-title h2 {
-        min-height: 80px; /* Reserve space for 2 lines if needed */
-      }
-
-      @media (max-width: 768px) {
-        #mobile-menu {
-          width: 48px;
-          height: 48px;
-          min-width: 48px;
-          min-height: 48px;
-          display: flex !important; /* Show on mobile with containment */
-          contain: layout size;
-        }
-        /* Lock text height to prevent Font Swap Shifts */
-        .hero h1 {
-          min-height: 110px; /* space for ~3 lines */
-          font-size: 2.2rem; /* verify consistency */
-        }
-        .hero p {
-          min-height: 120px; /* space for ~4 lines */
-        }
-      }
-      .section-title h2 {
-        min-height: 80px; /* Reserve space for 2 lines if needed */
-      }
-
-      /* HERO IMAGE FIX */
+      /* HERO IMAGE FIX: Ensure it covers but sits behind text */
       .hero-fix {
         width: 100%;
         height: 100%;
         object-fit: cover;
         object-position: top;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 0; /* Behind overlay and text */
       }
     </style>
 
