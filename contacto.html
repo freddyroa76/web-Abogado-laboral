@@ -415,7 +415,8 @@
       @media (max-width: 768px) {
         .inner-hero {
           aspect-ratio: auto !important;
-          min-height: 450px;
+          height: 450px; /* FIXED height to prevent push */
+          min-height: 450px; /* Fallback */
           padding: 0 20px;
         }
       }
