@@ -438,6 +438,14 @@
       .section-title h2 {
         min-height: 80px; /* Reserve space for 2 lines if needed */
       }
+
+      /* HERO IMAGE FIX */
+      .hero-fix {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top;
+      }
     </style>
 
     <!-- Defer Non-Critical CSS -->
@@ -467,12 +475,19 @@
 
     <link
       rel="stylesheet"
-      href="css/fontawesome-optimized.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
       media="print"
       onload="this.media = 'all'"
     />
     <noscript>
-      <link rel="stylesheet" href="css/fontawesome-optimized.css" />
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+      />
     </noscript>
     <!-- Advertencia: Revisar js/main.min.js manualmente por posibles errores de sintaxis reportados -->
     <script src="js/main.js" defer></script>
@@ -600,22 +615,14 @@
         <!-- LCP Image: Inline, Eager, High Priority -->
         <img
           src="img/header-contacto.webp"
+          width="1080"
+          height="450"
+          class="hero-fix"
+          alt="Contacto Abogado Laboral"
           fetchpriority="high"
           loading="eager"
           decoding="sync"
-          sizes="100vw"
-          alt=""
-          width="1920"
-          height="600"
-          style="
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 0;
-          "
+          style="position: absolute; top: 0; left: 0; z-index: 0"
         />
         <!-- Overlay -->
         <div
