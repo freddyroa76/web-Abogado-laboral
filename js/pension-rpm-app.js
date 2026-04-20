@@ -508,7 +508,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const mesadaCalculada = Math.round(bestCalc.ibl * (tasaFinal / 100));
                 const mesadaFinal = Math.max(state.formData.smlv, Math.min(mesadaCalculada, state.formData.smlv * 25)); 
-                return { rate: tasaFinal / 100, extra: semExtra, grupos, mesada: mesadaFinal };
+                
+                let porcentajeSalud = 12;
+                if (mesadaFinal <= state.formData.smlv) {
+                    porcentajeSalud = 4;
+                } else if (mesadaFinal > state.formData.smlv && mesadaFinal <= (state.formData.smlv * 3)) {
+                    porcentajeSalud = 10;
+                }
+                const descuentoSalud = Math.round(mesadaFinal * (porcentajeSalud / 100));
+                const mesadaNeta = mesadaFinal - descuentoSalud;
+
+                return { rate: tasaFinal / 100, extra: semExtra, grupos, mesada: mesadaFinal, porcentajeSalud, descuentoSalud, mesadaNeta };
             };
 
             const vA = getRes(true); 
@@ -590,8 +600,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 text-center">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Mesada Base ${res.isVerification ? 'Verificada' : 'Proyectada'}</p>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Mesada Base Bruta ${res.isVerification ? 'Verificada' : 'Proyectada'}</p>
                             <p class="text-3xl font-black text-slate-800">${formatCurrency(res.vA.mesada)}</p>
+                            <div class="mt-4 pt-4 border-t border-slate-200 grid grid-cols-2 gap-2 text-left">
+                                <div>
+                                    <p class="text-[10px] uppercase text-slate-400 font-bold">Salud (${res.vA.porcentajeSalud}%)</p>
+                                    <p class="text-sm font-semibold text-red-500">-${formatCurrency(res.vA.descuentoSalud)}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[10px] uppercase text-slate-400 font-bold">Neto a Pagar</p>
+                                    <p class="text-sm font-black text-green-600">${formatCurrency(res.vA.mesadaNeta)}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -617,8 +637,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="bg-orange-50/50 p-5 rounded-xl border border-secondary/20 text-center">
-                            <p class="text-xs font-bold text-secondary uppercase tracking-wide mb-1">Mesada Reliquidada ${res.isVerification ? 'Verificada' : 'Proyectada'}</p>
+                            <p class="text-xs font-bold text-secondary uppercase tracking-wide mb-1">Mesada Reliquidada Bruta ${res.isVerification ? 'Verificada' : 'Proyectada'}</p>
                             <p class="text-3xl font-black text-primary">${formatCurrency(res.vB.mesada)}</p>
+                            <div class="mt-4 pt-4 border-t border-secondary/20 grid grid-cols-2 gap-2 text-left">
+                                <div>
+                                    <p class="text-[10px] uppercase text-secondary/60 font-bold">Salud (${res.vB.porcentajeSalud}%)</p>
+                                    <p class="text-sm font-semibold text-red-500">-${formatCurrency(res.vB.descuentoSalud)}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[10px] uppercase text-secondary/60 font-bold">Neto a Pagar</p>
+                                    <p class="text-sm font-black text-green-600">${formatCurrency(res.vB.mesadaNeta)}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -626,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${res.vB.mesada > res.vA.mesada ? `
                 <div class="card-legal p-6 md:p-8 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6 bg-slate-50 border-l-4 border-l-primary mt-8">
                     <div class="flex-1 text-center md:text-left">
-                        <h5 class="text-xl font-bold text-primary">${res.isVerification ? 'Verificación a Favor' : 'Proyección a Favor'}: <span class="text-secondary">${formatCurrency(res.vB.mesada - res.vA.mesada)} Mensual</span></h5>
+                        <h5 class="text-xl font-bold text-primary">${res.isVerification ? 'Verificación a Favor' : 'Proyección a Favor'}: <span class="text-secondary">${formatCurrency(res.vB.mesada - res.vA.mesada)} Mensual (Bruto)</span></h5>
                         <p class="text-sm text-slate-600 mt-2 leading-relaxed">
                             Existe viabilidad matemática para buscar la reliquidación, dado que la estimación bajo los lineamientos de la Corte Suprema arroja una tasa superior.
                         </p>
@@ -686,8 +716,10 @@ document.addEventListener('DOMContentLoaded', () => {
             startY: 85, 
             head: [['Concepto', 'Cálculo Administrativo (Colpensiones)', 'Proyección Jurisprudencial (CSJ SL3501-2022)']], 
             body: [
-                ['Mesada Estimada Resultante', formatCurrency(res.vA.mesada), formatCurrency(res.vB.mesada)], 
-                ['Diferencia Mensual Proyectada', '-', formatCurrency(res.vB.mesada - res.vA.mesada)]
+                ['Mesada Bruta Estimada', formatCurrency(res.vA.mesada), formatCurrency(res.vB.mesada)], 
+                [`Descuento Ley 2018/2020 Salud`, `-${formatCurrency(res.vA.descuentoSalud)} (${res.vA.porcentajeSalud}%)`, `-${formatCurrency(res.vB.descuentoSalud)} (${res.vB.porcentajeSalud}%)`],
+                ['Mesada Neta a Pagar', formatCurrency(res.vA.mesadaNeta), formatCurrency(res.vB.mesadaNeta)],
+                ['Beneficio Jurisprudencial (Bruto)', '-', `+ ${formatCurrency(res.vB.mesada - res.vA.mesada)}`]
             ], 
             theme: 'grid', 
             headStyles: { fillColor: [15, 23, 42] },
