@@ -199,27 +199,104 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 1; i <= doc.numPages; i++) {
                 const page = await doc.getPage(i);
                 const content = await page.getTextContent();
-                fullText += content.items.map(item => item.str).join(" ") + "\n";
+                fullText += content.items.map(item => item.str).join(" ") + " ";
             }
             
+            // Normalizamos todos los espacios múltiples o saltos de línea para estabilizar la extracción y partición
+            const normalizedText = fullText.replace(/\s+/g, ' ');
+
             const regexPDF = /(\d{5,15})\s+([^\n\r]{3,60}?)\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})\s+\$?\s*([\d.,]+)\s+([\d.,]+)/g;
-            const matches = []; let m;
             
-            while ((m = regexPDF.exec(fullText)) !== null) {
+            // Identificar dónde empieza el detalle antiguo para no mezclar reglas
+            let splitIndex = Infinity;
+            const markerRegex = /DETALLE\s+DE\s+PAGOS\s+EFECTUADOS/i;
+            const markerMatch = markerRegex.exec(normalizedText);
+            if (markerMatch) {
+                splitIndex = markerMatch.index;
+            }
+
+            const umbral1995 = new Date(1995, 0, 1);
+            let rawMatches = [];
+            let m;
+            
+            regexPDF.lastIndex = 0;
+            while ((m = regexPDF.exec(normalizedText)) !== null) {
                 const emp = m[2].trim().toUpperCase();
                 if (emp.includes("RAZÓN SOCIAL") || emp.includes("ADMINISTRADORA") || emp.includes("NOMBRE AFILIADO") || emp === "NIT") continue;
+                
                 const ibc = cleanIBC(m[5]);
-                const extractedDias = cleanIBC(m[6]);
-                if (ibc < 10 && extractedDias === 0) continue;
+                const extractedNum = cleanIBC(m[6]);
+                
+                if (ibc < 10 && extractedNum === 0) continue;
                 
                 const start = parseFlexibleDate(m[3]);
                 const end = parseFlexibleDate(m[4]);
                 
-                // Colpensiones ya certifica los días comerciales en el reporte (M[6])
-                const diasComerciales = extractedDias > 0 ? extractedDias : getDiasComerciales(start, end);
-                
-                matches.push({ nit: m[1], empresa: m[2].trim(), desde: formatDateForDisplay(m[3]), hasta: formatDateForDisplay(m[4]), ibc: ibc, dias: diasComerciales });
+                if (!start || !end) continue;
+
+                const isAntiguo = (splitIndex !== Infinity && m.index >= splitIndex);
+
+                if (!isAntiguo) {
+                    // Contexto 1: TABLA RESUMEN GENERAL (Semanas)
+                    const diasComerciales = getDiasComerciales(start, end);
+                    rawMatches.push({ 
+                        nit: m[1], 
+                        empresa: m[2].trim(), 
+                        desde: formatDateForDisplay(m[3]), 
+                        hasta: formatDateForDisplay(m[4]), 
+                        ibc: ibc, 
+                        dias: diasComerciales,
+                        inicioDate: start.getTime(),
+                        origen: 'resumen' 
+                    });
+                } else {
+                    // Contexto 2: TABLA DETALLE DE PAGOS (Días)
+                    const diasComerciales = extractedNum > 0 ? extractedNum : getDiasComerciales(start, end);
+                    rawMatches.push({ 
+                        nit: m[1], 
+                        empresa: m[2].trim(), 
+                        desde: formatDateForDisplay(m[3]), 
+                        hasta: formatDateForDisplay(m[4]), 
+                        ibc: ibc, 
+                        dias: diasComerciales,
+                        inicioDate: start.getTime(),
+                        origen: 'detalle' 
+                    });
+                }
             }
+
+            // --- FILTRADO INTELIGENTE (RESCATE DE BRECHAS Y ELIMINACIÓN DE CONSOLIDADOS ISS) ---
+            const nitsConDetalleViejo = new Set(
+                rawMatches.filter(r => r.origen === 'detalle').map(r => r.nit)
+            );
+            const empConDetalleViejo = new Set(
+                rawMatches.filter(r => r.origen === 'detalle').map(r => r.empresa.toUpperCase().replace(/\./g, '').trim())
+            );
+
+            const matches = [];
+            for (const r of rawMatches) {
+                if (r.origen === 'resumen' && r.inicioDate < umbral1995.getTime()) {
+                    // Es un consolidado pre-1995. Sólo lo descartamos si la Tabla 2 tiene su detalle.
+                    // Si no tiene detalle (ej. entidades públicas, cajas previsoras), LO RESCATAMOS.
+                    const matchNit = nitsConDetalleViejo.has(r.nit);
+                    const empClean = r.empresa.toUpperCase().replace(/\./g, '').trim();
+                    const matchEmp = empConDetalleViejo.has(empClean);
+                    
+                    if (matchNit || matchEmp) {
+                        continue; // Tabla 2 protegerá estos años, ignoramos este resumen errático.
+                    }
+                }
+                
+                matches.push({
+                    nit: r.nit,
+                    empresa: r.empresa,
+                    desde: r.desde,
+                    hasta: r.hasta,
+                    ibc: r.ibc,
+                    dias: r.dias
+                });
+            }
+
             if (matches.length === 0) throw new Error("No se detectaron filas de aportes válidas en el PDF. Intente subir el Excel (CSV).");
             state.history = matches;
             renderHistory();
@@ -578,91 +655,58 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="card-legal p-8 rounded-2xl flex flex-col">
+                <div class="space-y-6">
+                    <div class="card-legal p-8 rounded-2xl flex flex-col relative border-primary/20 ring-1 ring-primary/10 bg-white shadow-md">
+                        <div class="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-4 py-2 rounded-bl-lg rounded-tr-xl tracking-wider">RESULTADO PRINCIPAL</div>
                         <div class="mb-6">
-                            <span class="text-[10px] font-bold px-2.5 py-1 rounded bg-slate-100 text-slate-500 tracking-wider">CÁLCULO ADMINISTRATIVO</span>
-                            <h3 class="text-xl font-bold text-primary mt-3">Método Colpensiones</h3>
-                            <p class="text-sm font-semibold text-slate-500 mt-1">Estimación Ley 797 de 2003</p>
+                            <h3 class="text-2xl font-bold text-primary mt-3">Cálculo Colpensiones</h3>
+                            <p class="text-sm font-medium text-slate-500 mt-1">Estimación Ley 797 de 2003 (Tope 1.800 Semanas)</p>
                         </div>
-                        <div class="space-y-3 mb-8 flex-1">
-                            <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
-                                <span class="text-slate-600">Tope limitante aplicado</span>
-                                <span class="font-bold text-slate-800">1.800 Semanas</span>
-                            </div>
-                            <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
-                                <span class="text-slate-600">Incremento proyectado</span>
-                                <span class="font-bold text-slate-800">${(res.vA.extra / 50 * 1.5).toFixed(2)}%</span>
-                            </div>
-                            <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
-                                <span class="text-slate-600 font-semibold">Tasa Estimada Resultante</span>
-                                <span class="font-bold text-primary text-base">${(res.vA.rate * 100).toFixed(2)}%</span>
-                            </div>
-                        </div>
-                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 text-center">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Mesada Base Bruta ${res.isVerification ? 'Verificada' : 'Proyectada'}</p>
-                            <p class="text-3xl font-black text-slate-800">${formatCurrency(res.vA.mesada)}</p>
-                            <div class="mt-4 pt-4 border-t border-slate-200 grid grid-cols-2 gap-2 text-left">
-                                <div>
-                                    <p class="text-[10px] uppercase text-slate-400 font-bold">Salud (${res.vA.porcentajeSalud}%)</p>
-                                    <p class="text-sm font-semibold text-red-500">-${formatCurrency(res.vA.descuentoSalud)}</p>
+                        <div class="grid md:grid-cols-2 gap-8 items-center mb-4">
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
+                                    <span class="text-slate-600">Semanas Adicionales Computadas</span>
+                                    <span class="font-bold text-slate-800">${res.vA.extra.toFixed(2)}</span>
                                 </div>
-                                <div class="text-right">
-                                    <p class="text-[10px] uppercase text-slate-400 font-bold">Neto a Pagar</p>
-                                    <p class="text-sm font-black text-green-600">${formatCurrency(res.vA.mesadaNeta)}</p>
+                                <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
+                                    <span class="text-slate-600">Incremento Proy. (1.5% x Grupo 50)</span>
+                                    <span class="font-bold text-slate-800">${Math.floor(res.vA.extra / 50) * 1.5}%</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
+                                    <span class="text-slate-600 font-semibold">Tasa de Reemplazo Calculada</span>
+                                    <span class="font-bold text-primary text-base">${(res.vA.rate * 100).toFixed(2)}%</span>
+                                </div>
+                            </div>
+                            <div class="bg-slate-50/80 p-6 rounded-xl border border-slate-200">
+                                <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 text-center">Mesada Bruta ${res.isVerification ? 'Verificada' : 'Proyectada'}</p>
+                                <p class="text-4xl font-black text-slate-800 text-center">${formatCurrency(res.vA.mesada)}</p>
+                                <div class="mt-6 pt-4 border-t border-slate-200 grid grid-cols-2 gap-4 text-left">
+                                    <div>
+                                        <p class="text-[10px] uppercase text-slate-400 font-bold">Salud (${res.vA.porcentajeSalud}%)</p>
+                                        <p class="text-sm font-semibold text-red-500">-${formatCurrency(res.vA.descuentoSalud)}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[10px] uppercase text-slate-400 font-bold">Neto a Recibir</p>
+                                        <p class="text-lg font-black text-green-600">${formatCurrency(res.vA.mesadaNeta)}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card-legal p-8 rounded-2xl flex flex-col relative border-secondary/30 ring-1 ring-secondary/20">
-                        <div class="absolute top-0 right-0 bg-secondary text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-lg rounded-tr-xl tracking-wider">${res.isVerification ? 'VERIFICACIÓN ÓPTIMA' : 'PROYECCIÓN ÓPTIMA'}</div>
-                        <div class="mb-6">
-                            <span class="text-[10px] font-bold px-2.5 py-1 rounded bg-orange-50 text-secondary tracking-wider">CÁLCULO JURISPRUDENCIAL</span>
-                            <h3 class="text-xl font-bold text-primary mt-3">Método Corte Suprema</h3>
-                            <p class="text-sm font-semibold text-secondary mt-1">Estimación s/ SL3501-2022</p>
-                        </div>
-                        <div class="space-y-3 mb-8 flex-1">
-                            <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
-                                <span class="text-slate-600">Tope aplicable</span>
-                                <span class="font-bold text-slate-800">Límite de ley (80%)</span>
-                            </div>
-                            <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
-                                <span class="text-slate-600">Incremento proyectado</span>
-                                <span class="font-bold text-secondary">${(Math.floor(res.vB.extra / 50) * 1.5).toFixed(2)}%</span>
-                            </div>
-                            <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
-                                <span class="text-slate-600 font-semibold">Tasa Estimada Optima</span>
-                                <span class="font-bold text-primary text-base">${(res.vB.rate * 100).toFixed(2)}%</span>
-                            </div>
-                        </div>
-                        <div class="bg-orange-50/50 p-5 rounded-xl border border-secondary/20 text-center">
-                            <p class="text-xs font-bold text-secondary uppercase tracking-wide mb-1">Mesada Reliquidada Bruta ${res.isVerification ? 'Verificada' : 'Proyectada'}</p>
-                            <p class="text-3xl font-black text-primary">${formatCurrency(res.vB.mesada)}</p>
-                            <div class="mt-4 pt-4 border-t border-secondary/20 grid grid-cols-2 gap-2 text-left">
-                                <div>
-                                    <p class="text-[10px] uppercase text-secondary/60 font-bold">Salud (${res.vB.porcentajeSalud}%)</p>
-                                    <p class="text-sm font-semibold text-red-500">-${formatCurrency(res.vB.descuentoSalud)}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-[10px] uppercase text-secondary/60 font-bold">Neto a Pagar</p>
-                                    <p class="text-sm font-black text-green-600">${formatCurrency(res.vB.mesadaNeta)}</p>
-                                </div>
-                            </div>
+                    ${res.totalSem > 1800 ? `
+                    <div class="card-legal p-5 rounded-xl border border-slate-100 bg-slate-50/50">
+                        <div class="mb-3">
+                            <h4 class="text-sm font-bold text-slate-600"><i class="fas fa-info-circle mr-1 text-slate-400"></i> Nota Jurisprudencial (Corte Suprema)</h4>
+                            <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                                Si se aplica el criterio de la Sentencia <a href="https://www.cortesuprema.gov.co/corte/wp-content/uploads/relatorias/la/bnov2022/SL3501-2022.pdf" target="_blank" class="text-secondary hover:underline font-bold">SL3501-2022</a> (eliminando el tope máximo de 1.800 semanas para el cálculo de incrementos), 
+                                la tasa de reemplazo sería de <strong>${(res.vB.rate * 100).toFixed(2)}%</strong>, proyectando una Mesada Bruta de <strong>${formatCurrency(res.vB.mesada)}</strong> 
+                                y un Neto a Pagar de <strong>${formatCurrency(res.vB.mesadaNeta)}</strong>, lo cual representaría un diferencial a favor de <strong>${formatCurrency(res.vB.mesada - res.vA.mesada)}</strong> al mes.
+                            </p>
                         </div>
                     </div>
+                    ` : ''}
                 </div>
-
-                ${res.vB.mesada > res.vA.mesada ? `
-                <div class="card-legal p-6 md:p-8 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6 bg-slate-50 border-l-4 border-l-primary mt-8">
-                    <div class="flex-1 text-center md:text-left">
-                        <h5 class="text-xl font-bold text-primary">${res.isVerification ? 'Verificación a Favor' : 'Proyección a Favor'}: <span class="text-secondary">${formatCurrency(res.vB.mesada - res.vA.mesada)} Mensual (Bruto)</span></h5>
-                        <p class="text-sm text-slate-600 mt-2 leading-relaxed">
-                            Existe viabilidad matemática para buscar la reliquidación, dado que la estimación bajo los lineamientos de la Corte Suprema arroja una tasa superior.
-                        </p>
-                    </div>
-                </div>
-                ` : ''}
 
                 <div class="mt-8 flex flex-col md:flex-row justify-end gap-4 w-full">
                     <button id="btn-export-excel-dyn" class="bg-green-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-green-700 transition-colors flex items-center justify-center space-x-3 shadow-md w-full md:w-auto">
@@ -763,13 +807,23 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setFontSize(16); 
         doc.text(`ANEXO MATEMÁTICO: PROYECCIÓN DETALLADA (${res.bestName.toUpperCase()})`, W/2, 20, { align: 'center' });
 
-        doc.setTextColor(15, 23, 42); 
-        doc.setFontSize(11);
-        
-        doc.text(`Fórmula del IBL: =SUMA(IA X #DIAS) / Total Días Computados`, 15, 40);
-        doc.text(`Sumatoria Total (IA X #DIAS): ${formatCurrency(res.sumIaXDias)}`, 15, 48);
-        doc.text(`Total Días Computados: ${res.diasComputadosTotales}`, 15, 54);
-        doc.text(`IBL Estimado Resultante: ${formatCurrency(res.ibl)}`, 15, 60);
+        doc.autoTable({
+            startY: 38,
+            head: [['Resumen de Parámetros de Liquidación (Fórmula de Ponderación Actuarial)', 'Valor Numérico Contabilizado']],
+            body: [
+                ['Ecuación de Ponderación', '=SUMA(IA X #DIAS) / Total Días Computados'],
+                ['Sumatoria Histórica de Productos Financieros (IA x Días)', formatCurrency(res.sumIaXDias)],
+                ['Divisor de Tiempos Reglamentarios (Total Días Computados)', res.diasComputadosTotales],
+                ['IBL Estimado Definitivo (Ingreso Base de Liquidación)', formatCurrency(res.ibl)]
+            ],
+            theme: 'grid',
+            headStyles: { fillColor: [71, 85, 105], halign: 'left', fontSize: 11 },
+            styles: { fontSize: 10, cellPadding: 4 },
+            columnStyles: {
+                0: { fontStyle: 'bold', textColor: [51, 65, 85] },
+                1: { fontStyle: 'bold', textColor: [15, 23, 42], halign: 'right' }
+            }
+        });
 
         const tableBody = res.detailedReport.map(r => [
             r.empresa.substring(0, 18),
@@ -781,7 +835,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ]);
 
         doc.autoTable({
-            startY: 65,
+            startY: doc.lastAutoTable.finalY + 12,
             head: [['Razón Social / Aportante', 'Desde', 'Hasta', 'Días', 'F. IPC Final', 'IPC Final', 'F. IPC Inicial', 'IPC Inicial', 'Salario Base', 'Salario Indexado (IA)', 'IA X #DIAS']],
             body: tableBody,
             theme: 'striped',
