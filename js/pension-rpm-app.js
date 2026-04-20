@@ -522,6 +522,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 detailedReport: bestCalc.detailedReport,
                 detailedReport10Years: calc10Years.detailedReport,
                 detailedReportTodaVida: calcTodaVida.detailedReport,
+                calc10Years: calc10Years,
+                calcTodaVida: calcTodaVida,
                 sumIaXDias: bestCalc.sumIaXDias,
                 diasComputadosTotales: bestCalc.consumedDays,
                 vA: vA,
@@ -560,7 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <p class="text-xs text-slate-500 mt-1">Histórico general</p>
                     </div>
                     <div class="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-slate-400">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Tasa Base Decreciente</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Tasa Base</p>
                         <h3 class="text-2xl font-black text-primary mt-1">${res.tasaBase.toFixed(2)}%</h3>
                         <p class="text-xs text-slate-500 mt-1">Fórmula proyectada: 65.5 - 0.5s</p>
                     </div>
@@ -635,11 +637,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="mt-8 flex flex-col md:flex-row justify-end gap-4 w-full">
                     <button id="btn-export-excel-dyn" class="bg-green-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-green-700 transition-colors flex items-center justify-center space-x-3 shadow-md w-full md:w-auto">
                         <i class="fas fa-file-excel text-xl"></i>
-                        <span>Descargar Anexo Excel (10 Años / Toda La Vida)</span>
+                        <span>Detalle IBL</span>
                     </button>
-                    <button id="btn-export-pdf-dyn" class="bg-primary text-white px-8 py-4 rounded-xl font-bold hover:bg-slate-800 transition-colors flex items-center justify-center space-x-3 shadow-md w-full md:w-auto">
+                    <button id="btn-export-pdf-dyn" class="bg-red-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-red-700 transition-colors flex items-center justify-center space-x-3 shadow-md w-full md:w-auto">
                         <i class="fas fa-file-pdf text-xl"></i>
-                        <span>Descargar Reporte PDF Detallado</span>
+                        <span>Informe Detallado</span>
                     </button>
                 </div>
             </div>
@@ -709,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
             startY: doc.lastAutoTable.finalY + 20,
             head: [['Fase de Estimación', 'Método Administrativo (Tope 1800 Sem.)', 'Método CSJ (Sin Límite Semanas)']],
             body: [
-                ['Tasa Base Decreciente Estimada', baseRateStr, baseRateStr],
+                ['Tasa Base', baseRateStr, baseRateStr],
                 ['Semanas Adicionales a las 1.300', semExtraA.toFixed(1) + ' (Tope administrativo max)', semExtraB.toFixed(1) + ' (Totales estimadas)'],
                 ['Grupos de 50 Semanas Completos', gruposA, gruposB],
                 ['Incremento Proyectado (Grupos x 1.5%)', incA, incB],
@@ -768,7 +770,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const res = state.results;
         
         // Helper to format data for worksheet
-        const formatDataForWS = (reportArray) => {
+        const formatDataForWS = (reportArray, calcSummary) => {
+            const preData = [
+                ['RESUMEN DE LIQUIDACIÓN'],
+                ['Sumatoria Total (IA x Días):', calcSummary.sumIaXDias],
+                ['Total Días Computados:', calcSummary.consumedDays],
+                ['Fórmula del IBL:', '=SUMA(IA X #DIAS) / Total Días Computados'],
+                ['IBL Estimado:', calcSummary.ibl],
+                [],
+                ['DETALLE DE APORTES']
+            ];
+
             const headers = ['Razón Social / Aportante', 'Desde', 'Hasta', 'Días', 'F. IPC Final', 'IPC Final', 'F. IPC Inicial', 'IPC Inicial', 'Salario Base (Histórico)', 'Salario Indexado (IA)', 'IA X #DIAS'];
             const data = reportArray.map(r => [
                 r.empresa,
@@ -783,18 +795,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 r.ibcIndexado,
                 r.iaXDias
             ]);
-            return [headers, ...data];
+            return [...preData, headers, ...data];
         };
 
-        const wb = Math.random(); // Placeholder check, using XLSX
-        const ts10Years = formatDataForWS(res.detailedReport10Years || []);
-        const tsTodaVida = formatDataForWS(res.detailedReportTodaVida || []);
+        const ts10Years = formatDataForWS(res.detailedReport10Years || [], res.calc10Years || {sumIaXDias:0, consumedDays:0, ibl:0});
+        const tsTodaVida = formatDataForWS(res.detailedReportTodaVida || [], res.calcTodaVida || {sumIaXDias:0, consumedDays:0, ibl:0});
 
         const ws10Years = XLSX.utils.aoa_to_sheet(ts10Years);
         const wsTodaVida = XLSX.utils.aoa_to_sheet(tsTodaVida);
 
         // Auto-width columns basic setting
-        const wscols = [ {wch: 40}, {wch: 12}, {wch: 12}, {wch: 8}, {wch: 15}, {wch: 10}, {wch: 15}, {wch: 10}, {wch: 22}, {wch: 22}, {wch: 22} ];
+        const wscols = [ {wch: 40}, {wch: 15}, {wch: 15}, {wch: 8}, {wch: 15}, {wch: 10}, {wch: 15}, {wch: 10}, {wch: 22}, {wch: 22}, {wch: 22} ];
         ws10Years['!cols'] = wscols;
         wsTodaVida['!cols'] = wscols;
 
