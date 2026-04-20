@@ -1,4 +1,4 @@
-const CACHE_NAME = "abogado-laboral-v4";
+const CACHE_NAME = "abogado-laboral-v24";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",

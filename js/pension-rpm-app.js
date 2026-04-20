@@ -9,8 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
             genero: 'M',
             edad: '',
             anoLiquidacion: 2026,
-            smlv: SMLV_DATA[2026] || 1300000,
-            aceptadoTyC: false
+            smlv: SMLV_DATA[2026] || 1300000
         },
         history: [],
         results: null,
@@ -82,6 +81,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth()+1).padStart(2, '0')}/${dateObj.getFullYear()}`;
     };
 
+    const getDiasComerciales = (start, end) => {
+        if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
+        let d1 = start.getDate();
+        let d2 = end.getDate();
+        if (d1 === 31) d1 = 30;
+        if (d2 === 31) d2 = 30;
+        if (start.getMonth() === 1 && (d1 === 28 || d1 === 29)) d1 = 30;
+        if (end.getMonth() === 1 && (d2 === 28 || d2 === 29)) d2 = 30;
+        const yDiff = end.getFullYear() - start.getFullYear();
+        const mDiff = end.getMonth() - start.getMonth();
+        const dDiff = d2 - d1;
+        let total = (yDiff * 360) + (mDiff * 30) + dDiff + 1;
+        return total > 0 ? total : 0;
+    };
+
     const cleanIBC = (val) => {
         if (!val) return 0;
         const s = String(val).replace(/[^\d.,]/g, '');
@@ -92,32 +106,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const formatCurrency = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(v);
 
     function checkReadyToUpload() {
-        const isCedulaValid = state.formData.cedula.trim().length >= 5 && /^\d+$/.test(state.formData.cedula.trim());
-        const uploadZone = document.getElementById('upload-zone');
-        const uploadLocked = document.getElementById('upload-locked');
-        const uploadActive = document.getElementById('upload-active');
+        const isCedulaValid = state.formData.cedula && state.formData.cedula.trim().length >= 5;
+        const isEdadValid = state.formData.edad && state.formData.edad > 0;
+        const uploaderArea = document.getElementById('uploader-area');
         
-        if (isCedulaValid && state.formData.aceptadoTyC) {
-            uploadZone.classList.remove('bg-slate-50/50', 'cursor-not-allowed', 'border-dashed', 'border-2', 'border-slate-300');
-            uploadZone.classList.add('hover:bg-slate-50', 'cursor-pointer');
-            uploadLocked.classList.add('hidden');
-            uploadActive.classList.remove('hidden');
+        if (isCedulaValid && isEdadValid) {
+            uploaderArea.classList.remove('disabled');
         } else {
-            uploadZone.classList.add('bg-slate-50/50', 'cursor-not-allowed', 'border-dashed', 'border-2', 'border-slate-300');
-            uploadZone.classList.remove('hover:bg-slate-50', 'cursor-pointer');
-            uploadLocked.classList.remove('hidden');
-            uploadActive.classList.add('hidden');
+            uploaderArea.classList.add('disabled');
         }
     }
 
     DOM.inputs.cedula.addEventListener('input', (e) => {
         state.formData.cedula = e.target.value.replace(/\D/g, '');
         e.target.value = state.formData.cedula;
-        checkReadyToUpload();
-    });
-
-    document.getElementById('tyc-checkbox').addEventListener('change', (e) => {
-        state.formData.aceptadoTyC = e.target.checked;
         checkReadyToUpload();
     });
 
@@ -135,15 +137,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     DOM.inputs.genero.addEventListener('change', (e) => state.formData.genero = e.target.value);
-    DOM.inputs.edad.addEventListener('input', (e) => state.formData.edad = e.target.value);
+    
+    DOM.inputs.edad.addEventListener('input', (e) => {
+        state.formData.edad = parseFloat(e.target.value) || 0;
+        checkReadyToUpload();
+    });
+
+    DOM.inputs.fileResumen.addEventListener('click', (e) => {
+        const isCedulaValid = state.formData.cedula && state.formData.cedula.trim().length >= 5;
+        const isEdadValid = state.formData.edad && state.formData.edad > 0;
+        
+        let missing = [];
+        if (!isCedulaValid) {
+            missing.push("la Cédula");
+            DOM.inputs.cedula.style.borderColor = "#ef4444";
+            DOM.inputs.cedula.style.boxShadow = "0 0 0 3px rgba(239,68,68,0.2)";
+            setTimeout(() => { DOM.inputs.cedula.style.borderColor = ""; DOM.inputs.cedula.style.boxShadow = ""; }, 3000);
+        }
+        if (!isEdadValid) {
+            missing.push("la Edad");
+            DOM.inputs.edad.style.borderColor = "#ef4444";
+            DOM.inputs.edad.style.boxShadow = "0 0 0 3px rgba(239,68,68,0.2)";
+            setTimeout(() => { DOM.inputs.edad.style.borderColor = ""; DOM.inputs.edad.style.boxShadow = ""; }, 3000);
+        }
+        
+        if (missing.length > 0) {
+            e.preventDefault();
+            showError("Por favor, digite " + missing.join(" y ") + " obligatoriamente antes de cargar el historial.");
+            return;
+        }
+    });
 
     DOM.inputs.fileResumen.addEventListener('change', async (e) => {
-        const isCedulaValid = state.formData.cedula.trim().length >= 5 && /^\d+$/.test(state.formData.cedula.trim());
-        if (!isCedulaValid || !state.formData.aceptadoTyC) return;
-        
         const file = e.target.files[0];
         if (!file) return;
         
+        hideError();
         if(file.name.toLowerCase().endsWith('.pdf')) {
             await handlePDF(file);
         } else {
@@ -180,22 +209,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 const emp = m[2].trim().toUpperCase();
                 if (emp.includes("RAZÓN SOCIAL") || emp.includes("ADMINISTRADORA") || emp.includes("NOMBRE AFILIADO") || emp === "NIT") continue;
                 const ibc = cleanIBC(m[5]);
-                const semanas = cleanIBC(m[6]);
-                if (ibc < 1000 || semanas > 500 || semanas === 0) continue;
+                const extractedDias = cleanIBC(m[6]);
+                if (ibc < 10 && extractedDias === 0) continue;
                 
                 const start = parseFlexibleDate(m[3]);
                 const end = parseFlexibleDate(m[4]);
                 
-                // RESTAURADO: Cálculo de días reales calendario (+1 para que coincida con Colpensiones)
-                const diasReales = Math.round((end - start) / 86400000) + 1;
+                // Colpensiones ya certifica los días comerciales en el reporte (M[6])
+                const diasComerciales = extractedDias > 0 ? extractedDias : getDiasComerciales(start, end);
                 
-                matches.push({ nit: m[1], empresa: m[2].trim(), desde: formatDateForDisplay(m[3]), hasta: formatDateForDisplay(m[4]), ibc: ibc, semanas: semanas, dias: diasReales });
+                matches.push({ nit: m[1], empresa: m[2].trim(), desde: formatDateForDisplay(m[3]), hasta: formatDateForDisplay(m[4]), ibc: ibc, dias: diasComerciales });
             }
             if (matches.length === 0) throw new Error("No se detectaron filas de aportes válidas en el PDF. Intente subir el Excel (CSV).");
             state.history = matches;
             renderHistory();
             goToStep(2);
-        } catch (e) { showError(e.message); } finally { setLoading(false); }
+        } catch (e) { showError(e.message); } finally { 
+            setLoading(false); 
+            DOM.inputs.fileResumen.value = '';
+        }
     }
 
     function handleExcel(file) {
@@ -218,16 +250,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (empresa.toUpperCase().includes("ADMINISTRADORA") || empresa.toUpperCase().includes("RAZÓN SOCIAL")) return;
                     const postDateVals = r.slice(desdeIdx+2).map(v => cleanIBC(v));
                     const ibc = Math.max(...postDateVals.filter(v => v > 1000), 0);
-                    const smallVals = postDateVals.filter(v => v > 0 && v < 200);
-                    const semanas = smallVals.length > 0 ? smallVals[smallVals.length - 1] : 0;
-                    if (ibc > 0 && semanas > 0) {
+                    const smallVals = postDateVals.filter(v => v > 0 && v <= 10000);
+                    const extractedDias = smallVals.length > 0 ? smallVals[smallVals.length - 1] : 0;
+                    if (ibc > 0 || extractedDias > 0) {
                         const start = parseFlexibleDate(r[desdeIdx]);
                         const end = parseFlexibleDate(r[desdeIdx+1]);
                         
-                        // RESTAURADO: Cálculo de días reales calendario
-                        const diasReales = Math.round((end - start) / 86400000) + 1;
+                        const diasComerciales = extractedDias > 0 ? extractedDias : getDiasComerciales(start, end);
                         
-                        validRows.push({ nit: String(r[desdeIdx-2] || ''), empresa: empresa, desde: formatDateForDisplay(r[desdeIdx]), hasta: formatDateForDisplay(r[desdeIdx+1]), ibc: ibc, semanas: Number(semanas.toFixed(2)), dias: diasReales });
+                        validRows.push({ nit: String(r[desdeIdx-2] || ''), empresa: empresa, desde: formatDateForDisplay(r[desdeIdx]), hasta: formatDateForDisplay(r[desdeIdx+1]), ibc: ibc, dias: diasComerciales });
                     }
                 }
             });
@@ -244,13 +275,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderHistory() {
-        DOM.containers.historyCount.innerText = `${state.history.length} registros extraídos para estimación`;
+        // --- DETECCIÓN DE SIMULTANEIDAD ---
+        let overlaps = new Set();
+        let processTimeline = state.history.map((h, i) => {
+            let s = parseFlexibleDate(h.desde);
+            let e = parseFlexibleDate(h.hasta);
+            return { idx: i, start: s ? s.getTime() : 0, end: e ? e.getTime() : 0 };
+        }).filter(h => h.start > 0 && h.end > 0).sort((a,b) => a.start - b.start);
+        
+        for (let i = 0; i < processTimeline.length; i++) {
+            for (let j = i + 1; j < processTimeline.length; j++) {
+                // If the next logical segment starts before the current one ends, it's an overlap (simultaneity)
+                // We add 86400000 (1 day) tolerance so adjacent days aren't overlaps
+                if (processTimeline[i].end >= processTimeline[j].start) {
+                    overlaps.add(processTimeline[i].idx);
+                    overlaps.add(processTimeline[j].idx);
+                } else break;
+            }
+        }
+
+        if (overlaps.size > 0) {
+            DOM.containers.historyCount.innerHTML = `<span class="text-secondary font-bold bg-orange-100/50 px-3 py-1 rounded border border-orange-200"><i class="fas fa-exclamation-triangle mr-1 text-orange-500"></i> ¡Atención! Se han resaltado en naranja periodos superpuestos (simultáneos). Por defecto, el motor los de-duplicará a máximo 30 días/mes.</span>`;
+        } else {
+            DOM.containers.historyCount.innerText = `${state.history.length} registros extraídos para estimación`;
+        }
+
         DOM.containers.historyTable.innerHTML = '';
         state.history.forEach((row, i) => {
+            const isOverlap = overlaps.has(i);
             const tr = document.createElement('tr');
-            tr.className = "border-b border-slate-100 hover:bg-blue-50/50 transition-colors";
+            tr.className = isOverlap ? "border-b border-orange-200 bg-orange-50/40 hover:bg-orange-100 transition-colors" : "border-b border-slate-100 hover:bg-blue-50/50 transition-colors";
+            
             tr.innerHTML = `
-                <td class="p-3 font-medium text-slate-700 truncate max-w-[200px]" title="${row.empresa}">${row.empresa}</td>
+                <td class="p-3 font-medium text-slate-700 truncate max-w-[200px]" title="${row.empresa}">${isOverlap ? '<i class="fas fa-bolt text-orange-400 mr-1" title="Periodo simultáneo"></i>' : ''}${row.empresa}</td>
                 <td class="p-3 font-mono text-xs"><input class="bg-transparent w-24 outline-none border-b border-transparent focus:border-secondary" value="${row.desde}" data-idx="${i}" data-field="desde" /></td>
                 <td class="p-3 font-mono text-xs"><input class="bg-transparent w-24 outline-none border-b border-transparent focus:border-secondary" value="${row.hasta}" data-idx="${i}" data-field="hasta" /></td>
                 <td class="p-3 text-right font-semibold text-slate-800"><input class="bg-transparent text-right w-28 outline-none border-b border-transparent focus:border-secondary" type="number" value="${row.ibc}" data-idx="${i}" data-field="ibc" /></td>
@@ -287,13 +344,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function doIBLCalculation(isTodaVida = false) {
-        const ipcFinalKey = `${state.formData.anoLiquidacion - 1}-12`;
-        const ipcFinal = IPC_DATA[ipcFinalKey]; 
+        // IPC Final SIEMPRE es Diciembre del año anterior a la liquidación
+        let targetFinalYear = state.formData.anoLiquidacion;
+        const ipcFinalKey = `${targetFinalYear - 1}-12`;
+        let ipcFinal = IPC_DATA[ipcFinalKey]; 
+
+        // Si por alguna razón el IPC final no existe (futuro remoto), tomar el último conocido
         if (!ipcFinal) {
-            throw new Error(`No se encontró el IPC final para Diciembre de ${state.formData.anoLiquidacion - 1} en la base de datos.`);
+             const availableKeys = Object.keys(IPC_DATA).sort();
+             ipcFinal = IPC_DATA[availableKeys[availableKeys.length - 1]];
+             if (!ipcFinal) throw new Error("No se encontró IPC final.");
         }
         
-        let splitHistory = [];
+        let monthlyAggregation = {};
         state.history.forEach((row) => {
             if (!row.desde || !row.hasta || row.ibc <= 0) return;
             const dStart = parseFlexibleDate(row.desde);
@@ -301,58 +364,84 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!dStart || !dEnd || dStart > dEnd) return;
 
             let curStart = new Date(dStart.getTime());
-            
             while (curStart <= dEnd) {
                 let curYear = curStart.getFullYear();
-                let endOfYear = new Date(curYear, 11, 31); 
-                let actEnd = dEnd < endOfYear ? new Date(dEnd.getTime()) : new Date(endOfYear.getTime());
+                let curMonth = curStart.getMonth();
+                let endOfMonth = new Date(curYear, curMonth + 1, 0); 
+                let actEnd = dEnd < endOfMonth ? new Date(dEnd.getTime()) : new Date(endOfMonth.getTime());
                 
-                // RESTAURADO: Segmentación en Días Reales Calendario
-                const segmentDays = Math.round((actEnd - curStart) / 86400000) + 1;
+                const segmentDays = getDiasComerciales(curStart, actEnd);
                 
                 if (segmentDays > 0) {
-                    splitHistory.push({ 
-                        empresa: row.empresa,
-                        desde: new Date(curStart.getTime()), 
-                        hasta: new Date(actEnd.getTime()), 
-                        dias: segmentDays, 
-                        ibcMensualOriginal: row.ibc, 
-                        year: curYear 
-                    });
+                    const mKey = `${curYear}-${String(curMonth + 1).padStart(2, '0')}`;
+                    if (!monthlyAggregation[mKey]) {
+                        monthlyAggregation[mKey] = {
+                            year: curYear,
+                            month: curMonth + 1,
+                            monthlyIBCContributionSum: 0,
+                            daysSet: new Set(),
+                            empresas: new Set()
+                        };
+                    }
+                    
+                    monthlyAggregation[mKey].monthlyIBCContributionSum += (row.ibc * segmentDays);
+                    monthlyAggregation[mKey].empresas.add(row.empresa);
+                    
+                    let actualStart = curStart.getDate();
+                    let actualEnd = actEnd.getDate();
+                    if (actualStart === 31) actualStart = 30;
+                    if (actualEnd === 31) actualEnd = 30;
+                    const isFebEnd = (curMonth === 1) && (actualEnd === 28 || actualEnd === 29);
+                    if (isFebEnd) actualEnd = 30;
+                    for(let d = actualStart; d <= actualEnd; d++) {
+                        monthlyAggregation[mKey].daysSet.add(d);
+                    }
                 }
-                curStart = new Date(curYear + 1, 0, 1); 
+                curStart = new Date(curYear, curMonth + 1, 1); 
             }
         });
 
-        splitHistory.sort((a,b) => b.hasta - a.hasta);
+        let aggregatedMonthsData = Object.keys(monthlyAggregation).map(k => monthlyAggregation[k]);
+        aggregatedMonthsData.sort((a,b) => {
+            if (a.year !== b.year) return b.year - a.year;
+            return b.month - a.month;
+        });
         
         let targetDays = isTodaVida ? Infinity : 3600;
         let remainingDays = targetDays; 
         let sumIaXDias = 0; 
-        let detailedReport = []; 
         let consumedDays = 0;
+        let detailedReport = []; 
         
-        splitHistory.forEach(seg => {
-            if (remainingDays <= 0) return;
-            const daysToTake = Math.min(seg.dias, remainingDays);
+        for (const seg of aggregatedMonthsData) {
+            if (remainingDays <= 0) break;
             
+            const realActiveDaysInMonth = seg.daysSet.size; 
+            if (realActiveDaysInMonth === 0) continue;
+            
+            const daysToTake = Math.min(realActiveDaysInMonth, remainingDays);
+            const combinedAveragedMonthlyRate = seg.monthlyIBCContributionSum / realActiveDaysInMonth; 
+
+            const monthStr = String(seg.month).padStart(2, '0');
+            
+            // IPC Inicial SIEMPRE es Diciembre del año anterior al aporte
             const ipcInicialKey = `${seg.year - 1}-12`;
             const ipcInicial = IPC_DATA[ipcInicialKey] || 1; 
             
             const factorIndexacion = ipcFinal / ipcInicial;
-            const ibcIndexadoIA = seg.ibcMensualOriginal * factorIndexacion;
+            const ibcIndexadoIA = combinedAveragedMonthlyRate * factorIndexacion;
             const iaXDias = ibcIndexadoIA * daysToTake; 
             
             detailedReport.push({
-                empresa: seg.empresa,
-                desde: formatShortDate(seg.desde),
-                hasta: formatShortDate(seg.hasta),
+                empresa: Array.from(seg.empresas).join(' | '),
+                desde: `01/${monthStr}/${seg.year}`,
+                hasta: `30/${monthStr}/${seg.year}`,
                 dias: daysToTake,
-                fechaIpcFinal: `Dic ${state.formData.anoLiquidacion - 1}`,
+                fechaIpcFinal: `Dic. ${targetFinalYear - 1}`,
                 ipcFinal: ipcFinal,
-                fechaIpcInicial: `Dic ${seg.year - 1}`,
+                fechaIpcInicial: `Dic. ${seg.year - 1}`,
                 ipcInicial: ipcInicial,
-                ibcHistorico: seg.ibcMensualOriginal, 
+                ibcHistorico: combinedAveragedMonthlyRate, 
                 ibcIndexado: ibcIndexadoIA, 
                 iaXDias: iaXDias 
             });
@@ -360,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sumIaXDias += iaXDias;
             remainingDays -= daysToTake;
             consumedDays += daysToTake;
-        });
+        }
 
         const ibl = consumedDays > 0 ? sumIaXDias / consumedDays : 0;
         return { ibl, consumedDays, sumIaXDias, detailedReport, isTodaVida };
@@ -371,7 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleCalculate() {
         hideError();
         try {
-            state.formData.nombre = document.querySelector('input[placeholder="Nombre Completo"]').value || 'Usuario';
+            const nombreInput = document.querySelector('input[placeholder="Nombre Completo"]');
+            state.formData.nombre = nombreInput ? nombreInput.value : 'Usuario ' + state.formData.cedula;
             state.formData.edad = DOM.inputs.edad.value;
             
             if (!state.formData.edad || state.formData.edad <= 0) {
@@ -387,32 +477,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             setLoading(true);
 
-            let ageInYears = parseFloat(state.formData.edad);
-            const totalDiasOriginales = state.history.reduce((a,c) => a + c.dias, 0);
-            const totalSem = totalDiasOriginales / 7;
-            const requiredAge = state.formData.genero === 'F' ? 57 : 62;
-            const isVerification = totalSem >= 1300 && ageInYears >= requiredAge;
-
             const calc10Years = doIBLCalculation(false);
             const calcTodaVida = doIBLCalculation(true);
+
+            // Única fuente de verdad: Días completamente de-duplicados por el motor actuarial
+            const totalSem = calcTodaVida.consumedDays / 7;
+            
+            const ageInYears = parseFloat(state.formData.edad) || 0;
+            const requiredAge = state.formData.genero === 'F' ? 57 : 62;
+            const isVerification = totalSem >= 1300 && ageInYears >= requiredAge;
 
             let bestCalc = calc10Years;
             let bestName = "Los Últimos 10 Años (3.600 Días)";
             
-            if (calcTodaVida.ibl > calc10Years.ibl && totalSem >= 1250) {
+            if (calcTodaVida.ibl > calc10Years.ibl) {
                 bestCalc = calcTodaVida;
                 bestName = "Toda la Vida (Art. 21 Ley 100)";
-            } else if (calcTodaVida.ibl > calc10Years.ibl && totalSem < 1250) {
-                 console.warn("Toda la vida es superior, pero afiliado no alcanza 1250 semanas requeridas.");
             }
 
-            const s = bestCalc.ibl / state.formData.smlv;
-            let tasaBase = 65.5 - (0.5 * s);
+            const smlvs = bestCalc.ibl / state.formData.smlv;
+            let tasaBase = 65.5 - (0.5 * smlvs);
             if (tasaBase < 55) tasaBase = 55.00;
 
-            const getRes = (aplicarTopeSemanas) => {
+            const getRes = (aplicarTopeColpensiones) => {
                 let semExtra = Math.max(0, totalSem - 1300);
-                if (aplicarTopeSemanas) semExtra = Math.min(semExtra, 500); 
+                if (aplicarTopeColpensiones) semExtra = Math.min(semExtra, 500); 
                 const grupos = Math.floor(semExtra / 50);
                 let tasaFinal = tasaBase + (grupos * 1.5);
                 if (tasaFinal > 80.00) tasaFinal = 80.00; 
@@ -424,13 +513,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const vA = getRes(true); 
             const vB = getRes(false); 
-
+            
             state.results = {
                 ibl: bestCalc.ibl,
                 bestName: bestName,
                 totalSem: totalSem,
                 tasaBase: tasaBase,
                 detailedReport: bestCalc.detailedReport,
+                detailedReport10Years: calc10Years.detailedReport,
+                detailedReportTodaVida: calcTodaVida.detailedReport,
                 sumIaXDias: bestCalc.sumIaXDias,
                 diasComputadosTotales: bestCalc.consumedDays,
                 vA: vA,
@@ -497,13 +588,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 text-center">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Mesada Base Proyectada</p>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Mesada Base ${res.isVerification ? 'Verificada' : 'Proyectada'}</p>
                             <p class="text-3xl font-black text-slate-800">${formatCurrency(res.vA.mesada)}</p>
                         </div>
                     </div>
 
                     <div class="card-legal p-8 rounded-2xl flex flex-col relative border-secondary/30 ring-1 ring-secondary/20">
-                        <div class="absolute top-0 right-0 bg-secondary text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-lg rounded-tr-xl tracking-wider">PROYECCIÓN ÓPTIMA</div>
+                        <div class="absolute top-0 right-0 bg-secondary text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-lg rounded-tr-xl tracking-wider">${res.isVerification ? 'VERIFICACIÓN ÓPTIMA' : 'PROYECCIÓN ÓPTIMA'}</div>
                         <div class="mb-6">
                             <span class="text-[10px] font-bold px-2.5 py-1 rounded bg-orange-50 text-secondary tracking-wider">CÁLCULO JURISPRUDENCIAL</span>
                             <h3 class="text-xl font-bold text-primary mt-3">Método Corte Suprema</h3>
@@ -524,7 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="bg-orange-50/50 p-5 rounded-xl border border-secondary/20 text-center">
-                            <p class="text-xs font-bold text-secondary uppercase tracking-wide mb-1">Mesada Reliquidada Proyectada</p>
+                            <p class="text-xs font-bold text-secondary uppercase tracking-wide mb-1">Mesada Reliquidada ${res.isVerification ? 'Verificada' : 'Proyectada'}</p>
                             <p class="text-3xl font-black text-primary">${formatCurrency(res.vB.mesada)}</p>
                         </div>
                     </div>
@@ -533,25 +624,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${res.vB.mesada > res.vA.mesada ? `
                 <div class="card-legal p-6 md:p-8 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6 bg-slate-50 border-l-4 border-l-primary mt-8">
                     <div class="flex-1 text-center md:text-left">
-                        <h5 class="text-xl font-bold text-primary">Proyección a Favor: <span class="text-secondary">${formatCurrency(res.vB.mesada - res.vA.mesada)} Mensual</span></h5>
+                        <h5 class="text-xl font-bold text-primary">${res.isVerification ? 'Verificación a Favor' : 'Proyección a Favor'}: <span class="text-secondary">${formatCurrency(res.vB.mesada - res.vA.mesada)} Mensual</span></h5>
                         <p class="text-sm text-slate-600 mt-2 leading-relaxed">
-                            Existe viabilidad matemática para buscar la reliquidación, dado que la estimación bajo los lineamientos de la Corte Suprema arroja una tasa superior. Esta proyección es de carácter orientativo.
+                            Existe viabilidad matemática para buscar la reliquidación, dado que la estimación bajo los lineamientos de la Corte Suprema arroja una tasa superior.
                         </p>
                     </div>
-                    <button id="btn-export-pdf-dyn" class="bg-primary text-white px-6 py-3.5 rounded-xl font-semibold hover:bg-slate-800 transition-colors flex items-center space-x-2 shrink-0 shadow-sm w-full md:w-auto justify-center">
-                        <i class="fas fa-file-pdf"></i>
-                        <span>Generar Reporte PDF</span>
-                    </button>
                 </div>
                 ` : ''}
+
+                <div class="mt-8 flex flex-col md:flex-row justify-end gap-4 w-full">
+                    <button id="btn-export-excel-dyn" class="bg-green-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-green-700 transition-colors flex items-center justify-center space-x-3 shadow-md w-full md:w-auto">
+                        <i class="fas fa-file-excel text-xl"></i>
+                        <span>Descargar Anexo Excel (10 Años / Toda La Vida)</span>
+                    </button>
+                    <button id="btn-export-pdf-dyn" class="bg-primary text-white px-8 py-4 rounded-xl font-bold hover:bg-slate-800 transition-colors flex items-center justify-center space-x-3 shadow-md w-full md:w-auto">
+                        <i class="fas fa-file-pdf text-xl"></i>
+                        <span>Descargar Reporte PDF Detallado</span>
+                    </button>
+                </div>
             </div>
         `;
         DOM.containers.results.innerHTML = html;
         const btnPdf = document.getElementById('btn-export-pdf-dyn');
         if (btnPdf) btnPdf.addEventListener('click', exportPDF);
+        const btnExcel = document.getElementById('btn-export-excel-dyn');
+        if (btnExcel) btnExcel.addEventListener('click', exportExcel);
     }
 
     function exportPDF() {
+        const { jsPDF } = window.jspdf;
         const res = state.results;
         const doc = new jsPDF('landscape'); 
         const W = doc.internal.pageSize.getWidth();
@@ -663,10 +764,55 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.save(`Proyeccion_Pensional_${state.formData.cedula}.pdf`);
     }
 
+    function exportExcel() {
+        const res = state.results;
+        
+        // Helper to format data for worksheet
+        const formatDataForWS = (reportArray) => {
+            const headers = ['Razón Social / Aportante', 'Desde', 'Hasta', 'Días', 'F. IPC Final', 'IPC Final', 'F. IPC Inicial', 'IPC Inicial', 'Salario Base (Histórico)', 'Salario Indexado (IA)', 'IA X #DIAS'];
+            const data = reportArray.map(r => [
+                r.empresa,
+                r.desde,
+                r.hasta,
+                r.dias,
+                r.fechaIpcFinal,
+                r.ipcFinal,
+                r.fechaIpcInicial,
+                r.ipcInicial,
+                r.ibcHistorico,
+                r.ibcIndexado,
+                r.iaXDias
+            ]);
+            return [headers, ...data];
+        };
+
+        const wb = Math.random(); // Placeholder check, using XLSX
+        const ts10Years = formatDataForWS(res.detailedReport10Years || []);
+        const tsTodaVida = formatDataForWS(res.detailedReportTodaVida || []);
+
+        const ws10Years = XLSX.utils.aoa_to_sheet(ts10Years);
+        const wsTodaVida = XLSX.utils.aoa_to_sheet(tsTodaVida);
+
+        // Auto-width columns basic setting
+        const wscols = [ {wch: 40}, {wch: 12}, {wch: 12}, {wch: 8}, {wch: 15}, {wch: 10}, {wch: 15}, {wch: 10}, {wch: 22}, {wch: 22}, {wch: 22} ];
+        ws10Years['!cols'] = wscols;
+        wsTodaVida['!cols'] = wscols;
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, ws10Years, "Últimos 10 Años");
+        XLSX.utils.book_append_sheet(workbook, wsTodaVida, "Toda La Vida");
+
+        XLSX.writeFile(workbook, `Detalle_IBL_${state.formData.cedula}.xlsx`);
+    }
+
     function goToStep(s) {
         DOM.steps.forEach((el, i) => {
-            if (i + 1 === s) el.classList.remove('hidden');
-            else el.classList.add('hidden');
+            if (i + 1 === s) {
+                el.classList.remove('hidden-step');
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden-step');
+            }
         });
         
         DOM.stepperDots.forEach((dot, i) => {
@@ -695,19 +841,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setLoading(isLoading) {
         state.loading = isLoading;
-        DOM.containers.error.classList.add('hidden');
+        DOM.containers.error.classList.add('hidden-step');
     }
 
     function showError(msg) {
         DOM.containers.errorMsg.innerText = msg;
+        DOM.containers.error.classList.remove('hidden-step');
         DOM.containers.error.classList.remove('hidden');
         DOM.containers.error.scrollIntoView({ behavior: 'smooth' });
     }
 
     function hideError() {
-        DOM.containers.error.classList.add('hidden');
+        DOM.containers.error.classList.add('hidden-step');
     }
 
+    // Inicializar navegación por Stepper
+    DOM.stepperDots.forEach((dot, i) => {
+        dot.addEventListener('click', () => {
+            const targetStep = i + 1;
+            // Solo permitir volver a pasos anteriores (o al mismo), no saltar adelante sin validación
+            if (targetStep < state.step) {
+                goToStep(targetStep);
+            }
+        });
+    });
+
     // Inicializar
+    DOM.inputs.smlv.value = state.formData.smlv;
     checkReadyToUpload();
 });
