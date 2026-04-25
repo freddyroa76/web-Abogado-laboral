@@ -13,7 +13,16 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         history: [],
         results: null,
-        showDetails: false
+        showDetails: false,
+        applyCorrections: true,
+        reportedSemanas: null,
+        audit: {
+            correctedCount: 0,
+            reportedSemanas: null,
+            calculatedSemanas: null,
+            gap: 0,
+            discrepancy: false
+        }
     };
 
     const DOM = {
@@ -43,7 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
             errorMsg: document.getElementById('error-msg'),
             historyTable: document.getElementById('history-table-body'),
             historyCount: document.getElementById('history-count'),
-            results: document.getElementById('results-container')
+            results: document.getElementById('results-container'),
+            auditPanel: document.getElementById('audit-panel'),
+            auditReported: document.getElementById('audit-reported-semanas'),
+            auditCalculated: document.getElementById('audit-calculated-semanas'),
+            auditGap: document.getElementById('audit-gap'),
+            auditCorrectedCount: document.getElementById('audit-corrected-count'),
+            auditToggle: document.getElementById('audit-toggle-correction')
         }
     };
 
@@ -76,6 +91,44 @@ document.addEventListener('DOMContentLoaded', () => {
         return new Date(str);
     };
 
+    // Intento de recuperación de fechas cuando la extracción falla (años irreales)
+    const repairDateIfInvalid = (dateObj, originalStr, contextText, matchIndex) => {
+        const nowYear = new Date().getFullYear();
+        const isValid = dateObj && !isNaN(dateObj.getTime()) && dateObj.getFullYear() >= 1900 && dateObj.getFullYear() <= (nowYear + 5);
+        if (isValid) return dateObj;
+
+        // 1) Intentar extraer últimos 4 dígitos del string original
+        try {
+            const digits = String(originalStr).replace(/[^\d]/g, '');
+            if (digits.length >= 4) {
+                const possibleYear = digits.slice(-4);
+                const parts = originalStr.match(/(\d{1,2})/g);
+                if (parts && parts.length >= 2) {
+                    const day = parseInt(parts[0], 10);
+                    const month = parseInt(parts[1], 10);
+                    const year = parseInt(possibleYear, 10);
+                    const cand = new Date(year, month - 1, day);
+                    if (!isNaN(cand.getTime()) && cand.getFullYear() >= 1900 && cand.getFullYear() <= (nowYear + 5)) return cand;
+                }
+            }
+        } catch (e) { /* ignore */ }
+
+        // 2) Buscar en ventana de contexto un patrón dd/mm/yyyy con año plausible
+        try {
+            const win = Math.max(0, (matchIndex || 0) - 200);
+            const windowText = (contextText || '').substring(win, Math.min((contextText || '').length, (matchIndex || 0) + 200));
+            const ddmmRegex = /(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*(19\d{2}|20\d{2}))/g;
+            let mm;
+            while ((mm = ddmmRegex.exec(windowText)) !== null) {
+                const candStr = mm[1].replace(/\s/g, '');
+                const candDate = parseFlexibleDate(candStr);
+                if (candDate && !isNaN(candDate.getTime()) && candDate.getFullYear() >= 1900 && candDate.getFullYear() <= (nowYear + 5)) return candDate;
+            }
+        } catch (e) { /* ignore */ }
+
+        return dateObj;
+    };
+
     const formatShortDate = (dateObj) => {
         if(!dateObj) return "";
         return `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth()+1).padStart(2, '0')}/${dateObj.getFullYear()}`;
@@ -101,6 +154,77 @@ document.addEventListener('DOMContentLoaded', () => {
         const s = String(val).replace(/[^\d.,]/g, '');
         const parsed = parseFloat(s.replace(/\./g, '').replace(',', '.'));
         return isNaN(parsed) ? 0 : parsed;
+    };
+
+    // Extraer número robusto (usa cleanIBC internamente)
+    const parseNumber = (txt) => cleanIBC(txt);
+
+    // Extrae el número de "Total Semanas" reportado en el PDF (si existe)
+    const extractReportedSemanas = (normalizedText) => {
+        if (!normalizedText) return null;
+        const patterns = [
+            /Total\s*(?:de\s*)?Semanas(?:\s*Cotizadas)?\s*[:\-\s]*([\d\.,]+)/i,
+            /Semanas\s*Cotizadas\s*[:\-\s]*([\d\.,]+)/i,
+            /Total\s*Semanas\s*[:\-\s]*([\d\.,]+)/i
+        ];
+        for (const p of patterns) {
+            const m = p.exec(normalizedText);
+            if (m && m[1]) {
+                const v = parseNumber(m[1]);
+                if (v > 0) return v;
+            }
+        }
+        return null;
+    };
+
+    // Detecta si un periodo cubre un mes comercial completo (regla: mismo mes/año y >=30 días comerciales)
+    const isFullCommercialMonth = (start, end) => {
+        if (!start || !end) return false;
+        if (start.getFullYear() !== end.getFullYear() || start.getMonth() !== end.getMonth()) return false;
+        const dias = getDiasComerciales(start, end);
+        return dias >= 30 && start.getDate() <= 3; // inicio mes cercano a día 1 y al menos 30 días comerciales
+    };
+
+    // Aplica la corrección automatizada sobre un historial: marca filas corregidas y fuerza 30 días en meses completos
+    const applyAutomaticCorrections = (hist, applyCorrectionsFlag) => {
+        let corrected = 0;
+        const cloned = hist.map(r => ({ ...r, diasOriginal: r.dias, corrected: false }));
+        if (!applyCorrectionsFlag) return { history: cloned, correctedCount: 0 };
+
+        for (const row of cloned) {
+            const s = parseFlexibleDate(row.desde);
+            const e = parseFlexibleDate(row.hasta);
+            if (!s || !e) continue;
+            if (isFullCommercialMonth(s, e)) {
+                if (row.dias !== 30) {
+                    row.dias = 30;
+                    row.corrected = true;
+                    corrected++;
+                }
+            }
+        }
+
+        return { history: cloned, correctedCount: corrected };
+    };
+
+    // Valida semanas reportadas vs cálculo matemático (Total Días / 7)
+    const validarSemanas = (hist, reportedSemanas, applyCorrectionsFlag) => {
+        if (!hist || hist.length === 0) return { reported: reportedSemanas || null, calculated: 0, gap: 0, discrepancy: false };
+        const { history: hCorrected } = applyAutomaticCorrections(hist, applyCorrectionsFlag);
+        const totalDias = hCorrected.reduce((s, r) => s + (Number(r.dias) || 0), 0);
+        const calculated = totalDias / 7;
+        const rep = reportedSemanas || null;
+        const gap = rep !== null ? (calculated - rep) : 0;
+        const discrepancy = rep !== null && Math.abs(gap) > 0.01;
+        // actualizar estado de auditoría
+        state.audit = {
+            correctedCount: hCorrected.filter(r => r.corrected).length,
+            reportedSemanas: rep,
+            calculatedSemanas: calculated,
+            gap: gap,
+            discrepancy: discrepancy
+        };
+        return { reported: rep, calculated, gap, discrepancy };
     };
 
     const formatCurrency = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(v);
@@ -205,6 +329,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // Normalizamos todos los espacios múltiples o saltos de línea para estabilizar la extracción y partición
             const normalizedText = fullText.replace(/\s+/g, ' ');
 
+            // Extraer semanas reportadas (header) si existe
+            const reportedSemanas = extractReportedSemanas(normalizedText);
+            if (reportedSemanas) {
+                state.reportedSemanas = reportedSemanas;
+                state.audit.reportedSemanas = reportedSemanas;
+            }
+
+            // Detectar bloque antiguo explícito (Detalle de tiempos anteriores a 1995)
+            const pre1995Regex = /DETALLE\s+DE\s+TIEMPOS\s+EFECTUADOS\s+ANTERIORES\s+A\s+1995/i;
+            const pre1995Match = pre1995Regex.exec(normalizedText);
+            const pre1995Index = pre1995Match ? pre1995Match.index : -1;
+
             const regexPDF = /(\d{5,15})\s+([^\n\r]{3,60}?)\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})\s+\$?\s*([\d.,]+)\s+([\d.,]+)/g;
             
             // Identificar dónde empieza el detalle antiguo para no mezclar reglas
@@ -224,17 +360,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 const emp = m[2].trim().toUpperCase();
                 if (emp.includes("RAZÓN SOCIAL") || emp.includes("ADMINISTRADORA") || emp.includes("NOMBRE AFILIADO") || emp === "NIT") continue;
                 
-                const ibc = cleanIBC(m[5]);
+                let ibc = cleanIBC(m[5]);
                 const extractedNum = cleanIBC(m[6]);
                 
                 if (ibc < 10 && extractedNum === 0) continue;
                 
-                const start = parseFlexibleDate(m[3]);
-                const end = parseFlexibleDate(m[4]);
-                
-                if (!start || !end) continue;
+                // Intentamos parsear las fechas y repararlas si la extracción produjo años irreales
+                const rawDesde = m[3];
+                const rawHasta = m[4];
+                const matchStartIndex = m.index || 0;
+                const posDesde = normalizedText.indexOf(rawDesde, matchStartIndex);
+                const posHasta = normalizedText.indexOf(rawHasta, matchStartIndex);
+
+                let start = parseFlexibleDate(rawDesde);
+                let end = parseFlexibleDate(rawHasta);
+                start = repairDateIfInvalid(start, rawDesde, normalizedText, posDesde >= 0 ? posDesde : matchStartIndex);
+                end = repairDateIfInvalid(end, rawHasta, normalizedText, posHasta >= 0 ? posHasta : matchStartIndex);
+
+                if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) continue;
 
                 const isAntiguo = (splitIndex !== Infinity && m.index >= splitIndex);
+                const isPre1995 = (pre1995Index !== -1 && m.index >= pre1995Index) || (start && start.getTime() < umbral1995.getTime());
+
+                // Si es pre1995 y el IBC parece dañado, intentar recuperación desde el entorno textual
+                if (isPre1995 && ibc < 10) {
+                    try {
+                        const snippet = normalizedText.substr(Math.max(0, m.index - 80), 200);
+                        const fb = /\$?\s*([\d\.,]{4,})/.exec(snippet);
+                        if (fb && fb[1]) {
+                            const recovered = parseNumber(fb[1]);
+                            if (recovered > ibc) ibc = recovered;
+                        }
+                    } catch (e) { /* ignore fallback */ }
+                }
 
                 if (!isAntiguo) {
                     // Contexto 1: TABLA RESUMEN GENERAL (Semanas)
@@ -242,12 +400,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     rawMatches.push({ 
                         nit: m[1], 
                         empresa: m[2].trim(), 
-                        desde: formatDateForDisplay(m[3]), 
-                        hasta: formatDateForDisplay(m[4]), 
+                        desde: formatShortDate(start), 
+                        hasta: formatShortDate(end), 
                         ibc: ibc, 
                         dias: diasComerciales,
                         inicioDate: start.getTime(),
-                        origen: 'resumen' 
+                        origen: 'resumen',
+                        pre1995: isPre1995
                     });
                 } else {
                     // Contexto 2: TABLA DETALLE DE PAGOS (Días)
@@ -255,12 +414,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     rawMatches.push({ 
                         nit: m[1], 
                         empresa: m[2].trim(), 
-                        desde: formatDateForDisplay(m[3]), 
-                        hasta: formatDateForDisplay(m[4]), 
+                        desde: formatShortDate(start), 
+                        hasta: formatShortDate(end), 
                         ibc: ibc, 
                         dias: diasComerciales,
                         inicioDate: start.getTime(),
-                        origen: 'detalle' 
+                        origen: 'detalle',
+                        pre1995: isPre1995
                     });
                 }
             }
@@ -352,9 +512,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderHistory() {
+        // Aplicar correcciones automatizadas si están activas (no muta state.history)
+        const { history: displayHistory, correctedCount } = applyAutomaticCorrections(state.history, state.applyCorrections);
+
         // --- DETECCIÓN DE SIMULTANEIDAD ---
         let overlaps = new Set();
-        let processTimeline = state.history.map((h, i) => {
+        let processTimeline = displayHistory.map((h, i) => {
             let s = parseFlexibleDate(h.desde);
             let e = parseFlexibleDate(h.hasta);
             return { idx: i, start: s ? s.getTime() : 0, end: e ? e.getTime() : 0 };
@@ -377,14 +540,33 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.containers.historyCount.innerText = `${state.history.length} registros extraídos para estimación`;
         }
 
+        // Actualizar auditoría (semana reportada vs calculada) y contador de correcciones
+        validarSemanas(state.history, state.reportedSemanas, state.applyCorrections);
+        if (DOM.containers.auditReported) {
+            DOM.containers.auditReported.innerText = state.audit.reportedSemanas !== null ? state.audit.reportedSemanas.toFixed(2) : '—';
+        }
+        if (DOM.containers.auditCalculated) {
+            DOM.containers.auditCalculated.innerText = state.audit.calculatedSemanas ? state.audit.calculatedSemanas.toFixed(2) : '0.00';
+        }
+        if (DOM.containers.auditGap) {
+            DOM.containers.auditGap.innerText = state.audit.gap ? state.audit.gap.toFixed(2) : '0.00';
+        }
+        if (DOM.containers.auditCorrectedCount) {
+            DOM.containers.auditCorrectedCount.innerText = correctedCount || 0;
+        }
+        if (DOM.containers.auditToggle) {
+            DOM.containers.auditToggle.checked = !!state.applyCorrections;
+        }
+
         DOM.containers.historyTable.innerHTML = '';
-        state.history.forEach((row, i) => {
+        displayHistory.forEach((row, i) => {
             const isOverlap = overlaps.has(i);
             const tr = document.createElement('tr');
             tr.className = isOverlap ? "border-b border-orange-200 bg-orange-50/40 hover:bg-orange-100 transition-colors" : "border-b border-slate-100 hover:bg-blue-50/50 transition-colors";
             
+            const correctedBadge = row.corrected ? '<span class="inline-block bg-green-100 text-green-700 px-2 py-0.5 rounded text-[11px] font-semibold mr-2">Corregido</span>' : '';
             tr.innerHTML = `
-                <td class="p-3 font-medium text-slate-700 truncate max-w-[200px]" title="${row.empresa}">${isOverlap ? '<i class="fas fa-bolt text-orange-400 mr-1" title="Periodo simultáneo"></i>' : ''}${row.empresa}</td>
+                <td class="p-3 font-medium text-slate-700 truncate max-w-[200px]" title="${row.empresa}">${correctedBadge}${isOverlap ? '<i class="fas fa-bolt text-orange-400 mr-1" title="Periodo simultáneo"></i>' : ''}${row.empresa}</td>
                 <td class="p-3 font-mono text-xs"><input class="bg-transparent w-24 outline-none border-b border-transparent focus:border-secondary" value="${row.desde}" data-idx="${i}" data-field="desde" /></td>
                 <td class="p-3 font-mono text-xs"><input class="bg-transparent w-24 outline-none border-b border-transparent focus:border-secondary" value="${row.hasta}" data-idx="${i}" data-field="hasta" /></td>
                 <td class="p-3 text-right font-semibold text-slate-800"><input class="bg-transparent text-right w-28 outline-none border-b border-transparent focus:border-secondary" type="number" value="${row.ibc}" data-idx="${i}" data-field="ibc" /></td>
@@ -420,6 +602,14 @@ document.addEventListener('DOMContentLoaded', () => {
         renderHistory();
     });
 
+    // Toggle para aplicar corrección automatizada desde el panel de auditoría
+    if (DOM.containers.auditToggle) {
+        DOM.containers.auditToggle.addEventListener('change', (e) => {
+            state.applyCorrections = !!e.target.checked;
+            renderHistory();
+        });
+    }
+
     function doIBLCalculation(isTodaVida = false) {
         // IPC Final SIEMPRE es Diciembre del año anterior a la liquidación
         let targetFinalYear = state.formData.anoLiquidacion;
@@ -433,6 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
              if (!ipcFinal) throw new Error("No se encontró IPC final.");
         }
         
+        // Construir un mapa por mes donde para cada día (1..30) se registra el IBC máximo observado.
         let monthlyAggregation = {};
         state.history.forEach((row) => {
             if (!row.desde || !row.hasta || row.ibc <= 0) return;
@@ -444,37 +635,44 @@ document.addEventListener('DOMContentLoaded', () => {
             while (curStart <= dEnd) {
                 let curYear = curStart.getFullYear();
                 let curMonth = curStart.getMonth();
-                let endOfMonth = new Date(curYear, curMonth + 1, 0); 
+                let endOfMonth = new Date(curYear, curMonth + 1, 0);
                 let actEnd = dEnd < endOfMonth ? new Date(dEnd.getTime()) : new Date(endOfMonth.getTime());
-                
-                const segmentDays = getDiasComerciales(curStart, actEnd);
-                
-                if (segmentDays > 0) {
-                    const mKey = `${curYear}-${String(curMonth + 1).padStart(2, '0')}`;
-                    if (!monthlyAggregation[mKey]) {
-                        monthlyAggregation[mKey] = {
-                            year: curYear,
-                            month: curMonth + 1,
-                            monthlyIBCContributionSum: 0,
-                            daysSet: new Set(),
-                            empresas: new Set()
-                        };
-                    }
-                    
-                    monthlyAggregation[mKey].monthlyIBCContributionSum += (row.ibc * segmentDays);
-                    monthlyAggregation[mKey].empresas.add(row.empresa);
-                    
-                    let actualStart = curStart.getDate();
-                    let actualEnd = actEnd.getDate();
-                    if (actualStart === 31) actualStart = 30;
-                    if (actualEnd === 31) actualEnd = 30;
-                    const isFebEnd = (curMonth === 1) && (actualEnd === 28 || actualEnd === 29);
-                    if (isFebEnd) actualEnd = 30;
-                    for(let d = actualStart; d <= actualEnd; d++) {
-                        monthlyAggregation[mKey].daysSet.add(d);
-                    }
+
+                const mKey = `${curYear}-${String(curMonth + 1).padStart(2, '0')}`;
+                if (!monthlyAggregation[mKey]) {
+                    monthlyAggregation[mKey] = {
+                        year: curYear,
+                        month: curMonth + 1,
+                        dayIbcMap: {},
+                        empresas: new Set()
+                    };
                 }
-                curStart = new Date(curYear, curMonth + 1, 1); 
+
+                // Determinar rango de días a recorrer; si aplica corrección automática y el periodo cubre mes completo,
+                // forzar días 1..30 para ese mes.
+                let actualStart = curStart.getDate();
+                let actualEnd = actEnd.getDate();
+                if (actualStart === 31) actualStart = 30;
+                if (actualEnd === 31) actualEnd = 30;
+                const isFebEnd = (curMonth === 1) && (actualEnd === 28 || actualEnd === 29);
+                if (isFebEnd) actualEnd = 30;
+
+                const periodStart = new Date(curStart.getTime());
+                const periodEnd = new Date(actEnd.getTime());
+                const applyCorrFullMonth = state.applyCorrections && isFullCommercialMonth(periodStart, periodEnd);
+
+                let dayFrom = actualStart;
+                let dayTo = actualEnd;
+                if (applyCorrFullMonth) { dayFrom = 1; dayTo = 30; }
+
+                for (let d = dayFrom; d <= dayTo; d++) {
+                    const existing = monthlyAggregation[mKey].dayIbcMap[d] || 0;
+                    monthlyAggregation[mKey].dayIbcMap[d] = Math.max(existing, row.ibc);
+                }
+
+                monthlyAggregation[mKey].empresas.add(row.empresa);
+
+                curStart = new Date(curYear, curMonth + 1, 1);
             }
         });
 
@@ -493,11 +691,13 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const seg of aggregatedMonthsData) {
             if (remainingDays <= 0) break;
             
-            const realActiveDaysInMonth = seg.daysSet.size; 
+            const dayKeys = seg.dayIbcMap ? Object.keys(seg.dayIbcMap).map(x => parseInt(x,10)) : [];
+            const realActiveDaysInMonth = Math.min(dayKeys.length, 30);
             if (realActiveDaysInMonth === 0) continue;
-            
+
             const daysToTake = Math.min(realActiveDaysInMonth, remainingDays);
-            const combinedAveragedMonthlyRate = seg.monthlyIBCContributionSum / realActiveDaysInMonth; 
+            const monthlyIBCContributionSum = dayKeys.reduce((s,d) => s + (seg.dayIbcMap[d] || 0), 0);
+            const combinedAveragedMonthlyRate = monthlyIBCContributionSum / realActiveDaysInMonth;
 
             const monthStr = String(seg.month).padStart(2, '0');
             
@@ -553,6 +753,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error("Por rigor legal, digite la Edad del afiliado y vuelva al Paso 2 para liquidar.");
             }
             setLoading(true);
+
+            // Validar semanas reportadas vs cálculo matemático antes de ejecutar la liquidación
+            const validation = validarSemanas(state.history, state.reportedSemanas, state.applyCorrections);
+            if (validation.discrepancy) {
+                showError("Discrepancia detectada entre 'Semanas reportadas' y cálculo matemático. Se usará el cálculo matemático propio para la liquidación.");
+            }
 
             const calc10Years = doIBLCalculation(false);
             const calcTodaVida = doIBLCalculation(true);
