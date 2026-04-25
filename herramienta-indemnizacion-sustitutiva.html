@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Indemnización Sustitutiva RPM | Tu Abogado Laboral</title>
+    
+    <meta name="description" content="Calculadora actuarial para Indemnización Sustitutiva de Vejez Colombia (Decreto 1730/2001).">
+    
+    <link rel="icon" type="image/webp" href="img/favicon.webp" />
+    <link rel="stylesheet" href="css/critical.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e3a8a', 
+                        secondary: '#b45309', 
+                        accent: '#0f766e', 
+                        surface: '#ffffff',
+                        background: '#f8fafc',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { background-color: #f8fafc; color: #334155; font-family: 'Inter', sans-serif; }
+        .card-legal { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .input-legal { background: #f8fafc; border: 1px solid #cbd5e1; transition: all 0.2s; }
+        .input-legal:focus { background: #ffffff; border-color: #b45309; box-shadow: 0 0 0 1px #b45309; outline: none; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body>
+        <div class="top-bar">
+            <div class="container">
+                <div class="info">
+                    <a href="tel:+573217927495" style="margin-right: 15px">
+                        <i class="fas fa-phone-alt"></i> (+57) 321 792 7495
+                    </a>
+                    <span class="separador">|</span>
+                    <a href="mailto:tuabogadolaboral@outlook.com">
+                        <i class="fas fa-envelope"></i> tuabogadolaboral@outlook.com
+                    </a>
+                </div>
+                <div class="social-icons">
+                    <a href="https://web.facebook.com/profile.php?id=100064878228146" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/tuabogadolaboralbq/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.linkedin.com/in/dra-johana-manga-padilla-5745b542/" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+        <header>
+            <div class="container header-container">
+                <div class="logo">
+                    <a href="index.html" aria-label="Inicio">
+                        <img src="img/logo-principal.webp" alt="Logo" class="logo-img" width="200" height="55" />
+                    </a>
+                </div>
+
+                <div class="menu-toggle" id="mobile-menu" aria-label="Menú principal" role="button" tabindex="0">
+                    <i class="fas fa-bars"></i>
+                </div>
+
+                <nav aria-label="Navegación principal">
+                    <ul class="nav-menu" id="nav-menu">
+                        <li><a href="index.html">Inicio</a></li>
+                        <li><a href="nosotros.html">Nosotros</a></li>
+                        <li><a href="servicios.html">Servicios</a></li>
+                        <li><a href="herramientas.html" class="active">Herramientas</a></li>
+                        <li><a href="contacto.html" class="btn-nav">Contacto</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <div class="breadcrumb-bar">
+                <div class="container">
+                    <a href="index.html">Inicio</a>
+                    <span class="sep">/</span>
+                    <a href="herramientas.html">Herramientas</a>
+                    <span class="sep">/</span>
+                    <span class="current">Indemnización Sustitutiva</span>
+                </div>
+            </div>
+
+        <div id="root"></div>
+
+    <script src="js/pension-rpm-data.js"></script>
+    <script src="js/indemnizacion-sustitutiva-rates.js"></script>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { jsPDF } = window.jspdf;
+
+        // `SMLV_DATA`, `IPC_DATA` y `getIpc` provienen de `js/pension-rpm-data.js`.
+        // `getTasaP`, `calcularIndemnizacion`, etc. provienen de `js/indemnizacion-sustitutiva-rates.js`.
+
+        const Icon = ({ name, className = "w-5 h-5" }) => {
+            const icons = {
+                calc: <g><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/></g>,
+                user: <g><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></g>,
+                check: <polyline points="20 6 9 17 4 12"/>,
+                trash: <g><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></g>,
+                trending: <g><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></g>,
+                lock: <g><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></g>,
+                file: <g><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></g>,
+                table: <g><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></g>
+            };
+            return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{icons[name]}</svg>;
+        };
+
+        const isDate = (val) => {
+            if (!val) return false;
+            const s = String(val).replace(/\s/g, '');
+            if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(s)) return true;
+            if (!isNaN(s) && Number(s) > 10000 && Number(s) < 80000) return true;
+            return false;
+        };
+
+        const formatDateForDisplay = (val) => {
+            if (!val) return '';
+            const str = String(val).trim();
+            if (!isNaN(str) && Number(str) > 10000 && Number(str) < 80000) {
+                const d = new Date((Number(str) - 25569) * 86400 * 1000);
+                return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${d.getFullYear()}`;
+            }
+            return str;
+        };
+
+        const parseFlexibleDate = (val) => {
+            if (!val) return null;
+            const str = String(val).trim();
+            const parts = str.split(/[\/\-]/);
+            if (parts.length === 3) {
+                if (parts[2].length === 4) return new Date(parts[2], parts[1]-1, parts[0]);
+                else if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
+            }
+            return new Date(str);
+        };
+
+        const getDiasComerciales = (fechaInicio, fechaFin) => {
+            let d1 = fechaInicio.getDate();
+            let m1 = fechaInicio.getMonth();
+            let y1 = fechaInicio.getFullYear();
+            let d2 = fechaFin.getDate();
+            let m2 = fechaFin.getMonth();
+            let y2 = fechaFin.getFullYear();
+            
+            if (d1 === 31) d1 = 30;
+            if (d2 === 31) d2 = 30;
+            
+            const esFinFebrero1 = (m1 === 1) && (d1 === 28 || d1 === 29);
+            const esFinFebrero2 = (m2 === 1) && (d2 === 28 || d2 === 29);
+            if (esFinFebrero1) d1 = 30;
+            if (esFinFebrero2) d2 = 30;
+            
+            return ((y2 - y1) * 360) + ((m2 - m1) * 30) + (d2 - d1) + 1;
+        };
+
+        const cleanIBC = (val) => {
+            if (!val) return 0;
+            const s = String(val).replace(/[^\d.,]/g, '');
+            const parsed = parseFloat(s.replace(/\./g, '').replace(',', '.'));
+            return isNaN(parsed) ? 0 : parsed;
+        };
+
+        function App() {
+            const [step, setStep] = useState(1);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState(null);
+            
+            const [formData, setFormData] = useState({ 
+                nombre: '', 
+                cedula: '', 
+                anoLiquidacion: 2026, 
+                smlv: SMLV_DATA[2026] || 1300000 
+            });
+            
+            const [history, setHistory] = useState([]);
+            const [results, setResults] = useState(null);
+            const [showDetails, setShowDetails] = useState(false); 
+
+            const isCedulaValid = formData.cedula.trim().length >= 5 && /^\d+$/.test(formData.cedula.trim());
+
+            useEffect(() => {
+                const year = formData.anoLiquidacion;
+                if (SMLV_DATA[year]) {
+                    setFormData(p => ({ ...p, smlv: SMLV_DATA[year] }));
+                }
+            }, [formData.anoLiquidacion]);
+
+            const formatCurrency = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(v);
+
+            const handlePDF = async (file) => {
+                if (!isCedulaValid) return;
+                const password = formData.cedula;
+                setLoading(true); setError(null);
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                try {
+                    const buffer = await file.arrayBuffer();
+                    let doc;
+                    try { doc = await pdfjsLib.getDocument({ data: buffer, password }).promise; } 
+                    catch (e) {
+                        if (e.name === "PasswordException") {
+                            try { doc = await pdfjsLib.getDocument({ data: buffer, password: `CC${password}` }).promise; }
+                            catch { throw new Error("Contraseña incorrecta. Verifique la cédula."); }
+                        } else throw e;
+                    }
+                    
+                    let fullText = "";
+                    for (let i = 1; i <= doc.numPages; i++) {
+                        const page = await doc.getPage(i);
+                        const content = await page.getTextContent();
+                        fullText += content.items.map(item => item.str).join(" ") + "\n";
+                    }
+
+                    // CORRECCIÓN ESTRUCTURAL 1: Mutilar los tiempos del sector público no cotizados a Colpensiones.
+                    // Si se dejan, la liquidación será rechazada por inflación indebida de semanas.
+                    let validText = fullText;
+                    if (validText.includes("RESUMEN DE TIEMPOS PÚBLICOS NO COTIZADOS A COLPENSIONES")) {
+                        validText = validText.split("RESUMEN DE TIEMPOS PÚBLICOS NO COTIZADOS A COLPENSIONES")[0];
+                    }
+                    
+                    const regexPDF = /(\d{5,15})\s+([^\n\r]{3,60}?)\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})\s+\$?\s*([\d.,]+)\s+([\d.,]+)/g;
+                    const matches = []; let m;
+                    
+                    while ((m = regexPDF.exec(validText)) !== null) {
+                        const emp = m[2].trim().toUpperCase();
+                        if (emp.includes("RAZÓN SOCIAL") || emp.includes("ADMINISTRADORA") || emp.includes("NOMBRE AFILIADO") || emp === "NIT") continue;
+                        
+                        const ibc = cleanIBC(m[5]);
+                        const semanas = cleanIBC(m[6]);
+                        if (ibc < 1000 || semanas > 500 || semanas === 0) continue;
+                        
+                        const dOficiales = Math.round(semanas * 7);
+                        
+                        matches.push({ nit: m[1], empresa: m[2].trim(), desde: formatDateForDisplay(m[3]), hasta: formatDateForDisplay(m[4]), ibc: ibc, semanas: semanas, dias: dOficiales });
+                    }
+                    if (matches.length === 0) throw new Error("No se detectaron filas válidas en el PDF. Intente subir el Excel (CSV).");
+                    setHistory(matches); setStep(2);
+                } catch (e) { setError(e.message); } finally { setLoading(false); }
+            };
+
+            const handleExcel = (file) => {
+                if (!isCedulaValid) return;
+                setLoading(true); setError(null);
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const wb = XLSX.read(e.target.result, { type: 'array' });
+                    const ws = wb.Sheets[wb.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+                    
+                    let validRows = [];
+                    json.forEach(r => {
+                        if (!r || r.length < 3) return;
+                        let desdeIdx = -1;
+                        for(let i=0; i < r.length - 1; i++) {
+                            if (isDate(r[i]) && isDate(r[i+1])) { desdeIdx = i; break; }
+                        }
+                        if (desdeIdx !== -1) {
+                            const empresa = String(r[desdeIdx-1] || '').trim();
+                            if (empresa.toUpperCase().includes("ADMINISTRADORA") || empresa.toUpperCase().includes("RAZÓN SOCIAL")) return;
+                            const postDateVals = r.slice(desdeIdx+2).map(v => cleanIBC(v));
+                            const ibc = Math.max(...postDateVals.filter(v => v > 1000), 0);
+                            const smallVals = postDateVals.filter(v => v > 0 && v < 200);
+                            const semanas = smallVals.length > 0 ? smallVals[smallVals.length - 1] : 0;
+                            if (ibc > 0 && semanas > 0) {
+                                const dOficiales = Math.round(Number(semanas) * 7);
+                                validRows.push({ nit: String(r[desdeIdx-2] || ''), empresa: empresa, desde: formatDateForDisplay(r[desdeIdx]), hasta: formatDateForDisplay(r[desdeIdx+1]), ibc: ibc, semanas: Number(semanas.toFixed(2)), dias: dOficiales });
+                            }
+                        }
+                    });
+                    if (validRows.length === 0) setError("No se detectaron registros válidos en el Excel.");
+                    else { setHistory(validRows); setStep(2); }
+                    setLoading(false);
+                };
+                reader.readAsArrayBuffer(file);
+            };
+
+            const handleCalculate = () => {
+                try {
+                    setLoading(true); setError(null); setShowDetails(false); 
+                    
+                    const ipcFinalKey = `${formData.anoLiquidacion - 1}-12`;
+                    const ipcFinal = getIpc(ipcFinalKey);
+                    
+                    let expandedMonths = {};
+
+                    // CORRECCIÓN ESTRUCTURAL 2: Agrupación Actuarial por Mes.
+                    // Si se detectan aportes simultáneos, se suman los IBCs (protegiendo el capital del afiliado)
+                    // pero el tiempo se limita estrictamente a un máximo de 30 días, evitando inflar la variable (S).
+                    history.forEach((row) => {
+                        if (!row.desde || !row.hasta || row.ibc <= 0 || row.dias <= 0) return;
+                        const dStart = parseFlexibleDate(row.desde);
+                        const dEnd = parseFlexibleDate(row.hasta);
+                        if (!dStart || !dEnd || dStart > dEnd) return;
+
+                        const totalCommDays = getDiasComerciales(dStart, dEnd) || 1;
+                        let curStart = new Date(dStart.getTime());
+                        
+                        while (curStart <= dEnd) {
+                            let curYear = curStart.getFullYear();
+                            let curMonth = curStart.getMonth();
+                            
+                            let endOfMonth = new Date(curYear, curMonth + 1, 0); 
+                            let actEnd = dEnd < endOfMonth ? new Date(dEnd.getTime()) : new Date(endOfMonth.getTime());
+                            
+                            let segmentDaysComm = getDiasComerciales(curStart, actEnd);
+                            
+                            if (segmentDaysComm > 0) {
+                                let assignedDays = (segmentDaysComm / totalCommDays) * row.dias;
+                                let iaXDiasBruto = row.ibc * assignedDays;
+                                let monthKey = `${curYear}-${String(curMonth + 1).padStart(2, '0')}`;
+                                
+                                if (!expandedMonths[monthKey]) {
+                                    expandedMonths[monthKey] = {
+                                        year: curYear,
+                                        monthKey: monthKey,
+                                        dias: assignedDays,
+                                        iaXDiasBruto: iaXDiasBruto,
+                                        empresas: [row.empresa]
+                                    };
+                                } else {
+                                    expandedMonths[monthKey].dias = Math.min(30, expandedMonths[monthKey].dias + assignedDays);
+                                    expandedMonths[monthKey].iaXDiasBruto += iaXDiasBruto;
+                                    if (!expandedMonths[monthKey].empresas.includes(row.empresa)) {
+                                        expandedMonths[monthKey].empresas.push(row.empresa);
+                                    }
+                                }
+                            }
+                            curStart = new Date(curYear, curMonth + 1, 1); 
+                        }
+                    });
+
+                    let splitHistory = Object.values(expandedMonths);
+                    splitHistory.sort((a,b) => b.monthKey.localeCompare(a.monthKey));
+                    
+                    let totalDias = 0;
+                    let sumIaXDias = 0;
+                    let sumPxDias = 0;
+                    let detailedReport = []; 
+                    
+                    splitHistory.forEach(seg => {
+                        const effectiveIbc = seg.iaXDiasBruto / seg.dias; 
+                        
+                        const ipcInicialKey = `${seg.year - 1}-12`;
+                        const ipcInicial = getIpc(ipcInicialKey);
+                        
+                        const factorIndexacion = ipcFinal / ipcInicial;
+                        const ibcIndexadoIA = effectiveIbc * factorIndexacion;
+                        const iaXDias = ibcIndexadoIA * seg.dias;
+                        
+                        const tasaP = getTasaP(seg.year);
+                        const pXDias = tasaP * seg.dias;
+                        
+                        detailedReport.push({
+                            empresa: seg.empresas.join(' + '),
+                            mes: seg.monthKey,
+                            dias: seg.dias,
+                            ipcFinal: ipcFinal,
+                            ipcInicial: ipcInicial,
+                            ibcHistorico: effectiveIbc, 
+                            ibcIndexado: ibcIndexadoIA,
+                            tasaP: tasaP,
+                            iaXDias: iaXDias,
+                            pXDias: pXDias
+                        });
+
+                        sumIaXDias += iaXDias;
+                        sumPxDias += pXDias;
+                        totalDias += seg.dias;
+                    });
+
+                    if (totalDias === 0) throw new Error("No hay días computables para realizar la liquidación.");
+
+                    const sbcMensual = sumIaXDias / totalDias;
+                    const pPonderado = sumPxDias / totalDias;
+                    const semanas = totalDias / 7;
+                    const indemnizacion = sbcMensual * (totalDias / 30) * pPonderado;
+                    
+                    setResults({ 
+                        totalDias,
+                        semanas,
+                        sbcMensual,
+                        pPonderado,
+                        indemnizacion,
+                        detailedReport,
+                        sumIaXDias
+                    });
+                    setStep(3);
+                } catch (e) { setError("Error matemático: " + e.message); } finally { setLoading(false); }
+            };
+
+            const exportPDF = () => {
+                const doc = new jsPDF('landscape'); 
+                const W = doc.internal.pageSize.getWidth();
+                
+                doc.setFillColor(30, 58, 138); 
+                doc.rect(0, 0, W, 40, 'F');
+                doc.setTextColor(255, 255, 255); 
+                doc.setFontSize(20); 
+                doc.text("DICTAMEN PERICIAL - INDEMNIZACIÓN SUSTITUTIVA", W/2, 25, { align: 'center' });
+                
+                doc.setTextColor(30, 58, 138); 
+                doc.setFontSize(14); 
+                doc.text("1. Resumen de Liquidación", 15, 55);
+                
+                doc.setFontSize(10); 
+                doc.text(`Afiliado: ${formData.nombre}`, 15, 65); 
+                doc.text(`Documento: ${formData.cedula}`, 15, 70);
+                doc.text(`Total Semanas Cotizadas a Colpensiones (S): ${results.semanas.toFixed(2)}`, 15, 75);
+                doc.text(`Salario Base de Liquidación (SBC): ${formatCurrency(results.sbcMensual)}`, 15, 80);
+                doc.text(`Porcentaje Promedio Cotización (P): ${(results.pPonderado * 100).toFixed(2)}%`, 15, 85);
+                
+                doc.autoTable({ 
+                    startY: 95, 
+                    head: [['Concepto', 'Base Legal', 'Valor a Reconocer']], 
+                    body: [
+                        ['Indemnización Sustitutiva de Vejez', 'Decreto 1730 de 2001 (Art. 1)', formatCurrency(results.indemnizacion)]
+                    ], 
+                    theme: 'grid', 
+                    headStyles: { fillColor: [30, 58, 138] },
+                    styles: { fontSize: 12, cellPadding: 4, fontStyle: 'bold' }
+                });
+
+                doc.addPage();
+                doc.setFillColor(30, 58, 138); 
+                doc.rect(0, 0, W, 30, 'F');
+                doc.setTextColor(255, 255, 255); 
+                doc.setFontSize(16); 
+                doc.text("ANEXO TÉCNICO: HISTORIAL MULTIANUAL CONSOLIDADO", W/2, 20, { align: 'center' });
+
+                doc.setTextColor(30, 58, 138); 
+                doc.setFontSize(11);
+                
+                doc.text(`Total Días Computados (Sin doble conteo por simultaneidad): ${results.totalDias.toFixed(2)}`, 15, 40);
+                doc.text(`Salario Base Mensual Indexado (SBC): ${formatCurrency(results.sbcMensual)}`, 15, 48);
+
+                const tableBody = results.detailedReport.map(r => [
+                    r.empresa.substring(0, 24),
+                    r.mes,
+                    r.dias.toFixed(2),
+                    r.ipcFinal.toFixed(4),
+                    r.ipcInicial.toFixed(4),
+                    formatCurrency(r.ibcHistorico),
+                    formatCurrency(r.ibcIndexado),
+                    (r.tasaP * 100).toFixed(2) + '%',
+                    formatCurrency(r.iaXDias) 
+                ]);
+
+                doc.autoTable({
+                    startY: 55,
+                    head: [['Aportantes', 'Periodo (Mes)', 'Días', 'IPC Fin.', 'IPC Ini.', 'IBC Consolidado', 'IBC Indexado', 'Tasa (P)', 'SBC Parcial (IA x Días)']],
+                    body: tableBody,
+                    theme: 'striped',
+                    styles: { fontSize: 8, cellPadding: 1.5 },
+                    headStyles: { fillColor: [30, 58, 138] },
+                    columnStyles: {
+                        5: { halign: 'right' },
+                        6: { halign: 'right', fontStyle: 'bold' },
+                        7: { halign: 'center', textColor: [180, 83, 9] },
+                        8: { halign: 'right', fontStyle: 'bold', textColor: [15, 118, 110] } 
+                    }
+                });
+
+                doc.save(`Indemnizacion_Sustitutiva_Corregida_${formData.cedula}.pdf`);
+            };
+
+            const exportExcel = () => {
+                const res = results;
+                
+                const preData = [
+                    ['LIQUIDACIÓN INDEMNIZACIÓN SUSTITUTIVA DE VEJEZ'],
+                    ['Base Legal:', 'Decreto 1730 de 2001 (Art. 1)'],
+                    [],
+                    ['DATOS DEL AFILIADO'],
+                    ['Nombre:', formData.nombre],
+                    ['Documento:', formData.cedula],
+                    ['Año de Liquidación:', formData.anoLiquidacion],
+                    [],
+                    ['RESUMEN DE LIQUIDACIÓN'],
+                    ['Total Días Computados:', res.totalDias],
+                    ['Total Semanas Cotizadas (S):', res.semanas],
+                    ['Salario Base de Liquidación (SBC):', res.sbcMensual],
+                    ['Porcentaje Ponderado (P):', res.pPonderado],
+                    ['Fórmula:', 'I = SBC × (S / 4.2857) × P'],
+                    ['Sumatoria (IA × Días):', res.sumIaXDias],
+                    ['INDEMNIZACIÓN SUSTITUTIVA:', res.indemnizacion],
+                    [],
+                    ['DETALLE ACTUARIAL MENSUALIZADO']
+                ];
+
+                const headers = [
+                    'Aportantes (Agrupados)',
+                    'Periodo (Mes)',
+                    'Días',
+                    'IPC Final',
+                    'IPC Inicial',
+                    'IBC Consolidado ($)',
+                    'IBC Indexado ($)',
+                    'Tasa P (%)',
+                    'P × Días',
+                    'SBC Parcial (IA × Días)'
+                ];
+
+                const data = res.detailedReport.map(r => [
+                    r.empresa,
+                    r.mes,
+                    r.dias,
+                    r.ipcFinal,
+                    r.ipcInicial,
+                    r.ibcHistorico,
+                    r.ibcIndexado,
+                    r.tasaP * 100,
+                    r.pXDias,
+                    r.iaXDias
+                ]);
+
+                const totalsRow = [
+                    'TOTALES',
+                    '',
+                    res.totalDias,
+                    '', '', '', '', '',
+                    '',
+                    res.sumIaXDias
+                ];
+
+                const allData = [...preData, headers, ...data, totalsRow];
+
+                const ws = XLSX.utils.aoa_to_sheet(allData);
+
+                // Ancho de columnas
+                ws['!cols'] = [
+                    {wch: 35}, {wch: 12}, {wch: 10}, {wch: 12}, {wch: 12},
+                    {wch: 20}, {wch: 20}, {wch: 10}, {wch: 12}, {wch: 22}
+                ];
+
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Indemnización Sustitutiva');
+                XLSX.writeFile(wb, `Indemnizacion_Sustitutiva_Detalle_${formData.cedula}.xlsx`);
+            };
+
+            const Stepper = () => (
+                <div className="flex justify-center items-center mb-10 w-full max-w-lg mx-auto">
+                    {[1, 2, 3].map((num) => (
+                        <React.Fragment key={num}>
+                            <div 
+                                onClick={() => num < step ? setStep(num) : null}
+                                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-all duration-300 ${num < step ? 'bg-primary border-primary text-white cursor-pointer' : num === step ? 'bg-secondary border-secondary text-white shadow-md' : 'bg-slate-50 border-slate-200 text-slate-400'}`}
+                            >
+                                {num < step ? <Icon name="check" className="w-5 h-5" /> : num}
+                            </div>
+                            {num !== 3 && <div className={`h-1 flex-1 mx-2 rounded-full transition-all duration-500 ${num < step ? 'bg-primary' : 'bg-slate-200'}`}></div>}
+                        </React.Fragment>
+                    ))}
+                </div>
+            );
+
+            return (
+                <div className="container py-12">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center mb-12">
+                            <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">Calculadora de Indemnización Sustitutiva</h1>
+                            <p className="text-slate-600 max-w-2xl mx-auto">Módulo especializado para el cálculo de la indemnización sustitutiva de vejez en el Régimen de Prima Media (Colpensiones), conforme al Decreto 1730 de 2001.</p>
+                        </div>
+                        
+                        <Stepper />
+
+                        {error && (
+                            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-r-xl mb-8 flex items-start shadow-sm">
+                                <Icon name="trash" className="w-5 h-5 mr-3 shrink-0 mt-0.5 text-red-500" />
+                                <div>
+                                    <h4 className="font-bold text-sm">Error en el proceso</h4>
+                                    <p className="text-sm mt-1">{error}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {step === 1 && (
+                            <div className="grid md:grid-cols-2 gap-8 animate-in slide-in-from-bottom-4">
+                                <div className="card-legal p-8 rounded-2xl space-y-6 relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+                                    <h2 className="text-xl font-bold text-primary flex items-center"><Icon name="user" className="w-5 h-5 mr-2 text-secondary" /> Datos del Afiliado</h2>
+                                    
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Nombre Completo</label>
+                                            <input type="text" className="w-full p-3.5 rounded-xl input-legal text-sm" value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} placeholder="Ej: Juan Pérez" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Número de Documento</label>
+                                            <input type="text" className="w-full p-3.5 rounded-xl input-legal text-sm font-mono" value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} placeholder="Para procesar PDF protegido" />
+                                        </div>
+                                        <div className="flex space-x-4">
+                                            <div className="w-1/3">
+                                                <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Año Cierre</label>
+                                                <input type="number" className="w-full p-3.5 rounded-xl input-legal text-sm font-bold text-center" value={formData.anoLiquidacion} onChange={e => setFormData({...formData, anoLiquidacion: parseInt(e.target.value)})} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                            <div className={`card-legal p-8 rounded-2xl flex flex-col items-center justify-center transition-colors relative ${isCedulaValid ? 'hover:bg-slate-50 group cursor-pointer' : 'bg-slate-50/50 cursor-not-allowed'}`}>
+                                {loading ? (
+                                    <div className="text-center">
+                                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                        <p className="font-semibold text-primary text-sm">Procesando documento...</p>
+                                    </div>
+                                ) : !isCedulaValid ? (
+                                    <div className="text-center flex flex-col items-center px-4">
+                                        <Icon name="lock" className="w-12 h-12 text-slate-300 mb-3" />
+                                        <h3 className="font-bold text-slate-600">Módulo Bloqueado</h3>
+                                        <p className="text-xs text-slate-500 mt-2">Ingrese el número de documento válido para habilitar la carga de la Historia Laboral.</p>
+                                    </div>
+                                ) : (
+                                    <div className="text-center flex flex-col items-center w-full px-4">
+                                        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                                            <Icon name="file" className="w-8 h-8 text-primary" />
+                                        </div>
+                                        <h3 className="font-bold text-primary">Cargar Historial (100%)</h3>
+                                        <p className="text-xs text-slate-500 mt-2">Formatos aceptados: PDF de Colpensiones o Excel (CSV)</p>
+                                        <input type="file" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" onChange={e => {
+                                            if(!e.target.files[0]) return;
+                                            e.target.files[0].name.toLowerCase().endsWith('.pdf') ? handlePDF(e.target.files[0]) : handleExcel(e.target.files[0]);
+                                        }} />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 2 && (
+                        <div className="card-legal p-8 rounded-2xl space-y-6 animate-in slide-in-from-bottom-4">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4">
+                                <div>
+                                    <h2 className="text-xl font-bold text-primary">Auditoría de Aportes Históricos</h2>
+                                    <p className="text-xs text-slate-500 mt-1">{history.length} registros extraídos en total (Sector Privado)</p>
+                                </div>
+                                <button className="bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:bg-slate-800 transition-colors shadow-sm flex items-center space-x-2 text-sm w-full sm:w-auto justify-center" onClick={handleCalculate}>
+                                    <Icon name="calc" className="w-4 h-4" />
+                                    <span>Calcular Indemnización</span>
+                                </button>
+                            </div>
+                            
+                            <div className="overflow-x-auto rounded-xl border border-slate-200 max-h-[400px] shadow-inner">
+                                <table className="w-full text-sm text-left whitespace-nowrap"><thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold tracking-wider sticky top-0 border-b border-slate-200"><tr><th className="p-4">Empresa / Razón Social</th><th className="p-4">Desde</th><th className="p-4">Hasta</th><th className="p-4 text-right">IBC Mensual ($)</th><th className="p-4 text-center">Días Computables</th><th className="p-4"></th></tr></thead>
+                                <tbody>{history.map((row, i) => (<tr key={i} className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors">
+                                    <td className="p-3 font-medium text-slate-700 truncate max-w-[200px]" title={row.empresa}>{row.empresa}</td>
+                                    <td className="p-3 font-mono text-xs"><input className="bg-transparent w-24 outline-none border-b border-transparent focus:border-secondary" value={row.desde} onChange={e=>{const h=[...history]; h[i].desde=e.target.value; setHistory(h);}} /></td>
+                                    <td className="p-3 font-mono text-xs"><input className="bg-transparent w-24 outline-none border-b border-transparent focus:border-secondary" value={row.hasta} onChange={e=>{const h=[...history]; h[i].hasta=e.target.value; setHistory(h);}} /></td>
+                                    <td className="p-3 text-right font-semibold text-slate-800"><input className="bg-transparent text-right w-28 outline-none border-b border-transparent focus:border-secondary" type="number" value={row.ibc} onChange={e=>{const h=[...history]; h[i].ibc=parseFloat(e.target.value); setHistory(h);}} /></td>
+                                    <td className="p-3 text-center text-slate-600"><input className="bg-transparent text-center w-16 outline-none border-b border-transparent focus:border-secondary" type="number" value={row.dias} onChange={e=>{const h=[...history]; h[i].dias=parseInt(e.target.value); setHistory(h);}} /></td>
+                                    <td className="p-3 text-center"><button className="text-slate-400 hover:text-red-500 transition-colors p-1" onClick={()=>setHistory(history.filter((_,idx)=>idx!==i))}><Icon name="trash" className="w-4 h-4"/></button></td>
+                                </tr>))}</tbody></table>
+                            </div>
+                            <button className="text-sm font-semibold text-secondary hover:text-primary transition-colors flex items-center" onClick={()=>setHistory([{empresa:'REGISTRO MANUAL',desde:'01/01/2000',hasta:'30/01/2000',ibc:1300000,semanas:4.29, dias:30}, ...history])}>+ Añadir Periodo Manualmente</button>
+                        </div>
+                    )}
+
+                    {step === 3 && results && (
+                        <div className="space-y-6 animate-in slide-in-from-bottom-4">
+                            
+                            <div className="grid md:grid-cols-3 gap-4">
+                                <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-primary">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Total Semanas a Pagar (S)</p>
+                                    <h3 className="text-2xl font-black text-primary mt-1">{results.semanas.toFixed(2)}</h3>
+                                    <p className="text-xs text-slate-500 mt-1">Sin simultaneidad extra ni sector público</p>
+                                </div>
+                                <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-accent">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Salario Base Liquidación (SBC)</p>
+                                    <h3 className="text-2xl font-black text-primary mt-1">{formatCurrency(results.sbcMensual)}</h3>
+                                    <p className="text-xs text-slate-500 mt-1">Promedio mensual indexado</p>
+                                </div>
+                                <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-secondary">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Porcentaje Ponderado (P)</p>
+                                    <h3 className="text-2xl font-black text-primary mt-1">{(results.pPonderado * 100).toFixed(2)}%</h3>
+                                    <p className="text-xs text-slate-500 mt-1">Promedio de aportes por rango de ley</p>
+                                </div>
+                            </div>
+
+                            <div className="card-legal p-8 rounded-2xl flex flex-col items-center bg-slate-50 border-2 border-secondary/30 relative">
+                                <div className="absolute top-0 right-0 bg-secondary text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-lg rounded-tr-xl tracking-wider">DECRETO 1730/2001</div>
+                                <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2 mt-4">Indemnización Sustitutiva a Recibir</p>
+                                <p className="text-5xl md:text-6xl font-black text-primary mb-4">{formatCurrency(results.indemnizacion)}</p>
+                                <div className="bg-white border border-slate-200 px-6 py-3 rounded-lg text-sm text-slate-600 font-mono flex flex-col items-center shadow-sm">
+                                    <span className="font-bold text-primary mb-1">Ecuación Aplicada: I = SBC × S × P</span>
+                                    <span>S = (Semanas / 4.2857) factor mensual</span>
+                                </div>
+                            </div>
+
+                            <div className="mt-8">
+                                <button 
+                                    onClick={() => setShowDetails(!showDetails)}
+                                    className="flex items-center justify-center w-full py-4 bg-white text-primary font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm"
+                                >
+                                    <Icon name="table" className="w-5 h-5 mr-2 text-secondary" />
+                                    {showDetails ? "Ocultar Detalle Actuarial (Tabla Mensualizada)" : "Ver Detalle Actuarial (Tabla Mensualizada)"}
+                                </button>
+
+                                {showDetails && (
+                                    <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 shadow-inner bg-white max-h-[500px] animate-in slide-in-from-top-4">
+                                        <table className="w-full text-xs text-left whitespace-nowrap">
+                                            <thead className="bg-slate-100 text-slate-600 uppercase font-bold tracking-wider sticky top-0 border-b border-slate-200 shadow-sm">
+                                                <tr>
+                                                    <th className="p-3">Aportantes (Agrupados)</th>
+                                                    <th className="p-3 text-center">Periodo</th>
+                                                    <th className="p-3 text-center">Días</th>
+                                                    <th className="p-3 text-right">IBC CONSOLIDADO</th>
+                                                    <th className="p-3 text-right font-bold text-primary">IBC INDEXADO</th>
+                                                    <th className="p-3 text-center text-secondary">TASA (P)</th>
+                                                    <th className="p-3 text-right font-bold text-accent">SBC PARCIAL</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {results.detailedReport.map((r, i) => (
+                                                    <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                                        <td className="p-3 font-medium text-slate-700 truncate max-w-[150px]" title={r.empresa}>{r.empresa}</td>
+                                                        <td className="p-3 font-mono text-center">{r.mes}</td>
+                                                        <td className="p-3 text-center font-bold">{r.dias.toFixed(2)}</td>
+                                                        <td className="p-3 text-right text-slate-500">{formatCurrency(r.ibcHistorico)}</td>
+                                                        <td className="p-3 text-right font-bold text-primary">{formatCurrency(r.ibcIndexado)}</td>
+                                                        <td className="p-3 text-center font-bold text-secondary">{(r.tasaP * 100).toFixed(1)}%</td>
+                                                        <td className="p-3 text-right font-bold text-accent">{formatCurrency(r.iaXDias)}</td>
+                                                    </tr>
+                                                ))}
+                                                <tr className="bg-slate-100 font-bold border-t-2 border-slate-300">
+                                                    <td colSpan="2" className="p-3 text-right">TOTALES:</td>
+                                                    <td className="p-3 text-center">{results.totalDias.toFixed(2)}</td>
+                                                    <td colSpan="4"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="card-legal p-6 md:p-8 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6 bg-slate-50 border-l-4 border-l-primary mt-8">
+                                <div className="flex-1 text-center md:text-left">
+                                    <h5 className="text-xl font-bold text-primary">Reporte Técnico Generado</h5>
+                                    <p className="text-sm text-slate-600 mt-2 leading-relaxed">El documento ahora refleja la agrupación mensual de sus aportes, garantizando que el total de semanas coincida con el aval de Colpensiones, sin perder capital por tiempos simultáneos.</p>
+                                </div>
+                                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                                    <button className="bg-green-600 text-white px-6 py-3.5 rounded-xl font-semibold hover:bg-green-700 transition-colors flex items-center space-x-2 shrink-0 shadow-sm w-full md:w-auto justify-center" onClick={exportExcel}>
+                                        <Icon name="table" className="w-4 h-4 shrink-0"/>
+                                        <span>Detalle Excel</span>
+                                    </button>
+                                    <button className="bg-primary text-white px-6 py-3.5 rounded-xl font-semibold hover:bg-slate-800 transition-colors flex items-center space-x-2 shrink-0 shadow-sm w-full md:w-auto justify-center" onClick={exportPDF}>
+                                        <Icon name="file" className="w-4 h-4 shrink-0"/>
+                                        <span>Dictamen PDF</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+        </main>
+        <footer>
+            <div class="container">
+                <div class="footer-grid">
+                    <div class="footer-col">
+                        <div class="footer-logo">Tu Abogado <span>Laboral</span></div>
+                        <p style="color: #ccc; margin-bottom: 20px; font-size: 0.9rem">Defensa experta y estratégica en Derecho Laboral y Pensional. Barranquilla, Colombia.</p>
+                        <div class="social-icons-footer">
+                            <a href="https://web.facebook.com/profile.php?id=100064878228146" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/tuabogadolaboralbq/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="https://www.linkedin.com/in/dra-johana-manga-padilla-5745b542/" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-col links-col">
+                        <h4>Enlaces Rápidos</h4>
+                        <ul>
+                            <li><a href="index.html">Inicio</a></li>
+                            <li><a href="nosotros.html">Sobre Nosotros</a></li>
+                            <li><a href="servicios.html">Áreas de Práctica</a></li>
+                            <li><a href="herramientas.html">Herramientas</a></li>
+                            <li><a href="contacto.html" class="active-footer">Agendar Cita</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col">
+                        <h3>Contacto</h3>
+                        <ul class="contact-list">
+                            <li><i class="fas fa-map-marker-alt"></i><span>Edificio Las Flores, Calle 39 #43-123, Barranquilla</span></li>
+                            <li><i class="fas fa-phone-alt"></i><span>+57 321 792 7495</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="container copyright-flex">
+                    <p>© 2026 Tu Abogado Laboral - Todos los derechos reservados.</p>
+                    <a href="politica-privacidad.html" class="privacy-link">Política de Privacidad</a>
+                </div>
+            </div>
+        </footer>
+
+        <a href="https://wa.me/573217927495" class="whatsapp-btn" target="_blank" aria-label="Contactar por WhatsApp"><i class="fab fa-whatsapp"></i></a>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

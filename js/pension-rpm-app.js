@@ -711,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="mt-8 flex flex-col md:flex-row justify-end gap-4 w-full">
                     <button id="btn-export-excel-dyn" class="bg-green-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-green-700 transition-colors flex items-center justify-center space-x-3 shadow-md w-full md:w-auto">
                         <i class="fas fa-file-excel text-xl"></i>
-                        <span>Detalle IBL</span>
+                        <span>Detalle Pensión</span>
                     </button>
                     <button id="btn-export-pdf-dyn" class="bg-red-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-red-700 transition-colors flex items-center justify-center space-x-3 shadow-md w-full md:w-auto">
                         <i class="fas fa-file-pdf text-xl"></i>
@@ -854,52 +854,137 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function exportExcel() {
         const res = state.results;
+        const fd = state.formData;
         
-        // Helper to format data for worksheet
-        const formatDataForWS = (reportArray, calcSummary) => {
-            const preData = [
-                ['RESUMEN DE LIQUIDACIÓN'],
-                ['Sumatoria Total (IA x Días):', calcSummary.sumIaXDias],
-                ['Total Días Computados:', calcSummary.consumedDays],
-                ['Fórmula del IBL:', '=SUMA(IA X #DIAS) / Total Días Computados'],
-                ['IBL Estimado:', calcSummary.ibl],
-                [],
-                ['DETALLE DE APORTES']
-            ];
+        // Determinar cuál es el mejor cálculo (mayor IBL)
+        const bestCalc = res.calcTodaVida && res.calcTodaVida.ibl > res.calc10Years.ibl 
+            ? res.calcTodaVida : res.calc10Years;
+        const bestReport = bestCalc === res.calcTodaVida 
+            ? (res.detailedReportTodaVida || []) : (res.detailedReport10Years || []);
+        const bestTitle = bestCalc === res.calcTodaVida 
+            ? 'TODA LA VIDA (ART. 21 LEY 100)' : '10 ÚLTIMOS AÑOS (3.600 DÍAS)';
 
-            const headers = ['Razón Social / Aportante', 'Desde', 'Hasta', 'Días', 'F. IPC Final', 'IPC Final', 'F. IPC Inicial', 'IPC Inicial', 'Salario Base (Histórico)', 'Salario Indexado (IA)', 'IA X #DIAS'];
-            const data = reportArray.map(r => [
+        // === HOJA PRINCIPAL: Formato tipo captura de pantalla ===
+        const headerData = [
+            ['LIQUIDACIÓN DE PENSIÓN ' + bestTitle + ' - TU ABOGADO LABORAL'],
+            [],
+            ['', 'NOMBRE', fd.nombre || 'Usuario ' + fd.cedula, 'Nombre del cliente'],
+            ['', 'CEDULA', fd.cedula, 'Cédula'],
+            ['', 'EN EL QUE SE LIQUIDARÁ', fd.anoLiquidacion, 'Año en el cual se liquida'],
+            ['', 'USUARIO COLPENSIONES', '', 'Usuario para consulta en línea'],
+            ['', 'PASSWORD', '', 'Clave de acceso'],
+            [],
+            ['', 'SMLV AÑO LIQUIDACIÓN', fd.smlv, 'Salario Mínimo año liquidación'],
+            ['', 'IBL', bestCalc.ibl, 'Ingreso Base Liquidación'],
+            ['', 'TASA DE REEMPLAZO - H', (res.vA.rate * 100).toFixed(2) + '%', 'Promedio Ponderado de los porcentajes'],
+            [],
+            ['', 'MONTO DE LA PENSIÓN', '$', res.vA.mesada, 'Monto de la pensión mensual'],
+            []
+        ];
+
+        // Headers de la tabla de detalle
+        const tableHeaders = [
+            'Nit Empresa',
+            'Empresa',
+            'IBC (SALARIO)',
+            'Fecha desde',
+            'Fecha hasta',
+            'semanas',
+            'Num días',
+            'días Acum',
+            'Fecha IPC Final',
+            'IPC final',
+            'Fecha IPC Inicial',
+            'IPC inicial',
+            'IBC INDEXADO (IA)'
+        ];
+
+        let diasAcum = 0;
+        const tableData = bestReport.map(r => {
+            diasAcum += r.dias;
+            return [
+                '', // NIT (not available in report, placeholder)
                 r.empresa,
+                r.ibcHistorico,
                 r.desde,
                 r.hasta,
+                (r.dias / 7).toFixed(2),
                 r.dias,
+                diasAcum,
                 r.fechaIpcFinal,
                 r.ipcFinal,
                 r.fechaIpcInicial,
                 r.ipcInicial,
-                r.ibcHistorico,
-                r.ibcIndexado,
                 r.iaXDias
-            ]);
-            return [...preData, headers, ...data];
-        };
+            ];
+        });
 
-        const ts10Years = formatDataForWS(res.detailedReport10Years || [], res.calc10Years || {sumIaXDias:0, consumedDays:0, ibl:0});
-        const tsTodaVida = formatDataForWS(res.detailedReportTodaVida || [], res.calcTodaVida || {sumIaXDias:0, consumedDays:0, ibl:0});
+        // Fila de totales
+        const totalsRow = [
+            'TOTALES', '', '', '', '',
+            (bestCalc.consumedDays / 7).toFixed(2),
+            bestCalc.consumedDays,
+            diasAcum,
+            '', '', '', '',
+            bestCalc.sumIaXDias
+        ];
 
-        const ws10Years = XLSX.utils.aoa_to_sheet(ts10Years);
-        const wsTodaVida = XLSX.utils.aoa_to_sheet(tsTodaVida);
+        const allData = [...headerData, tableHeaders, ...tableData, totalsRow];
+        const wsMain = XLSX.utils.aoa_to_sheet(allData);
+        wsMain['!cols'] = [
+            {wch: 5}, {wch: 30}, {wch: 18}, {wch: 14}, {wch: 14},
+            {wch: 10}, {wch: 10}, {wch: 10}, {wch: 18}, {wch: 12},
+            {wch: 18}, {wch: 12}, {wch: 20}
+        ];
 
-        // Auto-width columns basic setting
-        const wscols = [ {wch: 40}, {wch: 15}, {wch: 15}, {wch: 8}, {wch: 15}, {wch: 10}, {wch: 15}, {wch: 10}, {wch: 22}, {wch: 22}, {wch: 22} ];
-        ws10Years['!cols'] = wscols;
-        wsTodaVida['!cols'] = wscols;
+        // === HOJA RESUMEN: Comparación de ambos métodos de pensión ===
+        const resumenData = [
+            ['RESUMEN COMPARATIVO DE SIMULACIÓN PENSIONAL'],
+            ['Base Legal:', 'Ley 100 de 1993 / Ley 797 de 2003'],
+            [],
+            ['DATOS DEL AFILIADO'],
+            ['Nombre:', fd.nombre || 'Usuario ' + fd.cedula],
+            ['Documento:', fd.cedula],
+            ['Edad:', fd.edad],
+            ['Género:', fd.genero === 'F' ? 'Femenino' : 'Masculino'],
+            ['SMLV:', fd.smlv],
+            [],
+            ['COMPARACIÓN IBL'],
+            ['', 'Últimos 10 Años', 'Toda la Vida'],
+            ['Días Computados', res.calc10Years ? res.calc10Years.consumedDays : 0, res.calcTodaVida ? res.calcTodaVida.consumedDays : 0],
+            ['Sumatoria (IA × Días)', res.calc10Years ? res.calc10Years.sumIaXDias : 0, res.calcTodaVida ? res.calcTodaVida.sumIaXDias : 0],
+            ['IBL ($)', res.calc10Years ? res.calc10Years.ibl : 0, res.calcTodaVida ? res.calcTodaVida.ibl : 0],
+            ['>>> MEJOR IBL:', res.bestName, res.ibl],
+            [],
+            ['CÁLCULO DE PENSIÓN (Mejor IBL)'],
+            ['Semanas Totales:', res.totalSem],
+            ['IBL ($):', res.ibl],
+            ['Tasa Base (65.5 - 0.5s):', res.tasaBase.toFixed(2) + '%'],
+            [],
+            ['PROYECCIÓN DUAL'],
+            ['', 'Colpensiones (Tope 1.800 sem)', 'Jurisprudencial (CSJ SL3501-2022)'],
+            ['Semanas Adicionales (>1.300)', res.vA.extra.toFixed(2), res.vB.extra.toFixed(2)],
+            ['Grupos de 50 Semanas', res.vA.grupos, res.vB.grupos],
+            ['Incremento Densidad', (res.vA.grupos * 1.5).toFixed(2) + '%', (res.vB.grupos * 1.5).toFixed(2) + '%'],
+            ['Tasa de Reemplazo (máx 80%)', (res.vA.rate * 100).toFixed(2) + '%', (res.vB.rate * 100).toFixed(2) + '%'],
+            ['Mesada Bruta ($)', res.vA.mesada, res.vB.mesada],
+            ['Descuento Salud', '-' + res.vA.descuentoSalud + ' (' + res.vA.porcentajeSalud + '%)', '-' + res.vB.descuentoSalud + ' (' + res.vB.porcentajeSalud + '%)'],
+            ['Mesada Neta ($)', res.vA.mesadaNeta, res.vB.mesadaNeta],
+            [],
+            ['Diferencial Mensual Bruto:', res.vB.mesada - res.vA.mesada],
+            ['Diferencial Anual (×13):', (res.vB.mesada - res.vA.mesada) * 13],
+            [],
+            ['Nota:', 'Este documento es una simulación matemática estimada. No constituye dictamen pericial definitivo.']
+        ];
+
+        const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
+        wsResumen['!cols'] = [{wch: 35}, {wch: 35}, {wch: 35}];
 
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, ws10Years, "Últimos 10 Años");
-        XLSX.utils.book_append_sheet(workbook, wsTodaVida, "Toda La Vida");
+        XLSX.utils.book_append_sheet(workbook, wsMain, 'Liquidación Pensional');
+        XLSX.utils.book_append_sheet(workbook, wsResumen, 'Resumen Comparativo');
 
-        XLSX.writeFile(workbook, `Detalle_IBL_${state.formData.cedula}.xlsx`);
+        XLSX.writeFile(workbook, `Simulacion_Pensional_${fd.cedula}.xlsx`);
     }
 
     function goToStep(s) {
