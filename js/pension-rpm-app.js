@@ -951,14 +951,20 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setTextColor(255, 255, 255); 
         doc.setFontSize(20); 
         doc.text("REPORTE DE SIMULACIÓN PENSIONAL", W/2, 25, { align: 'center' });
+        // Marca visible
+        doc.setFontSize(9);
+        doc.text("TU ABOGADO LABORAL", W - 15, 12, { align: 'right' });
+        doc.setFontSize(8);
+        doc.text("Contacto: +57 321 792 7495  ·  tuabogadolaboral@outlook.com", W - 15, 18, { align: 'right' });
         
         doc.setTextColor(15, 23, 42); 
         doc.setFontSize(14); 
         doc.text("1. Resumen de Proyección y Reliquidación", 15, 55);
         
-        doc.setFontSize(10); 
-        doc.text(`Afiliado: ${state.formData.nombre}`, 15, 65); 
-        doc.text(`Documento: ${state.formData.cedula}`, 15, 70);
+        doc.setFontSize(10);
+        const afiliadoLabel = (state.formData.nombre && String(state.formData.nombre).trim()) ? String(state.formData.nombre).trim() : (state.formData.cedula || '—');
+        doc.text(`Afiliado: ${afiliadoLabel}`, 15, 65);
+        doc.text(`Documento: ${state.formData.cedula || '—'}`, 15, 71);
         doc.text(`Semanas Totales Computadas: ${res.totalSem.toFixed(2)}`, 15, 75);
         doc.text(`IBL Indexado Ponderado: ${formatCurrency(res.ibl)}`, 15, 80);
         
@@ -1055,6 +1061,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         addFooter(); 
+        // Pie con marca
+        doc.setFontSize(8);
+        doc.setTextColor(120,120,120);
+        doc.text("Tu Abogado Laboral — Centro de Herramientas", W/2, H - 6, { align: 'center' });
         doc.save(`Proyeccion_Pensional_${state.formData.cedula}.pdf`);
     }
 
@@ -1072,10 +1082,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // === HOJA PRINCIPAL: Formato tipo captura de pantalla ===
         const headerData = [
+            ['TU ABOGADO LABORAL'],
+            ['Contacto:', '+57 321 792 7495', 'tuabogadolaboral@outlook.com'],
+            [],
             ['LIQUIDACIÓN DE PENSIÓN ' + bestTitle + ' - TU ABOGADO LABORAL'],
             [],
-            ['', 'NOMBRE', fd.nombre || 'Usuario ' + fd.cedula, 'Nombre del cliente'],
-            ['', 'CEDULA', fd.cedula, 'Cédula'],
+            ['', 'Afiliado', fd.nombre && String(fd.nombre).trim() ? String(fd.nombre).trim() : (fd.cedula || '—')],
+            ['', 'CEDULA', fd.cedula || '—', 'Cédula'],
             ['', 'EN EL QUE SE LIQUIDARÁ', fd.anoLiquidacion, 'Año en el cual se liquida'],
             ['', 'USUARIO COLPENSIONES', '', 'Usuario para consulta en línea'],
             ['', 'PASSWORD', '', 'Clave de acceso'],

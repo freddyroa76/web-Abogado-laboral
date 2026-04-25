@@ -189,6 +189,26 @@
             return isNaN(parsed) ? 0 : parsed;
         };
 
+        // safeGetIpc: fallback guard in case external data script didn't load
+        const safeGetIpc = (key) => {
+            try {
+                if (typeof getIpc === 'function') return getIpc(key);
+            } catch (e) {}
+            try {
+                if (typeof IPC_DATA !== 'undefined' && IPC_DATA[key] !== undefined) return IPC_DATA[key];
+            } catch (e) {}
+            // Fallback: choose closest <= key or last known
+            try {
+                const all = (typeof IPC_DATA !== 'undefined') ? Object.keys(IPC_DATA).sort() : [];
+                if (all.length === 0) return 100;
+                let closest = all[all.length - 1];
+                for (let i = all.length - 1; i >= 0; i--) {
+                    if (all[i] <= key) { closest = all[i]; break; }
+                }
+                return IPC_DATA[closest] || 100;
+            } catch (e) { return 100; }
+        };
+
         function App() {
             const [step, setStep] = useState(1);
             const [loading, setLoading] = useState(false);
@@ -197,6 +217,7 @@
             const [formData, setFormData] = useState({ 
                 nombre: '', 
                 cedula: '', 
+                edad: '',
                 anoLiquidacion: 2026, 
                 smlv: SMLV_DATA[2026] || 1300000 
             });
@@ -204,8 +225,12 @@
             const [history, setHistory] = useState([]);
             const [results, setResults] = useState(null);
             const [showDetails, setShowDetails] = useState(false); 
+            const [applyCorrections, setApplyCorrections] = useState(true);
+            const [audit, setAudit] = useState({ reported: null, calculated: 0, gap: 0, correctedCount: 0 });
 
             const isCedulaValid = formData.cedula.trim().length >= 5 && /^\d+$/.test(formData.cedula.trim());
+            const isEdadValid = !!formData.edad && Number(formData.edad) > 0;
+            const isFormReady = isCedulaValid && isEdadValid;
 
             useEffect(() => {
                 const year = formData.anoLiquidacion;
@@ -215,6 +240,49 @@
             }, [formData.anoLiquidacion]);
 
             const formatCurrency = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(v);
+
+            // Detectar mes comercial completo
+            const isFullCommercialMonth = (start, end) => {
+                if (!start || !end) return false;
+                if (start.getFullYear() !== end.getFullYear() || start.getMonth() !== end.getMonth()) return false;
+                const dias = getDiasComerciales(start, end);
+                return dias >= 30 && start.getDate() <= 3;
+            };
+
+            // Aplica correcciones automáticas a una copia del historial (no muta state)
+            const applyAutomaticCorrections = (hist, flag) => {
+                if (!flag) return { history: hist.map(r => ({ ...r, corrected: false })), correctedCount: 0 };
+                let corrected = 0;
+                const cloned = hist.map(r => ({ ...r, corrected: false }));
+                cloned.forEach(row => {
+                    try {
+                        const s = parseFlexibleDate(row.desde);
+                        const e = parseFlexibleDate(row.hasta);
+                        if (s && e && isFullCommercialMonth(s, e)) {
+                            if ((Number(row.dias) || 0) !== 30) {
+                                row.dias = 30;
+                                row.corrected = true;
+                                corrected++;
+                            }
+                        }
+                    } catch (e) {}
+                });
+                return { history: cloned, correctedCount: corrected };
+            };
+
+            const computeAudit = (hist, flag) => {
+                const { history: h, correctedCount } = applyAutomaticCorrections(hist, flag);
+                const reported = h.reduce((s, r) => s + (Number(r.semanas) || 0), 0);
+                const totalDias = h.reduce((s, r) => s + (Number(r.dias) || 0), 0);
+                const calculated = totalDias / 7;
+                const gap = reported ? (calculated - reported) : 0;
+                return { reported, calculated, gap, correctedCount };
+            };
+
+            useEffect(() => {
+                const a = computeAudit(history, applyCorrections);
+                setAudit({ reported: a.reported, calculated: a.calculated, gap: a.gap, correctedCount: a.correctedCount });
+            }, [history, applyCorrections]);
 
             const handlePDF = async (file) => {
                 if (!isCedulaValid) return;
@@ -305,16 +373,18 @@
             const handleCalculate = () => {
                 try {
                     setLoading(true); setError(null); setShowDetails(false); 
-                    
+                    // Aplicar correcciones automáticas antes de la agregación mensual
+                    const { history: useHistory, correctedCount } = applyAutomaticCorrections(history, applyCorrections);
+
                     const ipcFinalKey = `${formData.anoLiquidacion - 1}-12`;
-                    const ipcFinal = getIpc(ipcFinalKey);
+                    const ipcFinal = safeGetIpc(ipcFinalKey);
                     
                     let expandedMonths = {};
 
                     // CORRECCIÓN ESTRUCTURAL 2: Agrupación Actuarial por Mes.
                     // Si se detectan aportes simultáneos, se suman los IBCs (protegiendo el capital del afiliado)
                     // pero el tiempo se limita estrictamente a un máximo de 30 días, evitando inflar la variable (S).
-                    history.forEach((row) => {
+                    useHistory.forEach((row) => {
                         if (!row.desde || !row.hasta || row.ibc <= 0 || row.dias <= 0) return;
                         const dStart = parseFlexibleDate(row.desde);
                         const dEnd = parseFlexibleDate(row.hasta);
@@ -369,7 +439,7 @@
                         const effectiveIbc = seg.iaXDiasBruto / seg.dias; 
                         
                         const ipcInicialKey = `${seg.year - 1}-12`;
-                        const ipcInicial = getIpc(ipcInicialKey);
+                        const ipcInicial = safeGetIpc(ipcInicialKey);
                         
                         const factorIndexacion = ipcFinal / ipcInicial;
                         const ibcIndexadoIA = effectiveIbc * factorIndexacion;
@@ -420,19 +490,25 @@
                 const doc = new jsPDF('landscape'); 
                 const W = doc.internal.pageSize.getWidth();
                 
-                doc.setFillColor(30, 58, 138); 
-                doc.rect(0, 0, W, 40, 'F');
-                doc.setTextColor(255, 255, 255); 
-                doc.setFontSize(20); 
-                doc.text("DICTAMEN PERICIAL - INDEMNIZACIÓN SUSTITUTIVA", W/2, 25, { align: 'center' });
+                doc.setFillColor(30, 58, 138);
+                doc.rect(0, 0, W, 48, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(20);
+                doc.text("DICTAMEN PERICIAL - INDEMNIZACIÓN SUSTITUTIVA", W/2, 30, { align: 'center' });
+                // Marca visible y contact: TU ABOGADO LABORAL (propaganda sencilla)
+                doc.setFontSize(10);
+                doc.text("TU ABOGADO LABORAL", W - 15, 14, { align: 'right' });
+                doc.setFontSize(8);
+                doc.text("Contacto: +57 321 792 7495  ·  tuabogadolaboral@outlook.com", W - 15, 20, { align: 'right' });
                 
                 doc.setTextColor(30, 58, 138); 
                 doc.setFontSize(14); 
                 doc.text("1. Resumen de Liquidación", 15, 55);
                 
-                doc.setFontSize(10); 
-                doc.text(`Afiliado: ${formData.nombre}`, 15, 65); 
-                doc.text(`Documento: ${formData.cedula}`, 15, 70);
+                doc.setFontSize(10);
+                const afiliadoLabel = (formData.nombre && String(formData.nombre).trim()) ? String(formData.nombre).trim() : (formData.cedula || '—');
+                doc.text(`Afiliado: ${afiliadoLabel}`, 15, 68);
+                doc.text(`Documento: ${formData.cedula || '—'}`, 15, 74);
                 doc.text(`Total Semanas Cotizadas a Colpensiones (S): ${results.semanas.toFixed(2)}`, 15, 75);
                 doc.text(`Salario Base de Liquidación (SBC): ${formatCurrency(results.sbcMensual)}`, 15, 80);
                 doc.text(`Porcentaje Promedio Cotización (P): ${(results.pPonderado * 100).toFixed(2)}%`, 15, 85);
@@ -488,6 +564,10 @@
                     }
                 });
 
+                // Pie de página con marca
+                doc.setFontSize(8);
+                doc.setTextColor(120,120,120);
+                doc.text("Tu Abogado Laboral — Dictamen pericial generado automáticamente", W/2, doc.internal.pageSize.getHeight() - 12, { align: 'center' });
                 doc.save(`Indemnizacion_Sustitutiva_Corregida_${formData.cedula}.pdf`);
             };
 
@@ -495,12 +575,15 @@
                 const res = results;
                 
                 const preData = [
+                    ['TU ABOGADO LABORAL'],
+                    ['Contacto:', '+57 321 792 7495', 'tuabogadolaboral@outlook.com'],
+                    [],
                     ['LIQUIDACIÓN INDEMNIZACIÓN SUSTITUTIVA DE VEJEZ'],
                     ['Base Legal:', 'Decreto 1730 de 2001 (Art. 1)'],
                     [],
                     ['DATOS DEL AFILIADO'],
-                    ['Nombre:', formData.nombre],
-                    ['Documento:', formData.cedula],
+                    ['Afiliado:', (formData.nombre && String(formData.nombre).trim()) ? String(formData.nombre).trim() : (formData.cedula || '—')],
+                    ['Documento:', formData.cedula || '—'],
                     ['Año de Liquidación:', formData.anoLiquidacion],
                     [],
                     ['RESUMEN DE LIQUIDACIÓN'],
@@ -608,13 +691,14 @@
                                     <h2 className="text-xl font-bold text-primary flex items-center"><Icon name="user" className="w-5 h-5 mr-2 text-secondary" /> Datos del Afiliado</h2>
                                     
                                     <div className="space-y-4">
+                                        {/* Orden y estilo alineado con herramienta-liquidacion-pension-rpm */}
                                         <div>
-                                            <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Nombre Completo</label>
-                                            <input type="text" className="w-full p-3.5 rounded-xl input-legal text-sm" value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} placeholder="Ej: Juan Pérez" />
+                                            <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Documento de Identidad (Requerido)</label>
+                                            <input type="text" className="w-full p-3.5 rounded-xl input-legal text-sm font-mono font-semibold" value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} placeholder="Solo números" />
                                         </div>
                                         <div>
-                                            <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Número de Documento</label>
-                                            <input type="text" className="w-full p-3.5 rounded-xl input-legal text-sm font-mono" value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} placeholder="Para procesar PDF protegido" />
+                                            <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Edad Actual (Requerida)</label>
+                                            <input type="number" className="w-full p-3.5 rounded-xl input-legal text-sm font-bold text-center" value={formData.edad} onChange={e => setFormData({...formData, edad: e.target.value})} placeholder="Ej: 62" />
                                         </div>
                                         <div className="flex space-x-4">
                                             <div className="w-1/3">
@@ -625,17 +709,17 @@
                                     </div>
                                 </div>
                             
-                            <div className={`card-legal p-8 rounded-2xl flex flex-col items-center justify-center transition-colors relative ${isCedulaValid ? 'hover:bg-slate-50 group cursor-pointer' : 'bg-slate-50/50 cursor-not-allowed'}`}>
+                            <div className={`card-legal p-8 rounded-2xl flex flex-col items-center justify-center transition-colors relative ${isFormReady ? 'hover:bg-slate-50 group cursor-pointer' : 'bg-slate-50/50 cursor-not-allowed'}`}>
                                 {loading ? (
                                     <div className="text-center">
                                         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                                         <p className="font-semibold text-primary text-sm">Procesando documento...</p>
                                     </div>
-                                ) : !isCedulaValid ? (
+                                ) : !isFormReady ? (
                                     <div className="text-center flex flex-col items-center px-4">
                                         <Icon name="lock" className="w-12 h-12 text-slate-300 mb-3" />
                                         <h3 className="font-bold text-slate-600">Módulo Bloqueado</h3>
-                                        <p className="text-xs text-slate-500 mt-2">Ingrese el número de documento válido para habilitar la carga de la Historia Laboral.</p>
+                                        <p className="text-xs text-slate-500 mt-2">Ingrese Cédula y Edad válidas para habilitar la carga de la Historia Laboral.</p>
                                     </div>
                                 ) : (
                                     <div className="text-center flex flex-col items-center w-full px-4">
@@ -655,30 +739,61 @@
                     )}
 
                     {step === 2 && (
-                        <div className="card-legal p-8 rounded-2xl space-y-6 animate-in slide-in-from-bottom-4">
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4">
-                                <div>
-                                    <h2 className="text-xl font-bold text-primary">Auditoría de Aportes Históricos</h2>
-                                    <p className="text-xs text-slate-500 mt-1">{history.length} registros extraídos en total (Sector Privado)</p>
+                        <div className="grid md:grid-cols-3 gap-6 animate-in slide-in-from-bottom-4">
+                            <div className="md:col-span-2 card-legal p-8 rounded-2xl space-y-6">
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4">
+                                    <div>
+                                        <h2 className="text-xl font-bold text-primary">Auditoría de Aportes Históricos</h2>
+                                        <p className="text-xs text-slate-500 mt-1">{history.length} registros extraídos en total (Sector Privado)</p>
+                                    </div>
+                                    <button className="bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:bg-slate-800 transition-colors shadow-sm flex items-center space-x-2 text-sm w-full sm:w-auto justify-center" onClick={handleCalculate}>
+                                        <Icon name="calc" className="w-4 h-4" />
+                                        <span>Calcular Indemnización</span>
+                                    </button>
                                 </div>
-                                <button className="bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:bg-slate-800 transition-colors shadow-sm flex items-center space-x-2 text-sm w-full sm:w-auto justify-center" onClick={handleCalculate}>
-                                    <Icon name="calc" className="w-4 h-4" />
-                                    <span>Calcular Indemnización</span>
-                                </button>
+                                
+                                <div className="overflow-x-auto rounded-xl border border-slate-200 max-h-[400px] shadow-inner">
+                                    <table className="w-full text-sm text-left whitespace-nowrap"><thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold tracking-wider sticky top-0 border-b border-slate-200"><tr><th className="p-4">Empresa / Razón Social</th><th className="p-4">Desde</th><th className="p-4">Hasta</th><th className="p-4 text-right">IBC Mensual ($)</th><th className="p-4 text-center">Días Computables</th><th className="p-4"></th></tr></thead>
+                                    <tbody>{history.map((row, i) => (<tr key={i} className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors">
+                                        <td className="p-3 font-medium text-slate-700 truncate max-w-[200px]" title={row.empresa}>{row.empresa}</td>
+                                        <td className="p-3 font-mono text-xs"><input className="bg-transparent w-24 outline-none border-b border-transparent focus:border-secondary" value={row.desde} onChange={e=>{const h=[...history]; h[i].desde=e.target.value; setHistory(h);}} /></td>
+                                        <td className="p-3 font-mono text-xs"><input className="bg-transparent w-24 outline-none border-b border-transparent focus:border-secondary" value={row.hasta} onChange={e=>{const h=[...history]; h[i].hasta=e.target.value; setHistory(h);}} /></td>
+                                        <td className="p-3 text-right font-semibold text-slate-800"><input className="bg-transparent text-right w-28 outline-none border-b border-transparent focus:border-secondary" type="number" value={row.ibc} onChange={e=>{const h=[...history]; h[i].ibc=parseFloat(e.target.value); setHistory(h);}} /></td>
+                                        <td className="p-3 text-center text-slate-600"><input className="bg-transparent text-center w-16 outline-none border-b border-transparent focus:border-secondary" type="number" value={row.dias} onChange={e=>{const h=[...history]; h[i].dias=parseInt(e.target.value); setHistory(h);}} /></td>
+                                        <td className="p-3 text-center"><button className="text-slate-400 hover:text-red-500 transition-colors p-1" onClick={()=>setHistory(history.filter((_,idx)=>idx!==i))}><Icon name="trash" className="w-4 h-4"/></button></td>
+                                    </tr>))}</tbody></table>
+                                </div>
+                                <button className="text-sm font-semibold text-secondary hover:text-primary transition-colors flex items-center" onClick={()=>setHistory([{empresa:'REGISTRO MANUAL',desde:'01/01/2000',hasta:'30/01/2000',ibc:1300000,semanas:4.29, dias:30}, ...history])}>+ Añadir Periodo Manualmente</button>
                             </div>
-                            
-                            <div className="overflow-x-auto rounded-xl border border-slate-200 max-h-[400px] shadow-inner">
-                                <table className="w-full text-sm text-left whitespace-nowrap"><thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold tracking-wider sticky top-0 border-b border-slate-200"><tr><th className="p-4">Empresa / Razón Social</th><th className="p-4">Desde</th><th className="p-4">Hasta</th><th className="p-4 text-right">IBC Mensual ($)</th><th className="p-4 text-center">Días Computables</th><th className="p-4"></th></tr></thead>
-                                <tbody>{history.map((row, i) => (<tr key={i} className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors">
-                                    <td className="p-3 font-medium text-slate-700 truncate max-w-[200px]" title={row.empresa}>{row.empresa}</td>
-                                    <td className="p-3 font-mono text-xs"><input className="bg-transparent w-24 outline-none border-b border-transparent focus:border-secondary" value={row.desde} onChange={e=>{const h=[...history]; h[i].desde=e.target.value; setHistory(h);}} /></td>
-                                    <td className="p-3 font-mono text-xs"><input className="bg-transparent w-24 outline-none border-b border-transparent focus:border-secondary" value={row.hasta} onChange={e=>{const h=[...history]; h[i].hasta=e.target.value; setHistory(h);}} /></td>
-                                    <td className="p-3 text-right font-semibold text-slate-800"><input className="bg-transparent text-right w-28 outline-none border-b border-transparent focus:border-secondary" type="number" value={row.ibc} onChange={e=>{const h=[...history]; h[i].ibc=parseFloat(e.target.value); setHistory(h);}} /></td>
-                                    <td className="p-3 text-center text-slate-600"><input className="bg-transparent text-center w-16 outline-none border-b border-transparent focus:border-secondary" type="number" value={row.dias} onChange={e=>{const h=[...history]; h[i].dias=parseInt(e.target.value); setHistory(h);}} /></td>
-                                    <td className="p-3 text-center"><button className="text-slate-400 hover:text-red-500 transition-colors p-1" onClick={()=>setHistory(history.filter((_,idx)=>idx!==i))}><Icon name="trash" className="w-4 h-4"/></button></td>
-                                </tr>))}</tbody></table>
-                            </div>
-                            <button className="text-sm font-semibold text-secondary hover:text-primary transition-colors flex items-center" onClick={()=>setHistory([{empresa:'REGISTRO MANUAL',desde:'01/01/2000',hasta:'30/01/2000',ibc:1300000,semanas:4.29, dias:30}, ...history])}>+ Añadir Periodo Manualmente</button>
+
+                            <aside className="md:col-span-1 card-legal p-6 border border-slate-100">
+                                <h3 className="text-sm font-bold text-slate-700 mb-3">Validador de Semanas Cotizadas</h3>
+                                <div className="space-y-3 text-sm text-slate-600">
+                                    <div className="flex justify-between items-center">
+                                        <span className="font-semibold">Semanas Reportadas</span>
+                                        <span>{audit.reported !== null ? audit.reported.toFixed(2) : '—'}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="font-semibold">Semanas Calculadas (Días/7)</span>
+                                        <span>{audit.calculated ? audit.calculated.toFixed(2) : '0.00'}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="font-semibold">Diferencia (gap)</span>
+                                        <span>{audit.gap ? audit.gap.toFixed(2) : '0.00'}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="font-semibold">Periodos corregidos</span>
+                                        <span>{audit.correctedCount || 0}</span>
+                                    </div>
+                                    <div className="pt-2 border-t border-slate-100">
+                                        <label className="flex items-center space-x-3">
+                                            <input id="indemnizacion-toggle-correction" type="checkbox" checked={applyCorrections} onChange={e=>{ setApplyCorrections(e.target.checked); const a = computeAudit(history, e.target.checked); setAudit({ reported: a.reported, calculated: a.calculated, gap: a.gap, correctedCount: a.correctedCount }); }} />
+                                            <span className="text-sm">Aplicar "Corrección Automática a 30 días"</span>
+                                        </label>
+                                    </div>
+                                    <div className="mt-3 text-xs text-slate-500">Si detectamos discrepancias, el motor usará el cómputo matemático total (Días/7) para la liquidación.</div>
+                                </div>
+                            </aside>
                         </div>
                     )}
 
@@ -769,8 +884,8 @@
                                         <Icon name="table" className="w-4 h-4 shrink-0"/>
                                         <span>Detalle Excel</span>
                                     </button>
-                                    <button className="bg-primary text-white px-6 py-3.5 rounded-xl font-semibold hover:bg-slate-800 transition-colors flex items-center space-x-2 shrink-0 shadow-sm w-full md:w-auto justify-center" onClick={exportPDF}>
-                                        <Icon name="file" className="w-4 h-4 shrink-0"/>
+                                    <button className="bg-[#e2231a] text-white px-6 py-3.5 rounded-xl font-semibold hover:bg-[#c11b14] transition-colors flex items-center space-x-2 shrink-0 shadow-sm w-full md:w-auto justify-center" onClick={exportPDF}>
+                                        <i className="fas fa-file-pdf w-4 h-4 mr-2 text-white" aria-hidden="true"></i>
                                         <span>Dictamen PDF</span>
                                     </button>
                                 </div>
