@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Indemnización Sustitutiva RPM | Tu Abogado Laboral</title>
+    <title>Captura de Historia Laboral Colpensiones | Tu Abogado Laboral</title>
     
-    <meta name="description" content="Calculadora actuarial para Indemnización Sustitutiva de Vejez Colombia (Decreto 1730/2001).">
+    <meta name="description" content="Módulo especializado para la captura y auditoría de historia laboral de Colpensiones, y cálculo actuarial para Indemnización Sustitutiva de Vejez Colombia (Decreto 1730/2001).">
     
     <link rel="icon" type="image/webp" href="img/favicon.webp" />
     <link rel="stylesheet" href="css/critical.css" />
@@ -20,7 +20,7 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -184,8 +184,16 @@
 
         const cleanIBC = (val) => {
             if (!val) return 0;
-            const s = String(val).replace(/[^\d.,]/g, '');
-            const parsed = parseFloat(s.replace(/\./g, '').replace(',', '.'));
+            let s = String(val).replace(/[^\d.,\-]/g, '').trim();
+            if (!s) return 0;
+            // Detect comma as thousands separator: "47,370" or "1,234,567"
+            if (/,\d{3}/.test(s)) {
+                s = s.replace(/,/g, ''); // Remove thousands commas
+            } else {
+                // European/Colombian: dots as thousands, comma as decimal
+                s = s.replace(/\./g, '').replace(',', '.');
+            }
+            const parsed = parseFloat(s);
             return isNaN(parsed) ? 0 : parsed;
         };
 
@@ -213,24 +221,49 @@
             const [step, setStep] = useState(1);
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState(null);
+            const [showCedula, setShowCedula] = useState(false);
+            
+            const getInitialDate = () => {
+                const today = new Date();
+                let m = today.getMonth() + 1;
+                let y = today.getFullYear();
+                if (today.getDate() <= 5) {
+                    m -= 1;
+                    if (m === 0) { m = 12; y -= 1; }
+                }
+                return { month: m, year: y };
+            };
+            const initDate = getInitialDate();
             
             const [formData, setFormData] = useState({ 
                 nombre: '', 
                 cedula: '', 
                 edad: '',
-                anoLiquidacion: 2026, 
-                smlv: SMLV_DATA[2026] || 1300000 
+                mesLiquidacion: initDate.month,
+                anoLiquidacion: initDate.year, 
+                smlv: (typeof SMLV_DATA !== 'undefined' && SMLV_DATA[initDate.year]) ? SMLV_DATA[initDate.year] : 1300000 
             });
+
+            const MESES_NOMBRES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
             
             const [history, setHistory] = useState([]);
+            const [resumenSemanas, setResumenSemanas] = useState([]);
+            const [totalSemanasPDF, setTotalSemanasPDF] = useState(null);
+            const [activeTab, setActiveTab] = useState('resumen');
             const [results, setResults] = useState(null);
             const [showDetails, setShowDetails] = useState(false); 
             const [applyCorrections, setApplyCorrections] = useState(true);
             const [audit, setAudit] = useState({ reported: null, calculated: 0, gap: 0, correctedCount: 0 });
 
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1;
+            
+            const isFechaCierreValid = formData.anoLiquidacion < currentYear || (formData.anoLiquidacion === currentYear && formData.mesLiquidacion <= currentMonth);
+
             const isCedulaValid = formData.cedula.trim().length >= 5 && /^\d+$/.test(formData.cedula.trim());
             const isEdadValid = !!formData.edad && Number(formData.edad) > 0;
-            const isFormReady = isCedulaValid && isEdadValid;
+            const isFormReady = isCedulaValid;
 
             useEffect(() => {
                 const year = formData.anoLiquidacion;
@@ -270,9 +303,9 @@
                 return { history: cloned, correctedCount: corrected };
             };
 
-            const computeAudit = (hist, flag) => {
+            const computeAudit = (hist, flag, resumen) => {
                 const { history: h, correctedCount } = applyAutomaticCorrections(hist, flag);
-                const reported = h.reduce((s, r) => s + (Number(r.semanas) || 0), 0);
+                const reported = (resumen || []).reduce((s, r) => s + (Number(r.semanas) || 0), 0);
                 const totalDias = h.reduce((s, r) => s + (Number(r.dias) || 0), 0);
                 const calculated = totalDias / 7;
                 const gap = reported ? (calculated - reported) : 0;
@@ -280,9 +313,9 @@
             };
 
             useEffect(() => {
-                const a = computeAudit(history, applyCorrections);
+                const a = computeAudit(history, applyCorrections, resumenSemanas);
                 setAudit({ reported: a.reported, calculated: a.calculated, gap: a.gap, correctedCount: a.correctedCount });
-            }, [history, applyCorrections]);
+            }, [history, applyCorrections, resumenSemanas]);
 
             const handlePDF = async (file) => {
                 if (!isCedulaValid) return;
@@ -306,31 +339,259 @@
                         const content = await page.getTextContent();
                         fullText += content.items.map(item => item.str).join(" ") + "\n";
                     }
+                    // CORRECCIÓN ESTRUCTURAL 1: Evitamos el split destructivo global.
+                    // Trabajaremos con fullText y luego limitaremos las secciones.
+                    
+                    // ═══ PARSER PDF DUAL: Identificación Estricta de Secciones ═══
+                    // Según el requerimiento, se deben ubicar 3 títulos exactos para segmentar el documento.
+                    // Usamos \s* en lugar de \s+ porque el motor PDF.js a veces une palabras si el espaciado es estrecho.
+                    const titleResumen = /RESUMEN\s*DE\s*SEMANAS\s*COTIZADAS(?:\s*POR\s*EMPLEADOR)?/i;
+                    const titlePre95 = /DETALLE\s*DE\s*PAGOS\s*EFECTUADOS\s*ANTERIORES\s*A\s*1995/i;
+                    const titlePost95 = /DETALLE\s*DE\s*PAGOS\s*EFECTUADOS\s*A\s*PARTIR\s*DE\s*1995/i;
 
-                    // CORRECCIÓN ESTRUCTURAL 1: Mutilar los tiempos del sector público no cotizados a Colpensiones.
-                    // Si se dejan, la liquidación será rechazada por inflación indebida de semanas.
-                    let validText = fullText;
-                    if (validText.includes("RESUMEN DE TIEMPOS PÚBLICOS NO COTIZADOS A COLPENSIONES")) {
-                        validText = validText.split("RESUMEN DE TIEMPOS PÚBLICOS NO COTIZADOS A COLPENSIONES")[0];
+                    const idxResumen = fullText.search(titleResumen);
+                    const idxPre95 = fullText.search(titlePre95);
+                    const idxPost95 = fullText.search(titlePost95);
+
+                    if (idxResumen === -1 || idxPre95 === -1 || idxPost95 === -1) {
+                        let missing = [];
+                        if (idxResumen === -1) missing.push("'RESUMEN DE SEMANAS COTIZADAS POR EMPLEADOR'");
+                        if (idxPre95 === -1) missing.push("'DETALLE DE PAGOS EFECTUADOS ANTERIORES A 1995'");
+                        if (idxPost95 === -1) missing.push("'DETALLE DE PAGOS EFECTUADOS A PARTIR DE 1995'");
+                        throw new Error(`No se ha detectado las tablas. Títulos faltantes en la lectura del PDF: ${missing.join(", ")}. Revise que el PDF sea original de Colpensiones.`);
+                    }
+
+                    // Extraer [10] TOTAL SEMANAS COTIZADAS
+                    let totalSemanasPDFVal = null;
+                    const tsMatch = fullText.match(/(?:\[\s*1\s*0\s*\]|\[10\])?\s*TOTAL\s*SEMANAS\s*COTIZADAS[^\d]*([\d.,]+)/i);
+                    if (tsMatch) {
+                        let tsVal = tsMatch[1].trim();
+                        // Smart parser para manejar "1.016,24", "1,016.24", "1.016", "1016,24", etc.
+                        const lastPunctuationIndex = Math.max(tsVal.lastIndexOf('.'), tsVal.lastIndexOf(','));
+                        if (lastPunctuationIndex !== -1) {
+                            const charsAfterPunctuation = tsVal.length - 1 - lastPunctuationIndex;
+                            const isDecimal = charsAfterPunctuation === 1 || charsAfterPunctuation === 2; // .24 or .5
+                            if (isDecimal) {
+                                const decimalChar = tsVal[lastPunctuationIndex];
+                                // Removemos todos los puntos y comas, excepto el último que convertimos en punto
+                                let prefix = tsVal.substring(0, lastPunctuationIndex).replace(/[.,]/g, '');
+                                let suffix = tsVal.substring(lastPunctuationIndex + 1);
+                                tsVal = prefix + '.' + suffix;
+                            } else {
+                                // No es decimal (ej. "1.016"), removemos la puntuación (es de miles)
+                                tsVal = tsVal.replace(/[.,]/g, '');
+                            }
+                        }
+                        totalSemanasPDFVal = parseFloat(tsVal);
+                    }
+                    setTotalSemanasPDF(totalSemanasPDFVal);
+
+                    // Seccionamos el texto estrictamente:
+                    const resumenText = fullText.substring(idxResumen, idxPre95);
+                    const pre95Text = fullText.substring(idxPre95, idxPost95);
+                    let post95Text = fullText.substring(idxPost95);
+                    
+                    // ═══ EXTRACCIÓN DE LA TABLA RESUMEN DE SEMANAS ═══
+                    const parsedResumen = [];
+                    const regexResumen = /(\d{5,15})\s+([^\n\r]{3,60}?)\s+(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})\s+(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})\s+\$\s*([\d.,]+)\s+([\-\d.,]+)/g;
+                    let mRes;
+                    while ((mRes = regexResumen.exec(resumenText)) !== null) {
+                        const emp = mRes[2].trim().toUpperCase();
+                        if (emp.includes("RAZÓN SOCIAL") || emp.includes("ADMINISTRADORA") || emp.includes("SEMANAS") || emp.includes("RESUMEN")) continue;
+                        
+                        let sVal = mRes[6].trim();
+                        // Manejo de decimales en caso de venir como 39,43
+                        if (sVal.includes(',') && !sVal.includes('.')) sVal = sVal.replace(',', '.');
+                        const semanasNum = parseFloat(sVal);
+
+                        parsedResumen.push({
+                            nit: mRes[1],
+                            empresa: mRes[2].trim(),
+                            desde: formatDateForDisplay(mRes[3]),
+                            hasta: formatDateForDisplay(mRes[4]),
+                            ibc: cleanIBC(mRes[5]),
+                            semanas: isNaN(semanasNum) ? 0 : semanasNum
+                        });
                     }
                     
-                    const regexPDF = /(\d{5,15})\s+([^\n\r]{3,60}?)\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})\s+\$?\s*([\d.,]+)\s+([\d.,]+)/g;
+                    // Mutilar los tiempos del sector público no cotizados a Colpensiones SOLO si están en la cola.
+                    const idxTiemposPublicos = post95Text.search(/RESUMEN\s*DE\s*TIEMPOS\s*P[UÚuú]BLICOS\s*NO\s*COTIZADOS/i);
+                    if (idxTiemposPublicos > -1) {
+                        post95Text = post95Text.substring(0, idxTiemposPublicos);
+                    }
+
                     const matches = []; let m;
-                    
-                    while ((m = regexPDF.exec(validText)) !== null) {
-                        const emp = m[2].trim().toUpperCase();
-                        if (emp.includes("RAZÓN SOCIAL") || emp.includes("ADMINISTRADORA") || emp.includes("NOMBRE AFILIADO") || emp === "NIT") continue;
+
+                    // ═══ PRE-1995: Formato real del PDF de Colpensiones ═══
+                    // Colpensiones tiene dos posibles salidas de texto dependiendo del PDF:
+                    // Formato A (Visual Exacto): NIT + Empresa + Desde + Hasta + $ IBC + Días + [Observación]
+                    const regexPre95_A = /(\d{5,15})\s+([^$]+?)\s+(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})\s+(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})\s+\$\s*([\d.,]+)\s+([\-\d.,]+)(?:\s+(.*?))?(?=\s+\d{5,15}\s|$|\s+(?:TOTAL|RESUMEN|P[AÁaá]GINA))/g;
+                    // Formato B (Desorden PDF.js): NIT + Empresa + Desde + Días + $ IBC + Hasta + [Observación]
+                    const regexPre95_B = /(\d{5,15})\s+([^$]+?)\s+(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})\s+([\-\d.,]+)\s+\$\s*([\d.,]+)\s+(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})(?:\s+(.*?))?(?=\s+\d{5,15}\s|$|\s+(?:TOTAL|RESUMEN|P[AÁaá]GINA))/g;
+
+                    const processPre95Match = (m, format) => {
+                        let rawEmp = m[2].trim();
+                        let tailObs = m[7] ? m[7].trim() : "";
+                        let obs = "";
+                        const obsRegex = /(Pago\s+aplicado\s+al\s+periodo\s+declarado|Información\s+reportada.*?|Mora\s+presunta|Periodo\s+en\s+mora\s+por\s+parte\s+del\s+empleador)/gi;
                         
-                        const ibc = cleanIBC(m[5]);
-                        const semanas = cleanIBC(m[6]);
-                        if (ibc < 1000 || semanas > 500 || semanas === 0) continue;
+                        // Extraer observación oculta en la razón social
+                        let obsMatch;
+                        while ((obsMatch = obsRegex.exec(rawEmp)) !== null) {
+                            obs += (obs ? " " : "") + obsMatch[0].trim();
+                        }
+                        rawEmp = rawEmp.replace(obsRegex, '').trim();
+                        rawEmp = rawEmp.replace(/^.*?declarado\s*/i, '').trim();
                         
-                        const dOficiales = Math.round(semanas * 7);
+                        // Extraer observación de la cola del registro
+                        while ((obsMatch = obsRegex.exec(tailObs)) !== null) {
+                            obs += (obs ? " " : "") + obsMatch[0].trim();
+                        }
+
+                        if (!rawEmp) rawEmp = m[2].trim();
                         
-                        matches.push({ nit: m[1], empresa: m[2].trim(), desde: formatDateForDisplay(m[3]), hasta: formatDateForDisplay(m[4]), ibc: ibc, semanas: semanas, dias: dOficiales });
+                        const emp = rawEmp.toUpperCase();
+                        if (emp.includes("RAZÓN SOCIAL") || emp.includes("ADMINISTRADORA") || emp.includes("NOMBRE AFILIADO") || emp === "NIT" || emp.includes("SEMANAS")) return;
+                        
+                        let desde, hasta, rawDias, ibc;
+                        if (format === 'A') {
+                            desde = m[3]; hasta = m[4]; ibc = cleanIBC(m[5]); rawDias = cleanIBC(m[6]);
+                        } else {
+                            desde = m[3]; rawDias = cleanIBC(m[4]); ibc = cleanIBC(m[5]); hasta = m[6];
+                        }
+
+                        if (ibc < 1000 || rawDias === 0) return;
+                        const dOficiales = Math.round(rawDias);
+                        if (Math.abs(dOficiales) > 5000) return;
+                        
+                        matches.push({
+                            seccion: 'pre1995', nit: m[1], empresa: rawEmp,
+                            desde: formatDateForDisplay(desde), hasta: formatDateForDisplay(hasta),
+                            ibc: ibc, semanas: rawDias / 7, dias: dOficiales, diasCot: Math.max(0, dOficiales),
+                            observacion: obs
+                        });
+                    };
+
+                    while ((m = regexPre95_A.exec(pre95Text)) !== null) processPre95Match(m, 'A');
+                    if (matches.length === 0) {
+                        while ((m = regexPre95_B.exec(pre95Text)) !== null) processPre95Match(m, 'B');
                     }
+
+                    // ═══ POST-1995: Formato real del PDF de Colpensiones ═══
+                    // Orden: NIT + Empresa + RA(SI/NO) + Periodo(YYYYMM) + $IBC + $Cotización + $Mora + [Novedad] + DíasRep + FechaPago + Referencia + [Observación] + DíasCot
+                    const regexPost95 = /(\d{5,15})\s+(.{3,60}?)\s+(SI|NO)\s+(\d{4})(\d{2})\s+\$\s*([\d.,]+)\s+\$\s*([\d.,]+)\s+\$\s*([\d.,\-]*)\s+(?:([A-Z]?)\s+)?(\d{1,3})\s+(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})\s+(\S+)(?:\s+(.*?))?\s+(\d{1,3})(?=\s+\d{5,15}\s|$|\s+(?:TOTAL|RESUMEN|P[AÁaá]GINA))/g;
+                    
+                    while ((m = regexPost95.exec(post95Text)) !== null) {
+                        const emp = m[2].trim().toUpperCase();
+                        if (emp.includes("RAZÓN SOCIAL") || emp.includes("NOMBRE") || emp === "NIT") continue;
+                        const ibc = cleanIBC(m[6]);
+                        if (ibc < 1000) continue;
+                        
+                        const year = parseInt(m[4]);
+                        const month = parseInt(m[5]);
+                        const diasRep = parseInt(m[10]);
+                        const diasCot = parseInt(m[14]);
+                        const lastDay = new Date(year, month, 0).getDate();
+                        const desde = `01/${String(month).padStart(2,'0')}/${year}`;
+                        const hasta = `${lastDay}/${String(month).padStart(2,'0')}/${year}`;
+                        
+                        matches.push({
+                            seccion: 'post1995',
+                            nit: m[1],
+                            empresa: m[2].trim(),
+                            desde: desde,
+                            hasta: hasta,
+                            ibc: ibc,
+                            semanas: diasCot / 7,
+                            dias: diasRep,
+                            diasCot: diasCot,
+                            ra: m[3],
+                            periodo: `${m[4]}${m[5]}`,
+                            cotizacionPagada: cleanIBC(m[7]),
+                            cotizacionMora: m[8].trim() === '0' || m[8].trim() === '' ? '0' : m[8].trim(),
+                            novedad: m[9] || '',
+                            fechaPago: m[11],
+                            referenciaPago: m[12],
+                            observacion: m[13] || ''
+                        });
+                    }
+
+                    // ═══ POST-1995 FALLBACK: Regex alternativo más flexible ═══
+                    if (matches.filter(m => { const d = parseFlexibleDate(m.desde); return d && d.getFullYear() >= 1995; }).length === 0 && post95Text.length > 100) {
+                        const regexPost95Alt = /(\d{5,15})\s+(.{3,60}?)\s+(SI|NO)\s+(\d{4})(\d{2})\s+\$\s*([\d.,]+)\s+\$\s*([\d.,]+)\s+\$\s*([\d.,\-]*)[\s\S]*?(?=\d{5,15}\s|$)/g;
+                        let mAlt;
+                        while ((mAlt = regexPost95Alt.exec(post95Text)) !== null) {
+                            const emp = mAlt[2].trim().toUpperCase();
+                            if (emp.includes("RAZÓN SOCIAL") || emp.includes("NOMBRE") || emp === "NIT") continue;
+                            const ibc = cleanIBC(mAlt[6]);
+                            if (ibc < 1000) continue;
+                            
+                            const year = parseInt(mAlt[4]);
+                            const month = parseInt(mAlt[5]);
+                            const lastDay = new Date(year, month, 0).getDate();
+                            const desde = `01/${String(month).padStart(2,'0')}/${year}`;
+                            const hasta = `${lastDay}/${String(month).padStart(2,'0')}/${year}`;
+                            
+                            matches.push({
+                                seccion: 'post1995',
+                                nit: mAlt[1],
+                                empresa: mAlt[2].trim(),
+                                desde: desde,
+                                hasta: hasta,
+                                ibc: ibc,
+                                semanas: 30 / 7, // fallback
+                                dias: 30, // fallback
+                                diasCot: 30, // fallback
+                                ra: mAlt[3],
+                                periodo: `${mAlt[4]}${mAlt[5]}`,
+                                cotizacionPagada: cleanIBC(mAlt[7]),
+                                cotizacionMora: mAlt[8].trim(),
+                                novedad: '', fechaPago: '', referenciaPago: '', observacion: ''
+                            });
+                        }
+                    }
+
+                    // ═══ FALLBACK GENÉRICO: Si no se encontró nada con los regex específicos ═══
+                    // Intentar el formato con Desde y Hasta como fechas consecutivas usando el texto limpio de Resumen (pre95Text / post95Text)
+                    if (matches.length === 0) {
+                        // Formato genérico: NIT + Empresa + Desde + Hasta + $IBC + Días (orden original)
+                        const regexGenericA = /(\d{5,15})\s+([^\n\r]{3,60}?)\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})\s+\$?\s*([\d.,]+)\s+([\-\d.,]+)/g;
+                        while ((m = regexGenericA.exec(pre95Text)) !== null) {
+                            const emp = m[2].trim().toUpperCase();
+                            if (emp.includes("RAZÓN SOCIAL") || emp.includes("ADMINISTRADORA") || emp.includes("SEMANAS") || emp.includes("RESUMEN")) continue;
+                            const ibc = cleanIBC(m[5]);
+                            const rawVal = cleanIBC(m[6]);
+                            if (ibc < 1000 || rawVal === 0) continue;
+                            const dOficiales = Math.round(rawVal);
+                            if (Math.abs(dOficiales) > 5000) continue;
+                            matches.push({ seccion: 'pre1995', nit: m[1], empresa: m[2].trim(), desde: formatDateForDisplay(m[3]), hasta: formatDateForDisplay(m[4]), ibc: ibc, semanas: rawVal / 7, dias: dOficiales, diasCot: Math.max(0, dOficiales), observacion: '' });
+                        }
+                        // Formato genérico B: Desde + Días + $IBC + Hasta (orden pre-95 real)
+                        if (matches.length === 0) {
+                            const regexGenericB = /(\d{5,15})\s+([^$]{3,60}?)\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})\s+([\-\d.,]+)\s+\$\s*([\d.,]+)\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})/g;
+                            while ((m = regexGenericB.exec(pre95Text)) !== null) {
+                                const emp = m[2].trim().toUpperCase();
+                                if (emp.includes("RAZÓN SOCIAL") || emp.includes("ADMINISTRADORA") || emp.includes("SEMANAS") || emp.includes("RESUMEN")) continue;
+                                const rawDias = cleanIBC(m[4]);
+                                const ibc = cleanIBC(m[5]);
+                                if (ibc < 1000 || rawDias === 0) continue;
+                                const dOficiales = Math.round(rawDias);
+                                if (Math.abs(dOficiales) > 5000) continue;
+                                matches.push({ seccion: 'pre1995', nit: m[1], empresa: m[2].trim(), desde: formatDateForDisplay(m[3]), hasta: formatDateForDisplay(m[6]), ibc: ibc, semanas: rawDias / 7, dias: dOficiales, diasCot: Math.max(0, dOficiales), observacion: '' });
+                            }
+                        }
+                    }
+
                     if (matches.length === 0) throw new Error("No se detectaron filas válidas en el PDF. Intente subir el Excel (CSV).");
-                    setHistory(matches); setStep(2);
+                    
+                    // ═══ DIAGNÓSTICO: Mostrar resumen de extracción en consola ═══
+                    const pre95Matches = matches.filter(m => { const d = parseFlexibleDate(m.desde); return d && d.getFullYear() < 1995; });
+                    const post95Matches = matches.filter(m => { const d = parseFlexibleDate(m.desde); return d && d.getFullYear() >= 1995; });
+                    const totalDiasExtraidos = matches.reduce((s, r) => s + (r.diasCot || Math.max(0, r.dias)), 0);
+                    console.log(`[AUDIT] Extracción PDF: ${matches.length} registros (Pre-95: ${pre95Matches.length}, Post-95: ${post95Matches.length}), Total días: ${totalDiasExtraidos}, Semanas: ${(totalDiasExtraidos/7).toFixed(2)}`);
+                    console.log(`[AUDIT] Extracción Resumen: ${parsedResumen.length} registros`);
+                    
+                    setHistory(matches); setResumenSemanas(parsedResumen); setStep(2);
                 } catch (e) { setError(e.message); } finally { setLoading(false); }
             };
 
@@ -343,6 +604,15 @@
                     const ws = wb.Sheets[wb.SheetNames[0]];
                     const json = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
                     
+                    // Detectar si el CSV/Excel usa "Días" directos (no semanas)
+                    let isDiasFormat = false;
+                    for (let hi = 0; hi < Math.min(json.length, 5); hi++) {
+                        if (json[hi]) json[hi].forEach(cell => {
+                            const cs = String(cell).toUpperCase().trim();
+                            if (cs.includes('DIA') || cs.includes('DÍA')) isDiasFormat = true;
+                        });
+                    }
+
                     let validRows = [];
                     json.forEach(r => {
                         if (!r || r.length < 3) return;
@@ -356,10 +626,25 @@
                             const postDateVals = r.slice(desdeIdx+2).map(v => cleanIBC(v));
                             const ibc = Math.max(...postDateVals.filter(v => v > 1000), 0);
                             const smallVals = postDateVals.filter(v => v > 0 && v < 200);
-                            const semanas = smallVals.length > 0 ? smallVals[smallVals.length - 1] : 0;
-                            if (ibc > 0 && semanas > 0) {
-                                const dOficiales = Math.round(Number(semanas) * 7);
-                                validRows.push({ nit: String(r[desdeIdx-2] || ''), empresa: empresa, desde: formatDateForDisplay(r[desdeIdx]), hasta: formatDateForDisplay(r[desdeIdx+1]), ibc: ibc, semanas: Number(semanas.toFixed(2)), dias: dOficiales });
+                            const lastSmall = smallVals.length > 0 ? smallVals[smallVals.length - 1] : 0;
+
+                            if (ibc > 0 && lastSmall > 0) {
+                                let dOficiales, semanasVal;
+                                if (isDiasFormat) {
+                                    // CSV con días directos: usar valor como días
+                                    dOficiales = Math.round(lastSmall);
+                                    semanasVal = Number((dOficiales / 7).toFixed(4));
+                                } else {
+                                    // CSV con semanas: convertir a días
+                                    semanasVal = Number(lastSmall.toFixed(2));
+                                    dOficiales = Math.round(lastSmall * 7);
+                                }
+                                let seccion = 'post1995';
+                                try {
+                                    const parsedDesde = parseFlexibleDate(formatDateForDisplay(r[desdeIdx]));
+                                    if (parsedDesde && parsedDesde.getFullYear() < 1995) seccion = 'pre1995';
+                                } catch(e){}
+                                validRows.push({ seccion: seccion, nit: String(r[desdeIdx-2] || ''), empresa: empresa, desde: formatDateForDisplay(r[desdeIdx]), hasta: formatDateForDisplay(r[desdeIdx+1]), ibc: ibc, semanas: semanasVal, dias: dOficiales, diasCot: dOficiales });
                             }
                         }
                     });
@@ -373,24 +658,132 @@
             const handleCalculate = () => {
                 try {
                     setLoading(true); setError(null); setShowDetails(false); 
-                    // Aplicar correcciones automáticas antes de la agregación mensual
                     const { history: useHistory, correctedCount } = applyAutomaticCorrections(history, applyCorrections);
 
-                    const ipcFinalKey = `${formData.anoLiquidacion - 1}-12`;
+                    const mesCierre = formData.mesLiquidacion || 12;
+                    const anoCierre = formData.anoLiquidacion;
+                    const ipcFinalKey = `${anoCierre}-${String(mesCierre).padStart(2, '0')}`;
                     const ipcFinal = safeGetIpc(ipcFinalKey);
                     
-                    let expandedMonths = {};
+                    let detailedReport = [];
+                    const MESES_CORTOS_M = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
-                    // CORRECCIÓN ESTRUCTURAL 2: Agrupación Actuarial por Mes.
-                    // Si se detectan aportes simultáneos, se suman los IBCs (protegiendo el capital del afiliado)
-                    // pero el tiempo se limita estrictamente a un máximo de 30 días, evitando inflar la variable (S).
-                    useHistory.forEach((row) => {
-                        if (!row.desde || !row.hasta || row.ibc <= 0 || row.dias <= 0) return;
+                    const getTasaSafe = (fecha) => {
+                        if (typeof getTasaCotizacion === 'function') return getTasaCotizacion(fecha);
+                        if (typeof getTasaP === 'function') return getTasaP(fecha.getFullYear());
+                        const ts = fecha.getTime();
+                        const _TASAS = [
+                            { d: new Date('1946-01-01').getTime(), h: new Date('1966-12-31').getTime(), p: 0.0455 },
+                            { d: new Date('1967-01-01').getTime(), h: new Date('1971-12-31').getTime(), p: 0.045 },
+                            { d: new Date('1972-01-01').getTime(), h: new Date('1977-01-31').getTime(), p: 0.0676 },
+                            { d: new Date('1977-02-01').getTime(), h: new Date('1982-02-28').getTime(), p: 0.09 },
+                            { d: new Date('1982-03-01').getTime(), h: new Date('1985-09-30').getTime(), p: 0.1125 },
+                            { d: new Date('1985-10-01').getTime(), h: new Date('1993-12-31').getTime(), p: 0.065 },
+                            { d: new Date('1994-01-01').getTime(), h: new Date('1994-12-31').getTime(), p: 0.115 },
+                            { d: new Date('1995-01-01').getTime(), h: new Date('1995-12-31').getTime(), p: 0.125 },
+                            { d: new Date('1996-01-01').getTime(), h: new Date('2003-12-31').getTime(), p: 0.135 },
+                            { d: new Date('2004-01-01').getTime(), h: new Date('2004-12-31').getTime(), p: 0.145 },
+                            { d: new Date('2005-01-01').getTime(), h: new Date('2005-12-31').getTime(), p: 0.15 },
+                            { d: new Date('2006-01-01').getTime(), h: new Date('2007-12-31').getTime(), p: 0.155 },
+                            { d: new Date('2008-01-01').getTime(), h: new Date('2026-12-31').getTime(), p: 0.16 }
+                        ];
+                        let tp = 0.16;
+                        for (const r of _TASAS) { if (ts >= r.d && ts <= r.h) { tp = r.p; break; } }
+                        return tp;
+                    };
+
+                    const pre95Records = [];
+                    const post95Records = [];
+                    let moraEntries = [];
+
+                    useHistory.forEach(row => {
+                        if (!row.desde || !row.hasta || row.ibc <= 0) return;
+                        
+                        const calcDias = row.diasCot != null ? row.diasCot : row.dias;
+                        const dS = parseFlexibleDate(row.desde);
+                        const isPre95 = dS && dS.getFullYear() < 1995;
+
+                        if (row.dias < 0 || calcDias <= 0) {
+                            if (isPre95) {
+                                moraEntries.push({ ...row, diasCot: Math.abs(row.dias), semanas: Math.abs(row.dias) / 7, ibcHistorico: row.ibc, esMora: true });
+                                pre95Records.push({ ...row, dias: Math.abs(row.dias), diasCot: Math.abs(row.dias) });
+                            }
+                            return;
+                        }
+
+                        if (isPre95) {
+                            pre95Records.push(row);
+                        } else {
+                            post95Records.push(row);
+                        }
+                    });
+
+                    // PROCESAR PRE-1995 (SIN SEGMENTAR)
+                    const coveredPre95Days = new Set();
+                    pre95Records.forEach(row => {
+                        const dStart = parseFlexibleDate(row.desde);
+                        const dEnd = parseFlexibleDate(row.hasta);
+                        if (!dStart || !dEnd || dStart > dEnd) return;
+                        
+                        let overlapCount = 0;
+                        let calendarDaysInPeriod = 0;
+                        for (let d = new Date(dStart.getTime()); d <= dEnd; d.setDate(d.getDate() + 1)) {
+                            calendarDaysInPeriod++;
+                            const dayStr = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+                            if (coveredPre95Days.has(dayStr)) {
+                                overlapCount++;
+                            } else {
+                                coveredPre95Days.add(dayStr);
+                            }
+                        }
+
+                        const rawDias = row.diasCot != null ? row.diasCot : row.dias;
+                        // Si rawDias es menor que los días calendario, escalamos el traslape
+                        let effectiveOverlap = overlapCount;
+                        if (calendarDaysInPeriod > 0 && rawDias < calendarDaysInPeriod) {
+                            effectiveOverlap = Math.round(overlapCount * (rawDias / calendarDaysInPeriod));
+                        }
+                        
+                        const calcDias = Math.max(0, rawDias - effectiveOverlap);
+                        
+                        const year = dStart.getFullYear();
+                        const mes = dStart.getMonth() + 1;
+                        
+                        const ipcInicialKey = `${year}-${String(mes).padStart(2, '0')}`;
+                        const ipcInicial = safeGetIpc(ipcInicialKey);
+                        const ibcIndexadoIA = (ipcInicial && ipcInicial > 0) ? row.ibc * (ipcFinal / ipcInicial) : row.ibc;
+                        
+                        const tasaP = getTasaSafe(dStart);
+
+                        detailedReport.push({
+                            nit: row.nit || '',
+                            empresa: row.empresa + (effectiveOverlap > 0 ? ` (-${effectiveOverlap}d simultáneos)` : ''),
+                            mes: `${year}-${String(mes).padStart(2, '0')}`,
+                            mesNombre: MESES_CORTOS_M[mes - 1] || '',
+                            ano: year,
+                            seccion: 'pre1995',
+                            desde: row.desde,
+                            hasta: row.hasta,
+                            dias: row.dias,
+                            diasCot: calcDias,
+                            semanas: calcDias / 7,
+                            ibcHistorico: row.ibc,
+                            tasaP: tasaP,
+                            ipcFinalFecha: `${MESES_CORTOS_M[mesCierre - 1]} ${anoCierre}`,
+                            ipcFinal: ipcFinal,
+                            ipcInicialFecha: `${MESES_CORTOS_M[mes - 1]} ${year}`,
+                            ipcInicial: ipcInicial,
+                            ibcIndexado: ibcIndexadoIA
+                        });
+                    });
+
+                    // PROCESAR POST-1995
+                    let expandedMonths = {};
+                    post95Records.forEach(row => {
                         const dStart = parseFlexibleDate(row.desde);
                         const dEnd = parseFlexibleDate(row.hasta);
                         if (!dStart || !dEnd || dStart > dEnd) return;
 
-                        const totalCommDays = getDiasComerciales(dStart, dEnd) || 1;
                         let curStart = new Date(dStart.getTime());
                         
                         while (curStart <= dEnd) {
@@ -400,26 +793,47 @@
                             let endOfMonth = new Date(curYear, curMonth + 1, 0); 
                             let actEnd = dEnd < endOfMonth ? new Date(dEnd.getTime()) : new Date(endOfMonth.getTime());
                             
-                            let segmentDaysComm = getDiasComerciales(curStart, actEnd);
-                            
-                            if (segmentDaysComm > 0) {
-                                let assignedDays = (segmentDaysComm / totalCommDays) * row.dias;
-                                let iaXDiasBruto = row.ibc * assignedDays;
+                            if (actEnd >= curStart) {
+                                // Regla B: Post-1995. Mes completo = 30, Fracción = diff + 1
+                                const isFullMonthSegment = curStart.getDate() === 1 && 
+                                    (actEnd.getDate() === new Date(curYear, curMonth + 1, 0).getDate() || actEnd.getDate() >= 30);
+                                
+                                let assignedDays;
+                                if (isFullMonthSegment) {
+                                    assignedDays = 30;
+                                } else {
+                                    const diffTime = Math.abs(actEnd - curStart);
+                                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                                    assignedDays = Math.min(30, diffDays + 1);
+                                }
+                                
+                                let effectiveIbc = row.ibc;
                                 let monthKey = `${curYear}-${String(curMonth + 1).padStart(2, '0')}`;
                                 
                                 if (!expandedMonths[monthKey]) {
                                     expandedMonths[monthKey] = {
                                         year: curYear,
                                         monthKey: monthKey,
-                                        dias: assignedDays,
-                                        iaXDiasBruto: iaXDiasBruto,
-                                        empresas: [row.empresa]
+                                        dias: Math.min(30, assignedDays),
+                                        sumIbcXDias: effectiveIbc * assignedDays,
+                                        empresas: [row.empresa],
+                                        nits: [row.nit || ''],
+                                        desde: new Date(curStart.getTime()),
+                                        hasta: new Date(actEnd.getTime())
                                     };
                                 } else {
+                                    // Limitar a 30 días el mes, protegiendo capital (sumando IBCs concurrentes)
                                     expandedMonths[monthKey].dias = Math.min(30, expandedMonths[monthKey].dias + assignedDays);
-                                    expandedMonths[monthKey].iaXDiasBruto += iaXDiasBruto;
+                                    expandedMonths[monthKey].sumIbcXDias += effectiveIbc * assignedDays;
+                                    
+                                    if (actEnd > expandedMonths[monthKey].hasta) expandedMonths[monthKey].hasta = new Date(actEnd.getTime());
+                                    if (curStart < expandedMonths[monthKey].desde) expandedMonths[monthKey].desde = new Date(curStart.getTime());
                                     if (!expandedMonths[monthKey].empresas.includes(row.empresa)) {
                                         expandedMonths[monthKey].empresas.push(row.empresa);
+                                    }
+                                    const rowNit = row.nit || '';
+                                    if (rowNit && !expandedMonths[monthKey].nits.includes(rowNit)) {
+                                        expandedMonths[monthKey].nits.push(rowNit);
                                     }
                                 }
                             }
@@ -427,60 +841,107 @@
                         }
                     });
 
-                    let splitHistory = Object.values(expandedMonths);
-                    splitHistory.sort((a,b) => b.monthKey.localeCompare(a.monthKey));
-                    
-                    let totalDias = 0;
-                    let sumIaXDias = 0;
-                    let sumPxDias = 0;
-                    let detailedReport = []; 
-                    
-                    splitHistory.forEach(seg => {
-                        const effectiveIbc = seg.iaXDiasBruto / seg.dias; 
-                        
-                        const ipcInicialKey = `${seg.year - 1}-12`;
+                    let splitHistoryPost95 = Object.values(expandedMonths);
+                    splitHistoryPost95.sort((a,b) => a.monthKey.localeCompare(b.monthKey));
+
+                    splitHistoryPost95.forEach(seg => {
+                        const effectiveIbc = seg.sumIbcXDias / seg.dias; 
+                        const mesSegmento = seg.monthKey.split('-')[1];
+                        const ipcInicialKey = `${seg.year}-${mesSegmento}`;
                         const ipcInicial = safeGetIpc(ipcInicialKey);
+                        const ibcIndexadoIA = (ipcInicial && ipcInicial > 0) ? effectiveIbc * (ipcFinal / ipcInicial) : effectiveIbc;
                         
-                        const factorIndexacion = ipcFinal / ipcInicial;
-                        const ibcIndexadoIA = effectiveIbc * factorIndexacion;
-                        const iaXDias = ibcIndexadoIA * seg.dias;
+                        const fechaSegmento = new Date(seg.year, parseInt(mesSegmento) - 1, 1);
+                        const tasaP = getTasaSafe(fechaSegmento);
                         
-                        const tasaP = getTasaP(seg.year);
-                        const pXDias = tasaP * seg.dias;
+                        const mesNum = parseInt(mesSegmento);
+                        const mesNombre = MESES_CORTOS_M[mesNum - 1];
+                        const primerDia = new Date(seg.year, mesNum - 1, 1);
+                        const ultimoDia = new Date(seg.year, mesNum, 0); 
+                        const fmtDate = (d) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
                         
                         detailedReport.push({
+                            nit: (seg.nits || []).join(' + '),
                             empresa: seg.empresas.join(' + '),
                             mes: seg.monthKey,
+                            mesNombre: mesNombre,
+                            ano: seg.year,
+                            seccion: 'post1995',
+                            desde: fmtDate(primerDia),
+                            hasta: fmtDate(ultimoDia),
                             dias: seg.dias,
-                            ipcFinal: ipcFinal,
-                            ipcInicial: ipcInicial,
+                            diasCot: seg.dias,
+                            semanas: seg.dias / 7,
                             ibcHistorico: effectiveIbc, 
-                            ibcIndexado: ibcIndexadoIA,
                             tasaP: tasaP,
-                            iaXDias: iaXDias,
-                            pXDias: pXDias
+                            ipcFinalFecha: `${MESES_CORTOS_M[mesCierre - 1]} ${anoCierre}`,
+                            ipcFinal: ipcFinal,
+                            ipcInicialFecha: `${mesNombre} ${seg.year}`,
+                            ipcInicial: ipcInicial,
+                            ibcIndexado: ibcIndexadoIA
                         });
-
-                        sumIaXDias += iaXDias;
-                        sumPxDias += pXDias;
-                        totalDias += seg.dias;
                     });
 
-                    if (totalDias === 0) throw new Error("No hay días computables para realizar la liquidación.");
+                    moraEntries.forEach(me => {
+                        const dS = parseFlexibleDate(me.desde);
+                        const mesNum = dS ? dS.getMonth() + 1 : 1;
+                        const yearS = dS ? dS.getFullYear() : 1990;
+                        detailedReport.push({
+                            nit: me.nit, empresa: me.empresa, mes: `${yearS}-${String(mesNum).padStart(2,'0')}`, mesNombre: MESES_CORTOS_M[mesNum-1], ano: yearS,
+                            seccion: 'pre1995', desde: me.desde, hasta: me.hasta, dias: me.dias, diasCot: 0, semanas: me.semanas,
+                            ibcHistorico: me.ibcHistorico, tasaP: 0, ipcFinalFecha: '', ipcFinal: 0, ipcInicialFecha: '', ipcInicial: 0, ibcIndexado: 0, esMora: true
+                        });
+                    });
 
-                    const sbcMensual = sumIaXDias / totalDias;
-                    const pPonderado = sumPxDias / totalDias;
-                    const semanas = totalDias / 7;
-                    const indemnizacion = sbcMensual * (totalDias / 30) * pPonderado;
+                    detailedReport.sort((a, b) => {
+                        const aDate = parseFlexibleDate(a.desde);
+                        const bDate = parseFlexibleDate(b.desde);
+                        return (aDate || new Date(0)) - (bDate || new Date(0));
+                    });
+
+                    // C. Consolidación SC
+                    let SCTotal = 0;
+                    detailedReport.forEach(p => {
+                        if (p.esMora) return;
+                        if (p.semanas > 0) {
+                            SCTotal += p.semanas;
+                        }
+                    });
+
+                    if (SCTotal <= 0) throw new Error("No hay semanas computables para realizar la liquidación.");
+
+                    // Regla 2: PPC y Regla 3: SBC
+                    let sumatoriaMasaTasa = 0;
+                    let sumatoriaMasaSalarial = 0;
+
+                    detailedReport.forEach(p => {
+                        if (p.esMora) return;
+                        if (p.semanas > 0) {
+                            const masaTasa = p.tasaP * p.semanas;
+                            sumatoriaMasaTasa += masaTasa;
+                            
+                            const masaSalarial = p.ibcIndexado * p.semanas;
+                            sumatoriaMasaSalarial += masaSalarial;
+                        }
+                    });
+
+                    const PPC = sumatoriaMasaTasa / SCTotal;
                     
+                    const promedioMensualPresente = sumatoriaMasaSalarial / SCTotal;
+                    const SBC = promedioMensualPresente * (7 / 30);
+                    
+                    const ISP = SBC * SCTotal * PPC;
+
                     setResults({ 
-                        totalDias,
-                        semanas,
-                        sbcMensual,
-                        pPonderado,
-                        indemnizacion,
+                        totalDias: SCTotal * 7,
+                        semanas: SCTotal,
+                        SC: SCTotal,
+                        PPC: PPC,
+                        SBC: SBC,
+                        ingresoMensualPromedio: promedioMensualPresente,
+                        indemnizacion: ISP,
                         detailedReport,
-                        sumIaXDias
+                        sumAportes: ISP
                     });
                     setStep(3);
                 } catch (e) { setError("Error matemático: " + e.message); } finally { setLoading(false); }
@@ -507,14 +968,16 @@
                 
                 doc.setFontSize(10);
                 const afiliadoLabel = (formData.nombre && String(formData.nombre).trim()) ? String(formData.nombre).trim() : (formData.cedula || '—');
-                doc.text(`Afiliado: ${afiliadoLabel}`, 15, 68);
-                doc.text(`Documento: ${formData.cedula || '—'}`, 15, 74);
-                doc.text(`Total Semanas Cotizadas a Colpensiones (S): ${results.semanas.toFixed(2)}`, 15, 75);
-                doc.text(`Salario Base de Liquidación (SBC): ${formatCurrency(results.sbcMensual)}`, 15, 80);
-                doc.text(`Porcentaje Promedio Cotización (P): ${(results.pPonderado * 100).toFixed(2)}%`, 15, 85);
+                doc.text(`Afiliado: ${afiliadoLabel}`, 15, 65);
+                doc.text(`Documento: ${formData.cedula || '—'}`, 15, 71);
+                doc.text(`Total Días Computados: ${results.totalDias.toFixed(2)}`, 15, 77);
+                doc.text(`SBC (Salario Base Semanal): ${formatCurrency(results.SBC)}`, 15, 83);
+                doc.text(`SC (Semanas Cotizadas): ${results.SC.toFixed(2)}`, 15, 89);
+                doc.text(`PPC (% Ponderado Cotización): ${(results.PPC * 100).toFixed(4)}%`, 15, 95);
+                doc.text(`Fórmula: ISP = SBC × SC × PPC  —  Decreto 1730/2001 Art. 3`, 15, 101);
                 
                 doc.autoTable({ 
-                    startY: 95, 
+                    startY: 107, 
                     head: [['Concepto', 'Base Legal', 'Valor a Reconocer']], 
                     body: [
                         ['Indemnización Sustitutiva de Vejez', 'Decreto 1730 de 2001 (Art. 1)', formatCurrency(results.indemnizacion)]
@@ -535,34 +998,85 @@
                 doc.setFontSize(11);
                 
                 doc.text(`Total Días Computados (Sin doble conteo por simultaneidad): ${results.totalDias.toFixed(2)}`, 15, 40);
-                doc.text(`Salario Base Mensual Indexado (SBC): ${formatCurrency(results.sbcMensual)}`, 15, 48);
+                doc.text(`SC: ${results.SC.toFixed(2)} semanas  |  SBC: ${formatCurrency(results.SBC)}  |  PPC: ${(results.PPC * 100).toFixed(4)}%`, 15, 48);
 
-                const tableBody = results.detailedReport.map(r => [
-                    r.empresa.substring(0, 24),
-                    r.mes,
-                    r.dias.toFixed(2),
-                    r.ipcFinal.toFixed(4),
-                    r.ipcInicial.toFixed(4),
-                    formatCurrency(r.ibcHistorico),
-                    formatCurrency(r.ibcIndexado),
-                    (r.tasaP * 100).toFixed(2) + '%',
-                    formatCurrency(r.iaXDias) 
-                ]);
+                const pre95 = results.detailedReport.filter(r => r.seccion === 'pre1995').sort((a,b) => a.mes.localeCompare(b.mes));
+                const post95 = results.detailedReport.filter(r => r.seccion === 'post1995').sort((a,b) => a.mes.localeCompare(b.mes));
 
-                doc.autoTable({
-                    startY: 55,
-                    head: [['Aportantes', 'Periodo (Mes)', 'Días', 'IPC Fin.', 'IPC Ini.', 'IBC Consolidado', 'IBC Indexado', 'Tasa (P)', 'SBC Parcial (IA x Días)']],
-                    body: tableBody,
-                    theme: 'striped',
-                    styles: { fontSize: 8, cellPadding: 1.5 },
-                    headStyles: { fillColor: [30, 58, 138] },
-                    columnStyles: {
-                        5: { halign: 'right' },
-                        6: { halign: 'right', fontStyle: 'bold' },
-                        7: { halign: 'center', textColor: [180, 83, 9] },
-                        8: { halign: 'right', fontStyle: 'bold', textColor: [15, 118, 110] } 
-                    }
-                });
+                let currentY = 55;
+
+                // SECCIÓN 1: ANTES DE 1995
+                if (pre95.length > 0) {
+                    doc.setTextColor(30, 58, 138);
+                    doc.setFontSize(12);
+                    doc.text("DETALLE DE PAGOS EFECTUADOS ANTERIORES A 1995", 15, currentY);
+                    currentY += 5;
+
+                    const pre95Body = pre95.map(r => [
+                        r.nit || '', r.empresa.substring(0, 20), r.desde, r.hasta,
+                        formatCurrency(r.ibcHistorico), r.semanas.toFixed(3), r.dias,
+                        (r.tasaP * 100).toFixed(2) + '%',
+                        r.ipcFinalFecha, r.ipcFinal.toFixed(4),
+                        r.ipcInicialFecha, r.ipcInicial.toFixed(4),
+                        formatCurrency(r.ibcIndexado)
+                    ]);
+
+                    doc.autoTable({
+                        startY: currentY,
+                        head: [['NIT', 'Razón Social', 'Desde', 'Hasta', 'Salario (IBC)', 'Sem.', 'Días', '% Cotiz.', 'Fecha IPC Final', 'IPC Final', 'Fecha IPC Inicial', 'IPC Inicial', 'IBC Indexado']],
+                        body: pre95Body,
+                        theme: 'striped',
+                        styles: { fontSize: 5.5, cellPadding: 1.2 },
+                        headStyles: { fillColor: [30, 58, 138], fontSize: 5 },
+                        columnStyles: {
+                            0: { cellWidth: 16 }, 1: { cellWidth: 26 },
+                            2: { halign: 'center', cellWidth: 16 }, 3: { halign: 'center', cellWidth: 16 },
+                            4: { halign: 'right', cellWidth: 20 }, 5: { halign: 'center', cellWidth: 12 },
+                            6: { halign: 'center', cellWidth: 10 }, 7: { halign: 'center', cellWidth: 12, textColor: [180, 83, 9] },
+                            8: { halign: 'center', cellWidth: 22 }, 9: { halign: 'right', cellWidth: 16 },
+                            10: { halign: 'center', cellWidth: 22 }, 11: { halign: 'right', cellWidth: 16 },
+                            12: { halign: 'right', fontStyle: 'bold', cellWidth: 22 }
+                        }
+                    });
+                    currentY = doc.lastAutoTable.finalY + 10;
+                }
+
+                // SECCIÓN 2: A PARTIR DE 1995
+                if (post95.length > 0) {
+                    if (currentY > 250) { doc.addPage('landscape'); currentY = 20; }
+                    doc.setTextColor(30, 58, 138);
+                    doc.setFontSize(12);
+                    doc.text("DETALLE DE PAGOS EFECTUADOS A PARTIR DE 1995", 15, currentY);
+                    currentY += 5;
+
+                    const post95Body = post95.map(r => [
+                        r.nit || '', r.empresa.substring(0, 20), r.desde, r.hasta,
+                        formatCurrency(r.ibcHistorico), r.semanas.toFixed(3), r.dias, r.diasCot != null ? r.diasCot : r.dias,
+                        (r.tasaP * 100).toFixed(2) + '%',
+                        r.ipcFinalFecha, r.ipcFinal.toFixed(4),
+                        r.ipcInicialFecha, r.ipcInicial.toFixed(4),
+                        formatCurrency(r.ibcIndexado)
+                    ]);
+
+                    doc.autoTable({
+                        startY: currentY,
+                        head: [['NIT', 'Razón Social', 'Desde', 'Hasta', 'Salario (IBC)', 'Sem.', 'Días Rep', 'Días Cot', '% Cotiz.', 'Fecha IPC Final', 'IPC Final', 'Fecha IPC Inicial', 'IPC Inicial', 'IBC Indexado']],
+                        body: post95Body,
+                        theme: 'striped',
+                        styles: { fontSize: 5.5, cellPadding: 1.2 },
+                        headStyles: { fillColor: [30, 58, 138], fontSize: 5 },
+                        columnStyles: {
+                            0: { cellWidth: 15 }, 1: { cellWidth: 24 },
+                            2: { halign: 'center', cellWidth: 15 }, 3: { halign: 'center', cellWidth: 15 },
+                            4: { halign: 'right', cellWidth: 18 }, 5: { halign: 'center', cellWidth: 11 },
+                            6: { halign: 'center', cellWidth: 11 }, 7: { halign: 'center', cellWidth: 11, fontStyle: 'bold' },
+                            8: { halign: 'center', cellWidth: 11, textColor: [180, 83, 9] },
+                            9: { halign: 'center', cellWidth: 20 }, 10: { halign: 'right', cellWidth: 14 },
+                            11: { halign: 'center', cellWidth: 20 }, 12: { halign: 'right', cellWidth: 14 },
+                            13: { halign: 'right', fontStyle: 'bold', cellWidth: 20 }
+                        }
+                    });
+                }
 
                 // Pie de página con marca
                 doc.setFontSize(8);
@@ -584,68 +1098,455 @@
                     ['DATOS DEL AFILIADO'],
                     ['Afiliado:', (formData.nombre && String(formData.nombre).trim()) ? String(formData.nombre).trim() : (formData.cedula || '—')],
                     ['Documento:', formData.cedula || '—'],
-                    ['Año de Liquidación:', formData.anoLiquidacion],
+                    ['Fecha de Liquidación:', `${MESES_NOMBRES[(formData.mesLiquidacion || 12) - 1]} ${formData.anoLiquidacion}`],
                     [],
                     ['RESUMEN DE LIQUIDACIÓN'],
                     ['Total Días Computados:', res.totalDias],
-                    ['Total Semanas Cotizadas (S):', res.semanas],
-                    ['Salario Base de Liquidación (SBC):', res.sbcMensual],
-                    ['Porcentaje Ponderado (P):', res.pPonderado],
-                    ['Fórmula:', 'I = SBC × (S / 4.2857) × P'],
-                    ['Sumatoria (IA × Días):', res.sumIaXDias],
+                    ['SBC (Salario Base Semanal):', res.SBC],
+                    ['SC (Semanas Cotizadas):', res.SC],
+                    ['PPC (% Ponderado Cotización):', (res.PPC * 100).toFixed(4) + '%'],
+                    ['Fórmula:', 'ISP = SBC × SC × PPC'],
+                    ['Base Legal:', 'Decreto 1730/2001 Art. 3'],
                     ['INDEMNIZACIÓN SUSTITUTIVA:', res.indemnizacion],
                     [],
                     ['DETALLE ACTUARIAL MENSUALIZADO']
                 ];
 
-                const headers = [
-                    'Aportantes (Agrupados)',
-                    'Periodo (Mes)',
-                    'Días',
-                    'IPC Final',
-                    'IPC Inicial',
-                    'IBC Consolidado ($)',
-                    'IBC Indexado ($)',
-                    'Tasa P (%)',
-                    'P × Días',
-                    'SBC Parcial (IA × Días)'
-                ];
+                const pre95x = res.detailedReport.filter(r => r.seccion === 'pre1995').sort((a,b) => a.mes.localeCompare(b.mes));
+                const post95x = res.detailedReport.filter(r => r.seccion === 'post1995').sort((a,b) => a.mes.localeCompare(b.mes));
 
-                const data = res.detailedReport.map(r => [
-                    r.empresa,
-                    r.mes,
-                    r.dias,
-                    r.ipcFinal,
-                    r.ipcInicial,
-                    r.ibcHistorico,
-                    r.ibcIndexado,
-                    r.tasaP * 100,
-                    r.pXDias,
-                    r.iaXDias
-                ]);
+                let excelRows = [];
 
-                const totalsRow = [
-                    'TOTALES',
-                    '',
-                    res.totalDias,
-                    '', '', '', '', '',
-                    '',
-                    res.sumIaXDias
-                ];
+                // SECCIÓN 1: ANTES DE 1995
+                if (pre95x.length > 0) {
+                    excelRows.push(['DETALLE DE PAGOS EFECTUADOS ANTERIORES A 1995']);
+                    excelRows.push(['NIT Aportante', 'Razón Social', 'Desde', 'Hasta', 'Salario (IBC)', 'Semanas', 'No. Días', '% Cotización', 'Fecha IPC Final', 'IPC Final', 'Fecha IPC Inicial', 'IPC Inicial', 'IBC Indexado']);
+                    pre95x.forEach(r => excelRows.push([r.nit || '', r.empresa, r.desde, r.hasta, r.ibcHistorico, r.semanas, r.dias, r.tasaP * 100, r.ipcFinalFecha, r.ipcFinal, r.ipcInicialFecha, r.ipcInicial, r.ibcIndexado]));
+                    const pre95Dias = pre95x.reduce((s,r) => s + r.dias, 0);
+                    const pre95Semanas = pre95x.reduce((s,r) => s + r.semanas, 0);
+                    excelRows.push(['Subtotal Pre-1995', '', '', '', '', pre95Semanas, pre95Dias, '', '', '', '', '', '']);
+                    excelRows.push([]);
+                }
 
-                const allData = [...preData, headers, ...data, totalsRow];
+                // SECCIÓN 2: A PARTIR DE 1995
+                if (post95x.length > 0) {
+                    excelRows.push(['DETALLE DE PAGOS EFECTUADOS A PARTIR DE 1995']);
+                    excelRows.push(['NIT Aportante', 'Razón Social', 'Desde', 'Hasta', 'Salario (IBC)', 'Semanas', 'Días Rep', 'Días Cot', '% Cotización', 'Fecha IPC Final', 'IPC Final', 'Fecha IPC Inicial', 'IPC Inicial', 'IBC Indexado']);
+                    post95x.forEach(r => excelRows.push([r.nit || '', r.empresa, r.desde, r.hasta, r.ibcHistorico, r.semanas, r.dias, r.diasCot != null ? r.diasCot : r.dias, r.tasaP * 100, r.ipcFinalFecha, r.ipcFinal, r.ipcInicialFecha, r.ipcInicial, r.ibcIndexado]));
+                    const post95Dias = post95x.reduce((s,r) => s + r.dias, 0);
+                    const post95DiasCot = post95x.reduce((s,r) => s + (r.diasCot != null ? r.diasCot : r.dias), 0);
+                    const post95Semanas = post95x.reduce((s,r) => s + r.semanas, 0);
+                    excelRows.push(['Subtotal Post-1995', '', '', '', '', post95Semanas, post95Dias, post95DiasCot, '', '', '', '', '', '']);
+                    excelRows.push([]);
+                }
+
+                excelRows.push(['TOTAL GENERAL DÍAS', '', '', res.totalDias]);
+
+                const allData = [...preData, ...excelRows];
 
                 const ws = XLSX.utils.aoa_to_sheet(allData);
 
                 // Ancho de columnas
                 ws['!cols'] = [
-                    {wch: 35}, {wch: 12}, {wch: 10}, {wch: 12}, {wch: 12},
-                    {wch: 20}, {wch: 20}, {wch: 10}, {wch: 12}, {wch: 22}
+                    {wch: 16}, {wch: 28}, {wch: 12}, {wch: 12}, {wch: 16}, {wch: 10}, {wch: 10}, {wch: 12}, {wch: 18}, {wch: 12}, {wch: 18}, {wch: 12}, {wch: 18}
                 ];
 
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, 'Indemnización Sustitutiva');
                 XLSX.writeFile(wb, `Indemnizacion_Sustitutiva_Detalle_${formData.cedula}.xlsx`);
+            };
+
+            const exportAuditExcel = () => {
+                try {
+                    const wb = XLSX.utils.book_new();
+
+                    // Hoja 0: Resumen de Semanas
+                    const wsResumenData = [
+                        ["#", "Identificación Empleador", "Nombre o Razón Social", "Ciclo Desde", "Ciclo Hasta", "Asignación Básica Mensual", "Semanas"]
+                    ];
+                    
+                    resumenSemanas.forEach((r, idx) => {
+                        wsResumenData.push([
+                            idx + 1,
+                            r.nit || '', r.empresa || '', r.desde || '', r.hasta || '',
+                            r.ibc || 0, r.semanas !== undefined ? r.semanas : ''
+                        ]);
+                    });
+
+                    const wsResumen = XLSX.utils.aoa_to_sheet(wsResumenData);
+                    const rangeRes = XLSX.utils.decode_range(wsResumen['!ref'] || "A1");
+                    for (let R = 1; R <= rangeRes.e.r; ++R) {
+                        let cellIBC = wsResumen[XLSX.utils.encode_cell({c: 5, r: R})];
+                        if (cellIBC) { cellIBC.t = 'n'; cellIBC.z = '$#,##0'; }
+                        let cellSemanas = wsResumen[XLSX.utils.encode_cell({c: 6, r: R})];
+                        if (cellSemanas && typeof cellSemanas.v === 'number') { cellSemanas.t = 'n'; cellSemanas.z = '#,##0.00'; }
+                    }
+                    XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen de Semanas");
+
+                    // Hoja 1: Antes de 1995
+                    const ws1Data = [
+                        ["Identificación Empleador", "Nombre o Razón Social", "Ciclo Desde", "Ciclo Hasta", "Asignación Básica Mensual", "Días Rep.", "Observación"]
+                    ];
+                    const pre95 = history.filter(r => r.seccion === 'pre1995' || (parseFlexibleDate(r.desde) && parseFlexibleDate(r.desde).getFullYear() < 1995));
+
+                    pre95.forEach(r => {
+                        ws1Data.push([
+                            r.nit || '', r.empresa || '', r.desde || '', r.hasta || '',
+                            r.ibc || 0, r.dias !== undefined ? r.dias : '', r.observacion || ''
+                        ]);
+                    });
+
+                    const ws1 = XLSX.utils.aoa_to_sheet(ws1Data);
+                    const range1 = XLSX.utils.decode_range(ws1['!ref']);
+                    for (let R = 1; R <= range1.e.r; ++R) {
+                        let cell = ws1[XLSX.utils.encode_cell({c: 4, r: R})];
+                        if (cell) { cell.t = 'n'; cell.z = '$#,##0'; }
+                    }
+                    // El append_sheet de ws1 se hará al final para asegurar el orden.
+
+                    // Hoja 2: A partir de 1995
+                    const ws2Data = [
+                        ["Identificación Aportante", "Nombre o Razón Social", "RA", "Período", "Fecha De Pago", "Referencia de Pago", "IBC Reportado", "Cotización Pagada", "Cotización Mora Sin Intereses", "Nov.", "Días Rep.", "Días Cot.", "Observación"]
+                    ];
+                    const post95 = history.filter(r => r.seccion === 'post1995' || (parseFlexibleDate(r.desde) && parseFlexibleDate(r.desde).getFullYear() >= 1995));
+
+                    post95.forEach(r => {
+                        ws2Data.push([
+                            r.nit || '', r.empresa || '', r.ra || '', r.periodo || '', r.fechaPago || '', r.referenciaPago || '',
+                            r.ibc || 0, r.cotizacionPagada || '', r.cotizacionMora || '', r.novedad || '', r.dias !== undefined ? r.dias : '', r.diasCot !== undefined ? r.diasCot : '', r.observacion || ''
+                        ]);
+                    });
+
+                    const ws2 = XLSX.utils.aoa_to_sheet(ws2Data);
+                    const range2 = XLSX.utils.decode_range(ws2['!ref']);
+                    for (let R = 1; R <= range2.e.r; ++R) {
+                        let cellIBC = ws2[XLSX.utils.encode_cell({c: 6, r: R})];
+                        if (cellIBC) { cellIBC.t = 'n'; cellIBC.z = '$#,##0'; }
+                        let cellCot = ws2[XLSX.utils.encode_cell({c: 7, r: R})];
+                        if (cellCot && cellCot.v) { cellCot.t = 'n'; cellCot.z = '$#,##0'; }
+                    }
+                    // El append_sheet de ws2 se hará al final para asegurar el orden.
+
+                    // Hoja 4: Verificación y Segmentación Mensual
+                    const ws3Data = [
+                        ["# Resumen", "Identificación Empleador", "Nombre o Razón Social", "Ciclo Desde", "Ciclo Hasta", "Asignación Básica Mensual", "Días Segmentados (Ley)", "Semanas Segmentadas", "Semanas Reportadas (Resumen PDF)", "Semanas Calculadas Totales", "Diferencia (Ley vs PDF)", "Observaciones"]
+                    ];
+                    
+                    let segmentedRows = [];
+
+                    const getCalendarDays = (start, end) => {
+                        return Math.floor((Date.UTC(end.getFullYear(), end.getMonth(), end.getDate()) - Date.UTC(start.getFullYear(), start.getMonth(), start.getDate())) / (1000 * 60 * 60 * 24)) + 1;
+                    };
+                    
+                    resumenSemanas.forEach((row, sortIndex) => {
+                        let dStart = parseFlexibleDate(row.desde);
+                        let dEnd = parseFlexibleDate(row.hasta);
+                        if (!dStart || !dEnd) return;
+
+                        let totalCalDays = getCalendarDays(dStart, dEnd);
+                        
+                        // Si el check está activo y el periodo total es de un mes o menos (<= 31 días),
+                        // aplicamos directamente (semanas * 7) redondeado a entero.
+                        if (applyCorrections && totalCalDays <= 31) {
+                            let targetSemanas = Number(row.semanas) || 0;
+                            let calcDias = Math.round(targetSemanas * 7);
+                            let calcSemanas = targetSemanas;
+                            
+                            segmentedRows.push({
+                                sortIndex: sortIndex, 
+                                nit: row.nit || '', 
+                                empresa: row.empresa, 
+                                desde: new Date(dStart.getTime()), 
+                                hasta: new Date(dEnd.getTime()),
+                                ibc: row.ibc, 
+                                calcDias: calcDias, 
+                                calcSemanas: calcSemanas,
+                                observacion: targetSemanas === 0 ? 'Ajuste exacto a 0 (PDF)' : 'Ajuste exacto a 1 mes (PDF)'
+                            });
+                            return;
+                        }
+
+                        let current = new Date(dStart.getTime());
+                        let rowSegments = [];
+                        
+                        // 1. Cálculo Inicial Matemático puro (según periodo de Resumen de Semanas)
+                        while (current <= dEnd) {
+                            let curYear = current.getFullYear();
+                            let curMonth = current.getMonth();
+                            let endOfMonth = new Date(curYear, curMonth + 1, 0);
+                            let actEnd = dEnd < endOfMonth ? new Date(dEnd.getTime()) : new Date(endOfMonth.getTime());
+                            
+                            let calcDias = 0;
+                            if (curYear < 1995) {
+                                calcDias = getCalendarDays(current, actEnd);
+                            } else {
+                                calcDias = getDiasComerciales(current, actEnd);
+                            }
+
+                            rowSegments.push({
+                                sortIndex: sortIndex, 
+                                nit: row.nit || '', 
+                                empresa: row.empresa, 
+                                desde: new Date(current.getTime()), 
+                                hasta: new Date(actEnd.getTime()),
+                                ibc: row.ibc, 
+                                calcDias: calcDias, 
+                                calcSemanas: Number((calcDias / 7).toFixed(4)),
+                                observacion: ''
+                            });
+                            
+                            current = new Date(curYear, curMonth + 1, 1);
+                        }
+
+                        // 2. Validación de Desvío
+                        if (rowSegments.length > 0) {
+                            let targetSemanas = Number(row.semanas) || 0;
+                            let mathTotalDias = rowSegments.reduce((sum, seg) => sum + seg.calcDias, 0);
+                            let mathTotalSemanas = mathTotalDias / 7;
+                            let diffSemanas = Math.abs(mathTotalSemanas - targetSemanas);
+                            
+                            let needsCorrection = false;
+                            let obsText = '';
+                            
+                            if (applyCorrections) {
+                                needsCorrection = targetSemanas === 0 || diffSemanas > 0.145; // > 0.14 semanas
+                                obsText = targetSemanas === 0 ? 'Ajuste exacto a 0 (PDF)' : 'Ajuste proporcional al PDF';
+                            } else {
+                                if (targetSemanas < mathTotalSemanas && diffSemanas > 0.01) {
+                                    needsCorrection = true;
+                                    obsText = targetSemanas === 0 ? 'Tope a 0 (Según PDF)' : 'Tope aplicado según Resumen (PDF)';
+                                }
+                            }
+
+                            if (needsCorrection) {
+                                if (targetSemanas === 0) {
+                                    rowSegments.forEach(seg => {
+                                        seg.calcDias = 0;
+                                        seg.calcSemanas = 0;
+                                        seg.observacion = obsText;
+                                    });
+                                } else if (rowSegments.length === 1) {
+                                    // 3. REGLA: Si el ítem a desglosar está dentro de UN MISMO MES CALENDARIO
+                                    // se aplican directamente las semanas de "Resumen de Semanas"
+                                    rowSegments[0].calcDias = Math.round(targetSemanas * 7);
+                                    rowSegments[0].calcSemanas = targetSemanas;
+                                    rowSegments[0].observacion = 'Ajuste directo según Resumen (Mes único)';
+                                } else {
+                                    // 4. REGLA: Si el desvío corresponde a periodos MAYORES A UN MES
+                                    // buscar el detalle para corregir con esos datos
+                                    let anyDetailFound = false;
+                                    
+                                    rowSegments.forEach(seg => {
+                                        let segYear = seg.desde.getFullYear();
+                                        let segMonth = seg.desde.getMonth();
+                                        
+                                        let exactMonthHistory = history.filter(h => {
+                                            let matchEmpresa = false;
+                                            if (row.nit && h.nit && row.nit.trim() === h.nit.trim()) {
+                                                matchEmpresa = true;
+                                            } else if (row.empresa && h.empresa) {
+                                                let rEmp = row.empresa.trim().toUpperCase();
+                                                let hEmp = h.empresa.trim().toUpperCase();
+                                                if (rEmp === hEmp || rEmp.includes(hEmp) || hEmp.includes(rEmp)) {
+                                                    matchEmpresa = true;
+                                                }
+                                            }
+                                            if (!matchEmpresa) return false;
+                                            
+                                            if (segYear < 1995) {
+                                                let hStart = parseFlexibleDate(h.desde);
+                                                let hEnd = parseFlexibleDate(h.hasta);
+                                                if (!hStart || !hEnd) return false;
+                                                return (seg.desde <= hEnd && seg.hasta >= hStart);
+                                            } else {
+                                                if (h.periodo) {
+                                                    let targetPeriodo = `${segYear}${String(segMonth + 1).padStart(2, '0')}`;
+                                                    return h.periodo === targetPeriodo;
+                                                } else {
+                                                    let hStart = parseFlexibleDate(h.desde);
+                                                    return hStart && hStart.getFullYear() === segYear && hStart.getMonth() === segMonth;
+                                                }
+                                            }
+                                        });
+
+                                        if (exactMonthHistory.length > 0) {
+                                            let extractedDias = null;
+                                            if (segYear < 1995) {
+                                                let hExact = exactMonthHistory.find(h => {
+                                                    let hStart = parseFlexibleDate(h.desde);
+                                                    let hEnd = parseFlexibleDate(h.hasta);
+                                                    return hStart && hEnd && hStart.getMonth() === hEnd.getMonth() && hStart.getFullYear() === hEnd.getFullYear();
+                                                });
+                                                if (hExact) extractedDias = Number(hExact.dias || 0);
+                                            } else {
+                                                extractedDias = exactMonthHistory.reduce((sum, h) => sum + Number(h.dias || 0), 0);
+                                            }
+
+                                            if (extractedDias !== null) {
+                                                seg.calcDias = extractedDias;
+                                                seg.calcSemanas = Number((extractedDias / 7).toFixed(4));
+                                                seg.observacion = 'Corregido con Detalle de Pagos';
+                                                anyDetailFound = true;
+                                            }
+                                        }
+                                    });
+
+                                    // Lógica ya escrita: Si tras buscar el detalle persiste un desvío, se ajusta proporcionalmente
+                                    let newMathTotalDias = rowSegments.reduce((sum, seg) => sum + seg.calcDias, 0);
+                                    let newMathTotalSemanas = newMathTotalDias / 7;
+                                    let newDiffSemanas = Math.abs(newMathTotalSemanas - targetSemanas);
+                                    
+                                    let stillNeedsCorrection = false;
+                                    if (applyCorrections) {
+                                        stillNeedsCorrection = newDiffSemanas > 0.145;
+                                    } else {
+                                        stillNeedsCorrection = targetSemanas < newMathTotalSemanas && newDiffSemanas > 0.01;
+                                    }
+
+                                    if (stillNeedsCorrection && newMathTotalDias > 0) {
+                                        let ratio = (targetSemanas * 7) / newMathTotalDias;
+                                        let accumulatedSemanas = 0;
+                                        
+                                        for (let i = 0; i < rowSegments.length - 1; i++) {
+                                            let newDias = Math.round(rowSegments[i].calcDias * ratio);
+                                            let newSemanas = Number((newDias / 7).toFixed(4));
+                                            rowSegments[i].calcDias = newDias;
+                                            rowSegments[i].calcSemanas = newSemanas;
+                                            rowSegments[i].observacion = rowSegments[i].observacion === 'Corregido con Detalle de Pagos' ? 'Detalle + Proporcional' : obsText;
+                                            accumulatedSemanas += newSemanas;
+                                        }
+                                        
+                                        let lastNewSemanas = Number((targetSemanas - accumulatedSemanas).toFixed(4));
+                                        let lastNewDias = Math.round(lastNewSemanas * 7);
+                                        rowSegments[rowSegments.length - 1].calcDias = lastNewDias;
+                                        rowSegments[rowSegments.length - 1].calcSemanas = lastNewSemanas;
+                                        rowSegments[rowSegments.length - 1].observacion = rowSegments[rowSegments.length - 1].observacion === 'Corregido con Detalle de Pagos' ? 'Detalle + Proporcional' : obsText;
+                                    }
+                                }
+                            }
+                        }
+
+                        segmentedRows.push(...rowSegments);
+                    });
+
+                    // Ordenar agrupando primero por el orden original del Resumen, luego por NIT, luego cronológicamente
+                    segmentedRows.sort((a,b) => {
+                        if (a.sortIndex !== b.sortIndex) return a.sortIndex - b.sortIndex;
+                        let nA = a.nit || '';
+                        let nB = b.nit || '';
+                        if (nA !== nB) return nA.localeCompare(nB);
+                        return a.desde - b.desde;
+                    });
+
+                    let merges = [];
+                    let startRowIndex = 1;
+                    let currentNit = segmentedRows.length > 0 ? segmentedRows[0].nit : null;
+                    let currentSortIndex = segmentedRows.length > 0 ? segmentedRows[0].sortIndex : 99999;
+                    let currentNitSum = 0;
+
+                    const finalizeGroup = (endRowIndex, nit, sortIdx, sumCalc) => {
+                        let repSemanas = 0;
+                        // Usar el índice exacto (sortIdx) en lugar del NIT, para manejar empleadores repetidos correctamente
+                        const rMatch = sortIdx !== 99999 ? resumenSemanas[sortIdx] : resumenSemanas.find(r => r.nit === nit);
+                        if (rMatch) repSemanas = Number(rMatch.semanas) || 0;
+                        
+                        let totalCalc = Number(sumCalc.toFixed(2));
+                        let diff = Number((totalCalc - repSemanas).toFixed(2));
+
+                        // Rellenar la primera fila del grupo con el índice, totales y diferencias
+                        if (ws3Data[startRowIndex]) {
+                            ws3Data[startRowIndex][0] = sortIdx === 99999 ? '-' : (sortIdx + 1);
+                            ws3Data[startRowIndex][8] = repSemanas;
+                            ws3Data[startRowIndex][9] = totalCalc;
+                            ws3Data[startRowIndex][10] = diff;
+                        }
+
+                        // Generar los merges (combinar celdas) si el empleador tiene múltiples periodos segmentados
+                        if (endRowIndex > startRowIndex) {
+                            merges.push({s: {r: startRowIndex, c: 0}, e: {r: endRowIndex, c: 0}}); // Columna #
+                            merges.push({s: {r: startRowIndex, c: 8}, e: {r: endRowIndex, c: 8}}); // Columna RepSemanas
+                            merges.push({s: {r: startRowIndex, c: 9}, e: {r: endRowIndex, c: 9}}); // Columna CalcTot
+                            merges.push({s: {r: startRowIndex, c: 10}, e: {r: endRowIndex, c: 10}}); // Columna Diff
+                        }
+                    };
+
+                    segmentedRows.forEach((r, idx) => {
+                        if (currentNit !== r.nit || currentSortIndex !== r.sortIndex) {
+                            finalizeGroup(idx, currentNit, currentSortIndex, currentNitSum);
+                            startRowIndex = idx + 1;
+                            currentNit = r.nit;
+                            currentSortIndex = r.sortIndex;
+                            currentNitSum = 0;
+                        }
+                        
+                        currentNitSum += r.calcSemanas;
+
+                        ws3Data.push([
+                            "", // Placeholder para #
+                            r.nit, r.empresa,
+                            `${String(r.desde.getDate()).padStart(2,'0')}/${String(r.desde.getMonth()+1).padStart(2,'0')}/${r.desde.getFullYear()}`,
+                            `${String(r.hasta.getDate()).padStart(2,'0')}/${String(r.hasta.getMonth()+1).padStart(2,'0')}/${r.hasta.getFullYear()}`,
+                            r.ibc, r.calcDias, r.calcSemanas, 
+                            "", "", "", // Columnas vacías que serán sobreescritas por finalizeGroup y combinadas
+                            r.observacion
+                        ]);
+                    });
+
+                    if (segmentedRows.length > 0) {
+                        finalizeGroup(segmentedRows.length, currentNit, currentSortIndex, currentNitSum);
+                    }
+
+                    const ws3 = XLSX.utils.aoa_to_sheet(ws3Data);
+                    ws3['!merges'] = merges;
+                    
+                    const range3 = XLSX.utils.decode_range(ws3['!ref']);
+                    for (let R = 1; R <= range3.e.r; ++R) {
+                        let cellNum = ws3[XLSX.utils.encode_cell({c: 0, r: R})];
+                        if (cellNum) { cellNum.s = { alignment: { vertical: 'top', horizontal: 'center' }, font: { bold: true } }; }
+
+                        let cellIBC = ws3[XLSX.utils.encode_cell({c: 5, r: R})];
+                        if (cellIBC) { cellIBC.t = 'n'; cellIBC.z = '$#,##0'; }
+                        
+                        let cellCalcSem = ws3[XLSX.utils.encode_cell({c: 7, r: R})];
+                        if (cellCalcSem && typeof cellCalcSem.v === 'number') { cellCalcSem.t = 'n'; cellCalcSem.z = '#,##0.0000'; }
+                        
+                        // Formato numérico y alineación vertical para celdas combinadas
+                        for (let col of [8, 9, 10]) {
+                            let cellTot = ws3[XLSX.utils.encode_cell({c: col, r: R})];
+                            if (cellTot && typeof cellTot.v === 'number') { 
+                                cellTot.t = 'n'; 
+                                cellTot.z = '#,##0.00';
+                                cellTot.s = { alignment: { vertical: 'top', horizontal: 'right' } };
+                            }
+                        }
+                        
+                        let isNeg = segmentedRows[R-1] && segmentedRows[R-1].isNegative;
+                        if (isNeg) {
+                            let cellObs = ws3[XLSX.utils.encode_cell({c: 11, r: R})];
+                            if (!cellObs) {
+                                XLSX.utils.sheet_add_aoa(ws3, [[""]], {origin: {c: 11, r: R}});
+                                cellObs = ws3[XLSX.utils.encode_cell({c: 11, r: R})];
+                            }
+                            if (cellObs) {
+                                cellObs.v = "[ALERTA ROJA: VALOR NEGATIVO] " + (cellObs.v || "");
+                            }
+                        }
+                    }
+                    
+                    // Orden final de las hojas: 
+                    // 1. Resumen de Semanas (ya agregado)
+                    // 2. Verificación y Segmentación
+                    // 3. Antes de 1995
+                    // 4. A partir de 1995
+                    XLSX.utils.book_append_sheet(wb, ws3, "Verificación y Segmentación");
+                    XLSX.utils.book_append_sheet(wb, ws1, "Antes de 1995");
+                    XLSX.utils.book_append_sheet(wb, ws2, "A partir de 1995");
+
+                    const sufijo = applyCorrections ? "corregido" : "calculados";
+                    XLSX.writeFile(wb, `Auditoria_Datos_${formData.cedula}_${sufijo}.xlsx`);
+                } catch (e) {
+                    setError("Error al generar Excel de auditoría: " + e.message);
+                }
             };
 
             const Stepper = () => (
@@ -665,11 +1566,19 @@
             );
 
             return (
-                <div className="container py-12">
-                    <div className="max-w-5xl mx-auto">
+                <div className="w-full py-12 px-4 md:px-8">
+                    <div className={`mx-auto transition-all duration-500 ease-in-out ${step === 2 ? 'max-w-7xl 2xl:max-w-[1600px]' : 'max-w-5xl'}`}>
                         <div className="text-center mb-12">
-                            <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">Calculadora de Indemnización Sustitutiva</h1>
-                            <p className="text-slate-600 max-w-2xl mx-auto">Módulo especializado para el cálculo de la indemnización sustitutiva de vejez en el Régimen de Prima Media (Colpensiones), conforme al Decreto 1730 de 2001.</p>
+                            <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+                                {step === 1 ? "Captura de Historia Laboral Colpensiones" : 
+                                 step === 2 ? "Auditoría de Datos Extraídos" : 
+                                 "Liquidación de Indemnización Sustitutiva"}
+                            </h1>
+                            <p className="text-slate-600 max-w-2xl mx-auto">
+                                {step === 1 ? "Módulo especializado para la captura, extracción y auditoría de historias laborales de Colpensiones, y el cálculo actuarial." : 
+                                 step === 2 ? "Verifica y ajusta los periodos cotizados para asegurar la precisión del cálculo actuarial frente al reporte oficial." :
+                                 "Resultados del cálculo actuarial conforme a la fórmula legal del Decreto 1730 de 2001 (ISP = SBC × SC × PPC)."}
+                            </p>
                         </div>
                         
                         <Stepper />
@@ -690,22 +1599,55 @@
                                     <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
                                     <h2 className="text-xl font-bold text-primary flex items-center"><Icon name="user" className="w-5 h-5 mr-2 text-secondary" /> Datos del Afiliado</h2>
                                     
-                                    <div className="space-y-4">
-                                        {/* Orden y estilo alineado con herramienta-liquidacion-pension-rpm */}
+                                    <div className="space-y-5">
                                         <div>
-                                            <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Documento de Identidad (Requerido)</label>
-                                            <input type="text" className="w-full p-3.5 rounded-xl input-legal text-sm font-mono font-semibold" value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} placeholder="Solo números" />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Edad Actual (Requerida)</label>
-                                            <input type="number" className="w-full p-3.5 rounded-xl input-legal text-sm font-bold text-center" value={formData.edad} onChange={e => setFormData({...formData, edad: e.target.value})} placeholder="Ej: 62" />
-                                        </div>
-                                        <div className="flex space-x-4">
-                                            <div className="w-1/3">
-                                                <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Año Cierre</label>
-                                                <input type="number" className="w-full p-3.5 rounded-xl input-legal text-sm font-bold text-center" value={formData.anoLiquidacion} onChange={e => setFormData({...formData, anoLiquidacion: parseInt(e.target.value)})} />
+                                            <label className="text-xs font-semibold text-slate-500 mb-1.5 block uppercase tracking-wide">Nombre del Afiliado <span className="text-slate-400 font-normal normal-case">(Opcional)</span></label>
+                                            <div className="relative">
+                                                <i className="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                                <input type="text" className="w-full p-3.5 pl-11 rounded-xl input-legal text-sm font-semibold" value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} placeholder="Ej: Juan Pérez" />
                                             </div>
                                         </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="text-xs font-semibold text-slate-500 mb-1.5 block uppercase tracking-wide">No. Documento <span className="text-red-500">*</span></label>
+                                                <div className="relative">
+                                                    <i className="fas fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                                    <input type={showCedula ? "text" : "password"} className="w-full p-3.5 pl-11 pr-10 rounded-xl input-legal text-sm font-mono font-semibold tracking-widest" value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} placeholder="Solo números" />
+                                                    <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors" onClick={() => setShowCedula(!showCedula)} title={showCedula ? "Ocultar Cédula" : "Mostrar Cédula"}>
+                                                        <i className={showCedula ? "fas fa-eye-slash" : "fas fa-eye"}></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-semibold text-slate-500 mb-1.5 block uppercase tracking-wide">Edad <span className="text-slate-400 font-normal normal-case">(Opcional)</span></label>
+                                                <input type="number" className="w-full p-3.5 rounded-xl input-legal text-sm font-bold text-center" value={formData.edad} onChange={e => setFormData({...formData, edad: e.target.value})} placeholder="Ej: 62" />
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-2 border-t border-slate-100">
+                                            <label className="text-xs font-semibold text-slate-500 mb-1.5 block uppercase tracking-wide">Fecha de Cierre <span className="text-slate-400 font-normal normal-case">(Cálculo)</span></label>
+                                            <div className="relative">
+                                                <i className="far fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                                <input type="month" className="w-full p-3.5 pl-11 rounded-xl input-legal text-sm font-bold uppercase" 
+                                                    value={`${formData.anoLiquidacion}-${String(formData.mesLiquidacion).padStart(2, '0')}`} 
+                                                    onChange={e => {
+                                                        if (e.target.value) {
+                                                            const [y, m] = e.target.value.split('-');
+                                                            setFormData({...formData, anoLiquidacion: parseInt(y), mesLiquidacion: parseInt(m)});
+                                                        }
+                                                    }} 
+                                                />
+                                            </div>
+                                        </div>
+                                        {!isFechaCierreValid && (
+                                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start space-x-3">
+                                                <i className="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
+                                                <p className="text-xs text-amber-700 font-medium">
+                                                    La fecha de cierre es posterior al mes actual.
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             
@@ -719,7 +1661,7 @@
                                     <div className="text-center flex flex-col items-center px-4">
                                         <Icon name="lock" className="w-12 h-12 text-slate-300 mb-3" />
                                         <h3 className="font-bold text-slate-600">Módulo Bloqueado</h3>
-                                        <p className="text-xs text-slate-500 mt-2">Ingrese Cédula y Edad válidas para habilitar la carga de la Historia Laboral.</p>
+                                        <p className="text-xs text-slate-500 mt-2">Ingrese una Cédula válida para habilitar la carga de la Historia Laboral.</p>
                                     </div>
                                 ) : (
                                     <div className="text-center flex flex-col items-center w-full px-4">
@@ -739,38 +1681,89 @@
                     )}
 
                     {step === 2 && (
-                        <div className="grid md:grid-cols-3 gap-6 animate-in slide-in-from-bottom-4">
-                            <div className="md:col-span-2 card-legal p-8 rounded-2xl space-y-6">
+                        <div className="grid lg:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4">
+                            <div className="lg:col-span-3 card-legal p-4 md:p-8 rounded-2xl space-y-6 w-full overflow-hidden">
                                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4">
                                     <div>
-                                        <h2 className="text-xl font-bold text-primary">Auditoría de Aportes Históricos</h2>
-                                        <p className="text-xs text-slate-500 mt-1">{history.length} registros extraídos en total (Sector Privado)</p>
+                                        <h2 className="text-xl font-bold text-primary">Auditoría de Datos Extraídos</h2>
+                                        <div className="flex space-x-4 mt-2">
+                                            <button 
+                                                className={`text-sm font-semibold pb-2 border-b-2 transition-colors ${activeTab === 'resumen' ? 'border-primary text-primary' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                                                onClick={() => setActiveTab('resumen')}
+                                            >
+                                                Resumen de Semanas ({resumenSemanas.length})
+                                            </button>
+                                            <button 
+                                                className={`text-sm font-semibold pb-2 border-b-2 transition-colors ${activeTab === 'detalle' ? 'border-primary text-primary' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                                                onClick={() => setActiveTab('detalle')}
+                                            >
+                                                Detalle de Pagos ({history.length})
+                                            </button>
+                                        </div>
                                     </div>
-                                    <button className="bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:bg-slate-800 transition-colors shadow-sm flex items-center space-x-2 text-sm w-full sm:w-auto justify-center" onClick={handleCalculate}>
-                                        <Icon name="calc" className="w-4 h-4" />
-                                        <span>Calcular Indemnización</span>
-                                    </button>
+                                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto mt-4 sm:mt-0">
+                                        <button className="bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:bg-slate-800 transition-colors shadow-sm flex items-center space-x-2 text-sm w-full sm:w-auto justify-center" onClick={handleCalculate}>
+                                            <Icon name="calc" className="w-4 h-4" />
+                                            <span>Calcular Indemnización</span>
+                                        </button>
+                                    </div>
                                 </div>
                                 
-                                <div className="overflow-x-auto rounded-xl border border-slate-200 max-h-[400px] shadow-inner">
-                                    <table className="w-full text-sm text-left whitespace-nowrap"><thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold tracking-wider sticky top-0 border-b border-slate-200"><tr><th className="p-4">Empresa / Razón Social</th><th className="p-4">Desde</th><th className="p-4">Hasta</th><th className="p-4 text-right">IBC Mensual ($)</th><th className="p-4 text-center">Días Computables</th><th className="p-4"></th></tr></thead>
-                                    <tbody>{history.map((row, i) => (<tr key={i} className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors">
-                                        <td className="p-3 font-medium text-slate-700 truncate max-w-[200px]" title={row.empresa}>{row.empresa}</td>
-                                        <td className="p-3 font-mono text-xs"><input className="bg-transparent w-24 outline-none border-b border-transparent focus:border-secondary" value={row.desde} onChange={e=>{const h=[...history]; h[i].desde=e.target.value; setHistory(h);}} /></td>
-                                        <td className="p-3 font-mono text-xs"><input className="bg-transparent w-24 outline-none border-b border-transparent focus:border-secondary" value={row.hasta} onChange={e=>{const h=[...history]; h[i].hasta=e.target.value; setHistory(h);}} /></td>
-                                        <td className="p-3 text-right font-semibold text-slate-800"><input className="bg-transparent text-right w-28 outline-none border-b border-transparent focus:border-secondary" type="number" value={row.ibc} onChange={e=>{const h=[...history]; h[i].ibc=parseFloat(e.target.value); setHistory(h);}} /></td>
-                                        <td className="p-3 text-center text-slate-600"><input className="bg-transparent text-center w-16 outline-none border-b border-transparent focus:border-secondary" type="number" value={row.dias} onChange={e=>{const h=[...history]; h[i].dias=parseInt(e.target.value); setHistory(h);}} /></td>
-                                        <td className="p-3 text-center"><button className="text-slate-400 hover:text-red-500 transition-colors p-1" onClick={()=>setHistory(history.filter((_,idx)=>idx!==i))}><Icon name="trash" className="w-4 h-4"/></button></td>
-                                    </tr>))}</tbody></table>
+                                <div className="bg-blue-50/50 border-l-4 border-blue-400 p-4 rounded-r-lg shadow-sm">
+                                    <p className="text-sm text-blue-800 flex items-start gap-2">
+                                        <Icon name="check" className="w-5 h-5 flex-shrink-0 text-blue-500" />
+                                        <span>
+                                            <strong>Recordatorio:</strong> Tienes total libertad para editar, añadir o eliminar datos en estas tablas. Siempre que llegues a este paso o realices un cambio, te recomendamos <strong>Descargar el Excel</strong> en el panel lateral; el archivo reflejará inmediatamente todos los cambios que hayas hecho en pantalla para tu verificación.
+                                        </span>
+                                    </p>
                                 </div>
-                                <button className="text-sm font-semibold text-secondary hover:text-primary transition-colors flex items-center" onClick={()=>setHistory([{empresa:'REGISTRO MANUAL',desde:'01/01/2000',hasta:'30/01/2000',ibc:1300000,semanas:4.29, dias:30}, ...history])}>+ Añadir Periodo Manualmente</button>
+                                
+                                {activeTab === 'resumen' ? (
+                                    <>
+                                        <div className="md:hidden text-[10px] uppercase font-bold text-slate-400 text-right mb-2"><i className="fas fa-arrows-alt-h mr-1"></i> Desliza para editar</div>
+                                        <div className="overflow-x-auto rounded-xl border border-slate-200 max-h-[500px] lg:max-h-none shadow-inner relative">
+                                            <table className="w-full text-sm text-left whitespace-nowrap"><thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold tracking-wider sticky top-0 z-10 border-b border-slate-200 shadow-sm"><tr><th className="p-3 md:p-4">Identificación Empleador</th><th className="p-3 md:p-4">Nombre o Razón Social</th><th className="p-3 md:p-4">Ciclo Desde</th><th className="p-3 md:p-4">Ciclo Hasta</th><th className="p-3 md:p-4 text-right">Asignación Básica Mensual</th><th className="p-3 md:p-4 text-center">Semanas</th><th className="p-3 md:p-4"></th></tr></thead>
+                                            <tbody>{resumenSemanas.map((row, i) => (<tr key={i} className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors group">
+                                                <td className="p-1.5 md:p-2 font-mono text-xs"><input className="bg-transparent w-20 md:w-24 px-2 py-1 outline-none border border-transparent focus:bg-white focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded transition-all hover:bg-black/5" value={row.nit || ''} onChange={e=>{const h=[...resumenSemanas]; h[i].nit=e.target.value; setResumenSemanas(h);}} /></td>
+                                                <td className="p-1.5 md:p-2 font-medium text-slate-700 min-w-[150px] md:min-w-[250px]"><input className="bg-transparent w-full px-2 py-1 outline-none border border-transparent focus:bg-white focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded transition-all hover:bg-black/5 truncate" title={row.empresa} value={row.empresa} onChange={e=>{const h=[...resumenSemanas]; h[i].empresa=e.target.value; setResumenSemanas(h);}} /></td>
+                                                <td className="p-1.5 md:p-2 font-mono text-xs"><input className="bg-transparent w-20 md:w-24 px-2 py-1 outline-none border border-transparent focus:bg-white focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded transition-all hover:bg-black/5" value={row.desde} onChange={e=>{const h=[...resumenSemanas]; h[i].desde=e.target.value; setResumenSemanas(h);}} /></td>
+                                                <td className="p-1.5 md:p-2 font-mono text-xs"><input className="bg-transparent w-20 md:w-24 px-2 py-1 outline-none border border-transparent focus:bg-white focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded transition-all hover:bg-black/5" value={row.hasta} onChange={e=>{const h=[...resumenSemanas]; h[i].hasta=e.target.value; setResumenSemanas(h);}} /></td>
+                                                <td className="p-1.5 md:p-2 text-right font-semibold text-slate-800"><input className="bg-transparent text-right w-24 md:w-28 px-2 py-1 outline-none border border-transparent focus:bg-white focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded transition-all hover:bg-black/5" type="number" value={row.ibc} onChange={e=>{const h=[...resumenSemanas]; h[i].ibc=parseFloat(e.target.value); setResumenSemanas(h);}} /></td>
+                                                <td className="p-1.5 md:p-2 text-center text-slate-600"><input className="bg-transparent text-center w-16 md:w-20 px-2 py-1 outline-none border border-transparent focus:bg-white focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded transition-all hover:bg-black/5" type="number" step="0.01" value={row.semanas} onChange={e=>{const h=[...resumenSemanas]; h[i].semanas=parseFloat(e.target.value); setResumenSemanas(h);}} /></td>
+                                                <td className="p-1.5 md:p-2 text-center"><button className="text-slate-400 hover:text-red-500 transition-colors p-1.5 rounded hover:bg-red-50 opacity-50 group-hover:opacity-100" onClick={()=>setResumenSemanas(resumenSemanas.filter((_,idx)=>idx!==i))}><Icon name="trash" className="w-4 h-4"/></button></td>
+                                            </tr>))}</tbody></table>
+                                        </div>
+                                        <button className="text-sm font-semibold text-secondary hover:text-primary transition-colors flex items-center" onClick={()=>setResumenSemanas([{nit:'', empresa:'NUEVO EMPLEADOR',desde:'01/01/2000',hasta:'30/01/2000',ibc:1300000,semanas:4.29}, ...resumenSemanas])}>+ Añadir Resumen Manualmente</button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="md:hidden text-[10px] uppercase font-bold text-slate-400 text-right mb-2"><i className="fas fa-arrows-alt-h mr-1"></i> Desliza para editar</div>
+                                        <div className="overflow-x-auto rounded-xl border border-slate-200 max-h-[500px] lg:max-h-none shadow-inner relative">
+                                            <table className="w-full text-sm text-left whitespace-nowrap"><thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold tracking-wider sticky top-0 z-10 border-b border-slate-200 shadow-sm"><tr><th className="p-3 md:p-4">Identificación Empleador</th><th className="p-3 md:p-4">Nombre o Razón Social</th><th className="p-3 md:p-4">Ciclo Desde</th><th className="p-3 md:p-4">Ciclo Hasta</th><th className="p-3 md:p-4 text-right">Asignación Básica Mensual</th><th className="p-3 md:p-4 text-center">Días Computables</th><th className="p-3 md:p-4"></th></tr></thead>
+                                            <tbody>{history.map((row, i) => (<tr key={i} className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors group">
+                                                <td className="p-1.5 md:p-2 font-mono text-xs"><input className="bg-transparent w-20 md:w-24 px-2 py-1 outline-none border border-transparent focus:bg-white focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded transition-all hover:bg-black/5" value={row.nit || ''} onChange={e=>{const h=[...history]; h[i].nit=e.target.value; setHistory(h);}} /></td>
+                                                <td className="p-1.5 md:p-2 font-medium text-slate-700 min-w-[150px] md:min-w-[250px]"><input className="bg-transparent w-full px-2 py-1 outline-none border border-transparent focus:bg-white focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded transition-all hover:bg-black/5 truncate" title={row.empresa} value={row.empresa} onChange={e=>{const h=[...history]; h[i].empresa=e.target.value; setHistory(h);}} /></td>
+                                                <td className="p-1.5 md:p-2 font-mono text-xs"><input className="bg-transparent w-20 md:w-24 px-2 py-1 outline-none border border-transparent focus:bg-white focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded transition-all hover:bg-black/5" value={row.desde} onChange={e=>{const h=[...history]; h[i].desde=e.target.value; setHistory(h);}} /></td>
+                                                <td className="p-1.5 md:p-2 font-mono text-xs"><input className="bg-transparent w-20 md:w-24 px-2 py-1 outline-none border border-transparent focus:bg-white focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded transition-all hover:bg-black/5" value={row.hasta} onChange={e=>{const h=[...history]; h[i].hasta=e.target.value; setHistory(h);}} /></td>
+                                                <td className="p-1.5 md:p-2 text-right font-semibold text-slate-800"><input className="bg-transparent text-right w-24 md:w-28 px-2 py-1 outline-none border border-transparent focus:bg-white focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded transition-all hover:bg-black/5" type="number" value={row.ibc} onChange={e=>{const h=[...history]; h[i].ibc=parseFloat(e.target.value); setHistory(h);}} /></td>
+                                                <td className="p-1.5 md:p-2 text-center text-slate-600"><input className="bg-transparent text-center w-14 md:w-16 px-2 py-1 outline-none border border-transparent focus:bg-white focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded transition-all hover:bg-black/5" type="number" value={row.dias} onChange={e=>{const h=[...history]; h[i].dias=parseInt(e.target.value); setHistory(h);}} /></td>
+                                                <td className="p-1.5 md:p-2 text-center"><button className="text-slate-400 hover:text-red-500 transition-colors p-1.5 rounded hover:bg-red-50 opacity-50 group-hover:opacity-100" onClick={()=>setHistory(history.filter((_,idx)=>idx!==i))}><Icon name="trash" className="w-4 h-4"/></button></td>
+                                            </tr>))}</tbody></table>
+                                        </div>
+                                        <button className="text-sm font-semibold text-secondary hover:text-primary transition-colors flex items-center" onClick={()=>setHistory([{nit:'', empresa:'REGISTRO MANUAL',desde:'01/01/2000',hasta:'30/01/2000',ibc:1300000,semanas:4.29, dias:30}, ...history])}>+ Añadir Periodo Manualmente</button>
+                                    </>
+                                )}
                             </div>
 
-                            <aside className="md:col-span-1 card-legal p-6 border border-slate-100">
+                            <aside className="lg:col-span-1 card-legal p-6 border border-slate-100 h-fit sticky top-6">
                                 <h3 className="text-sm font-bold text-slate-700 mb-3">Validador de Semanas Cotizadas</h3>
                                 <div className="space-y-3 text-sm text-slate-600">
+                                    <div className="flex justify-between items-center text-primary bg-blue-50 p-2 rounded">
+                                        <span className="font-semibold">Semanas cotizadas según reporte</span>
+                                        <span className="font-bold">{totalSemanasPDF !== null ? totalSemanasPDF.toFixed(2) : '—'}</span>
+                                    </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="font-semibold">Semanas Reportadas</span>
+                                        <span className="font-semibold">Semanas sumadas reporte</span>
                                         <span>{audit.reported !== null ? audit.reported.toFixed(2) : '—'}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
@@ -785,11 +1778,18 @@
                                         <span className="font-semibold">Periodos corregidos</span>
                                         <span>{audit.correctedCount || 0}</span>
                                     </div>
-                                    <div className="pt-2 border-t border-slate-100">
-                                        <label className="flex items-center space-x-3">
-                                            <input id="indemnizacion-toggle-correction" type="checkbox" checked={applyCorrections} onChange={e=>{ setApplyCorrections(e.target.checked); const a = computeAudit(history, e.target.checked); setAudit({ reported: a.reported, calculated: a.calculated, gap: a.gap, correctedCount: a.correctedCount }); }} />
-                                            <span className="text-sm">Aplicar "Corrección Automática a 30 días"</span>
+                                    <div className="pt-3 mt-2 border-t border-slate-100 flex flex-col gap-3">
+                                        <label className="flex items-center space-x-3 cursor-pointer">
+                                            <input id="indemnizacion-toggle-correction" type="checkbox" checked={applyCorrections} onChange={e=>{ setApplyCorrections(e.target.checked); const a = computeAudit(history, e.target.checked, resumenSemanas); setAudit({ reported: a.reported, calculated: a.calculated, gap: a.gap, correctedCount: a.correctedCount }); }} className="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary focus:ring-2" />
+                                            <span className="text-sm font-medium text-slate-700">Ajustar cálculos proporcionales al reporte PDF de Colpensiones</span>
                                         </label>
+                                        <button 
+                                            className="bg-white border border-secondary text-secondary text-xs font-bold px-4 py-2 rounded-lg hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center space-x-2 w-full" 
+                                            onClick={exportAuditExcel}
+                                        >
+                                            <Icon name="table" className="w-4 h-4" />
+                                            <span>{applyCorrections ? 'Descargar Excel Ajustado' : 'Descargar Excel - Resumen semanas'}</span>
+                                        </button>
                                     </div>
                                     <div className="mt-3 text-xs text-slate-500">Si detectamos discrepancias, el motor usará el cómputo matemático total (Días/7) para la liquidación.</div>
                                 </div>
@@ -802,29 +1802,29 @@
                             
                             <div className="grid md:grid-cols-3 gap-4">
                                 <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-primary">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Total Semanas a Pagar (S)</p>
-                                    <h3 className="text-2xl font-black text-primary mt-1">{results.semanas.toFixed(2)}</h3>
-                                    <p className="text-xs text-slate-500 mt-1">Sin simultaneidad extra ni sector público</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">SBC — Salario Base Semanal</p>
+                                    <h3 className="text-2xl font-black text-primary mt-1">{formatCurrency(results.SBC)}</h3>
+                                    <p className="text-xs text-slate-500 mt-1">IMP: {formatCurrency(results.ingresoMensualPromedio)} × 7/30</p>
                                 </div>
                                 <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-accent">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Salario Base Liquidación (SBC)</p>
-                                    <h3 className="text-2xl font-black text-primary mt-1">{formatCurrency(results.sbcMensual)}</h3>
-                                    <p className="text-xs text-slate-500 mt-1">Promedio mensual indexado</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">SC — Semanas Cotizadas</p>
+                                    <h3 className="text-2xl font-black text-primary mt-1">{results.SC.toFixed(2)}</h3>
+                                    <p className="text-xs text-slate-500 mt-1">{results.totalDias.toFixed(2)} días / 7</p>
                                 </div>
                                 <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-secondary">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Porcentaje Ponderado (P)</p>
-                                    <h3 className="text-2xl font-black text-primary mt-1">{(results.pPonderado * 100).toFixed(2)}%</h3>
-                                    <p className="text-xs text-slate-500 mt-1">Promedio de aportes por rango de ley</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">PPC — % Ponderado Cotización</p>
+                                    <h3 className="text-2xl font-black text-primary mt-1">{(results.PPC * 100).toFixed(4)}%</h3>
+                                    <p className="text-xs text-slate-500 mt-1">Σ(P×días) / Σ(días)</p>
                                 </div>
                             </div>
 
                             <div className="card-legal p-8 rounded-2xl flex flex-col items-center bg-slate-50 border-2 border-secondary/30 relative">
-                                <div className="absolute top-0 right-0 bg-secondary text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-lg rounded-tr-xl tracking-wider">DECRETO 1730/2001</div>
+                                <div className="absolute top-0 right-0 bg-secondary text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-lg rounded-tr-xl tracking-wider">DECRETO 1730/2001 ART. 3</div>
                                 <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2 mt-4">Indemnización Sustitutiva a Recibir</p>
                                 <p className="text-5xl md:text-6xl font-black text-primary mb-4">{formatCurrency(results.indemnizacion)}</p>
                                 <div className="bg-white border border-slate-200 px-6 py-3 rounded-lg text-sm text-slate-600 font-mono flex flex-col items-center shadow-sm">
-                                    <span className="font-bold text-primary mb-1">Ecuación Aplicada: I = SBC × S × P</span>
-                                    <span>S = (Semanas / 4.2857) factor mensual</span>
+                                    <span className="font-bold text-primary mb-1">ISP = SBC × SC × PPC</span>
+                                    <span>{formatCurrency(results.SBC)} × {results.SC.toFixed(2)} × {(results.PPC * 100).toFixed(4)}%</span>
                                 </div>
                             </div>
 
@@ -837,41 +1837,132 @@
                                     {showDetails ? "Ocultar Detalle Actuarial (Tabla Mensualizada)" : "Ver Detalle Actuarial (Tabla Mensualizada)"}
                                 </button>
 
-                                {showDetails && (
-                                    <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 shadow-inner bg-white max-h-[500px] animate-in slide-in-from-top-4">
-                                        <table className="w-full text-xs text-left whitespace-nowrap">
-                                            <thead className="bg-slate-100 text-slate-600 uppercase font-bold tracking-wider sticky top-0 border-b border-slate-200 shadow-sm">
-                                                <tr>
-                                                    <th className="p-3">Aportantes (Agrupados)</th>
-                                                    <th className="p-3 text-center">Periodo</th>
-                                                    <th className="p-3 text-center">Días</th>
-                                                    <th className="p-3 text-right">IBC CONSOLIDADO</th>
-                                                    <th className="p-3 text-right font-bold text-primary">IBC INDEXADO</th>
-                                                    <th className="p-3 text-center text-secondary">TASA (P)</th>
-                                                    <th className="p-3 text-right font-bold text-accent">SBC PARCIAL</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {results.detailedReport.map((r, i) => (
-                                                    <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                                        <td className="p-3 font-medium text-slate-700 truncate max-w-[150px]" title={r.empresa}>{r.empresa}</td>
-                                                        <td className="p-3 font-mono text-center">{r.mes}</td>
-                                                        <td className="p-3 text-center font-bold">{r.dias.toFixed(2)}</td>
-                                                        <td className="p-3 text-right text-slate-500">{formatCurrency(r.ibcHistorico)}</td>
-                                                        <td className="p-3 text-right font-bold text-primary">{formatCurrency(r.ibcIndexado)}</td>
-                                                        <td className="p-3 text-center font-bold text-secondary">{(r.tasaP * 100).toFixed(1)}%</td>
-                                                        <td className="p-3 text-right font-bold text-accent">{formatCurrency(r.iaXDias)}</td>
-                                                    </tr>
-                                                ))}
-                                                <tr className="bg-slate-100 font-bold border-t-2 border-slate-300">
-                                                    <td colSpan="2" className="p-3 text-right">TOTALES:</td>
-                                                    <td className="p-3 text-center">{results.totalDias.toFixed(2)}</td>
-                                                    <td colSpan="4"></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                {showDetails && (() => {
+                                    const pre95 = results.detailedReport.filter(r => r.seccion === 'pre1995').sort((a,b) => a.mes.localeCompare(b.mes));
+                                    const post95 = results.detailedReport.filter(r => r.seccion === 'post1995').sort((a,b) => a.mes.localeCompare(b.mes));
+                                    const pre95Dias = pre95.reduce((s,r) => s + r.dias, 0);
+                                    const pre95DiasCot = pre95.reduce((s,r) => s + (r.diasCot || Math.max(0, r.dias)), 0);
+                                    const post95Dias = post95.reduce((s,r) => s + r.dias, 0);
+                                    const post95DiasCot = post95.reduce((s,r) => s + (r.diasCot != null ? r.diasCot : r.dias), 0);
+                                    return (
+                                    <div className="mt-4 space-y-6 animate-in slide-in-from-top-4">
+                                        {/* SECCIÓN 1: ANTES DE 1995 */}
+                                        {pre95.length > 0 && (
+                                        <div>
+                                            <h4 className="text-sm font-bold text-primary mb-2 uppercase tracking-wide">Detalle de Pagos Efectuados Anteriores a 1995</h4>
+                                            <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-inner bg-white max-h-[400px]">
+                                                <table className="w-full text-[10px] text-left whitespace-nowrap">
+                                                    <thead className="bg-slate-100 text-slate-600 uppercase font-bold tracking-wider sticky top-0 border-b border-slate-200">
+                                                        <tr>
+                                                            <th className="p-2">(1) NIT</th>
+                                                            <th className="p-2">(2) Razón Social</th>
+                                                            <th className="p-2 text-center">(3) Desde</th>
+                                                            <th className="p-2 text-center">(4) Hasta</th>
+                                                            <th className="p-2 text-right">(5) Salario (IBC)</th>
+                                                            <th className="p-2 text-center">(6) Semanas</th>
+                                                            <th className="p-2 text-center">(7) Días</th>
+                                                            <th className="p-2 text-center">(8) % Cotiz.</th>
+                                                            <th className="p-2 text-center">Fecha IPC Final</th>
+                                                            <th className="p-2 text-right">(9) IPC Final</th>
+                                                            <th className="p-2 text-center">Fecha IPC Inicial</th>
+                                                            <th className="p-2 text-right">(10) IPC Inicial</th>
+                                                            <th className="p-2 text-right">(11) IBC Indexado</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {pre95.map((r, i) => (
+                                                            <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                                                <td className="p-2 font-mono text-slate-500">{r.nit || ''}</td>
+                                                                <td className="p-2 font-medium text-slate-700 truncate max-w-[140px]" title={r.empresa}>{r.empresa}</td>
+                                                                <td className="p-2 font-mono text-center">{r.desde}</td>
+                                                                <td className="p-2 font-mono text-center">{r.hasta}</td>
+                                                                <td className="p-2 text-right text-slate-600">{formatCurrency(r.ibcHistorico)}</td>
+                                                                <td className="p-2 text-center text-slate-600">{r.semanas.toFixed(3)}</td>
+                                                                <td className={`p-2 text-center font-bold ${r.dias < 0 ? 'text-red-600' : ''}`}>{r.dias}</td>
+                                                                <td className="p-2 text-center font-bold text-secondary">{(r.tasaP * 100).toFixed(2)}%</td>
+                                                                <td className="p-2 text-center text-slate-500">{r.ipcFinalFecha}</td>
+                                                                <td className="p-2 text-right text-slate-600">{r.ipcFinal.toFixed(4)}</td>
+                                                                <td className="p-2 text-center text-slate-500">{r.ipcInicialFecha}</td>
+                                                                <td className="p-2 text-right text-slate-600">{r.ipcInicial.toFixed(4)}</td>
+                                                                <td className="p-2 text-right font-bold text-primary">{formatCurrency(r.ibcIndexado)}</td>
+                                                            </tr>
+                                                        ))}
+                                                        <tr className="bg-slate-100 font-bold border-t-2 border-slate-300">
+                                                            <td colSpan="5" className="p-2 text-right">Subtotal Pre-1995:</td>
+                                                            <td className="p-2 text-center">{pre95.reduce((s,r) => s + r.semanas, 0).toFixed(3)}</td>
+                                                            <td className="p-2 text-center">{pre95Dias} <span className="text-xs text-slate-400">(Cot: {pre95DiasCot})</span></td>
+                                                            <td colSpan="6"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        )}
+
+                                        {/* SECCIÓN 2: A PARTIR DE 1995 */}
+                                        {post95.length > 0 && (
+                                        <div>
+                                            <h4 className="text-sm font-bold text-primary mb-2 uppercase tracking-wide">Detalle de Pagos Efectuados a Partir de 1995</h4>
+                                            <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-inner bg-white max-h-[400px]">
+                                                <table className="w-full text-[10px] text-left whitespace-nowrap">
+                                                    <thead className="bg-slate-100 text-slate-600 uppercase font-bold tracking-wider sticky top-0 border-b border-slate-200">
+                                                        <tr>
+                                                            <th className="p-2">(1) NIT</th>
+                                                            <th className="p-2">(2) Razón Social</th>
+                                                            <th className="p-2 text-center">(3) Desde</th>
+                                                            <th className="p-2 text-center">(4) Hasta</th>
+                                                            <th className="p-2 text-right">(5) Salario (IBC)</th>
+                                                            <th className="p-2 text-center">(6) Semanas</th>
+                                                            <th className="p-2 text-center">(7) Días Rep</th>
+                                                            <th className="p-2 text-center">(7b) Días Cot</th>
+                                                            <th className="p-2 text-center">(8) % Cotiz.</th>
+                                                            <th className="p-2 text-center">Fecha IPC Final</th>
+                                                            <th className="p-2 text-right">(9) IPC Final</th>
+                                                            <th className="p-2 text-center">Fecha IPC Inicial</th>
+                                                            <th className="p-2 text-right">(10) IPC Inicial</th>
+                                                            <th className="p-2 text-right">(11) IBC Indexado</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {post95.map((r, i) => (
+                                                            <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                                                <td className="p-2 font-mono text-slate-500">{r.nit || ''}</td>
+                                                                <td className="p-2 font-medium text-slate-700 truncate max-w-[140px]" title={r.empresa}>{r.empresa}</td>
+                                                                <td className="p-2 font-mono text-center">{r.desde}</td>
+                                                                <td className="p-2 font-mono text-center">{r.hasta}</td>
+                                                                <td className="p-2 text-right text-slate-600">{formatCurrency(r.ibcHistorico)}</td>
+                                                                <td className="p-2 text-center text-slate-600">{r.semanas.toFixed(3)}</td>
+                                                                <td className={`p-2 text-center ${r.dias !== (r.diasCot != null ? r.diasCot : r.dias) ? 'text-red-500' : ''}`}>{r.dias}</td>
+                                                                <td className="p-2 text-center font-bold text-primary">{r.diasCot != null ? r.diasCot : r.dias}</td>
+                                                                <td className="p-2 text-center font-bold text-secondary">{(r.tasaP * 100).toFixed(2)}%</td>
+                                                                <td className="p-2 text-center text-slate-500">{r.ipcFinalFecha}</td>
+                                                                <td className="p-2 text-right text-slate-600">{r.ipcFinal.toFixed(4)}</td>
+                                                                <td className="p-2 text-center text-slate-500">{r.ipcInicialFecha}</td>
+                                                                <td className="p-2 text-right text-slate-600">{r.ipcInicial.toFixed(4)}</td>
+                                                                <td className="p-2 text-right font-bold text-primary">{formatCurrency(r.ibcIndexado)}</td>
+                                                            </tr>
+                                                        ))}
+                                                        <tr className="bg-slate-100 font-bold border-t-2 border-slate-300">
+                                                            <td colSpan="5" className="p-2 text-right">Subtotal Post-1995:</td>
+                                                            <td className="p-2 text-center">{post95.reduce((s,r) => s + r.semanas, 0).toFixed(3)}</td>
+                                                            <td className="p-2 text-center">{post95Dias}</td>
+                                                            <td className="p-2 text-center font-bold text-primary">{post95DiasCot}</td>
+                                                            <td colSpan="6"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        )}
+
+                                        {/* TOTAL GENERAL */}
+                                        <div className="bg-slate-100 p-4 rounded-xl flex justify-between items-center font-bold text-sm">
+                                            <span className="text-slate-700">TOTAL GENERAL DÍAS:</span>
+                                            <span className="text-primary text-lg">{results.totalDias}</span>
+                                        </div>
                                     </div>
-                                )}
+                                    );
+                                })()}
                             </div>
 
                             <div className="card-legal p-6 md:p-8 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6 bg-slate-50 border-l-4 border-l-primary mt-8">

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html><head><title>PDF Extractor V2</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head><body>
+<h2>PDF Extractor V2</h2>
+<input type="file" id="pdfInput" accept=".pdf">
+<label>Pwd: <input type="text" id="pwd" value="73096218"></label>
+<button onclick="extract()">Extract</button>
+<pre id="output" style="white-space:pre-wrap;font-size:10px;max-height:85vh;overflow:auto;"></pre>
+<script>
+async function extract() {
+    const file = document.getElementById('pdfInput').files[0];
+    if (!file) return alert('Select PDF');
+    const pw = document.getElementById('pwd').value;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const buf = await file.arrayBuffer();
+    let doc;
+    try { doc = await pdfjsLib.getDocument({data:buf,password:pw}).promise; }
+    catch(e) { try { doc = await pdfjsLib.getDocument({data:buf,password:'CC'+pw}).promise; } catch(e2) { return; } }
+    
+    let out = '';
+    let fullText = '';
+    
+    for (let i = 1; i <= doc.numPages; i++) {
+        const page = await doc.getPage(i);
+        const content = await page.getTextContent();
+        const pageText = content.items.map(it => it.str).join(' ');
+        fullText += pageText + '\n';
+    }
+    
+    // Remove RESUMEN DE SEMANAS section
+    let cleanText = fullText;
+    const resIdx = cleanText.search(/RESUMEN\s+DE\s+SEMANAS\s+COTIZADAS/i);
+    if (resIdx > -1) {
+        const after = cleanText.substring(resIdx);
+        const nextDet = after.search(/DETALLE\s+DE\s+PAGOS/i);
+        if (nextDet > -1) {
+            cleanText = cleanText.substring(0, resIdx) + cleanText.substring(resIdx + nextDet);
+        }
+    }
+    
+    // Split into pre/post 95
+    let pre95T = cleanText, post95T = '';
+    const splitIdx = cleanText.search(/PAGOS\s+EFECTUADOS\s+A\s+PARTIR\s+DE\s+1995/i);
+    if (splitIdx > -1) {
+        pre95T = cleanText.substring(0, splitIdx);
+        post95T = cleanText.substring(splitIdx);
+    }
+    
+    out += '=== PRE-95 TEXT (' + pre95T.length + ' chars) ===\n';
+    out += pre95T + '\n\n';
+    
+    out += '=== POST-95 TEXT (' + post95T.length + ' chars) ===\n';
+    out += post95T.substring(0, 5000) + '\n\n';
+    
+    // Test the CORRECTED pre-95 regex
+    const regexPre = /(\d{5,15})\s+([^$]{3,60}?)\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})\s+([\-\d.,]+)\s+\$\s*([\d.,]+)\s+(\d{1,2}\s*[\/\-]\s*\d{1,2}\s*[\/\-]\s*\d{4})/g;
+    let m, pre95Rows = [];
+    while ((m = regexPre.exec(pre95T)) !== null) {
+        const emp = m[2].trim().toUpperCase();
+        if (emp.includes('RAZÓN') || emp.includes('ADMINISTRADORA') || emp.includes('NOMBRE') || emp === 'NIT' || emp.includes('SEMANAS')) continue;
+        pre95Rows.push({nit:m[1], emp:m[2].trim(), desde:m[3], dias:m[4], ibc:m[5], hasta:m[6]});
+    }
+    
+    out += '=== PRE-95 REGEX MATCHES: ' + pre95Rows.length + ' ===\n';
+    let totalDiasPre = 0;
+    pre95Rows.forEach((r, i) => {
+        const d = parseFloat(r.dias.replace(/\./g,'').replace(',','.'));
+        totalDiasPre += d;
+        out += (i+1) + '. ' + r.nit + ' | ' + r.emp + ' | ' + r.desde + ' | D:' + r.dias + ' | $' + r.ibc + ' | ' + r.hasta + '\n';
+    });
+    out += 'Pre-95 Total Days: ' + totalDiasPre + ' | Weeks: ' + (totalDiasPre/7).toFixed(2) + '\n\n';
+    
+    // Test post-95 primary regex
+    const regexPost = /(\d{5,15})\s+(.{3,60}?)\s+(?:SI|NO)\s+(\d{4})(\d{2})\s+\$\s*([\d.,]+)\s+\$\s*[\d.,]+\s+\$\s*[\d.,\-]*\s+(?:[A-Z]?\s+)?(\d{1,3})\s+\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}\s+\S+\s+(?:.*?)\s+(\d{1,3})/g;
+    let post95Rows = [];
+    while ((m = regexPost.exec(post95T)) !== null) {
+        const emp = m[2].trim().toUpperCase();
+        if (emp.includes('RAZÓN') || emp.includes('NOMBRE') || emp === 'NIT') continue;
+        post95Rows.push({nit:m[1], emp:m[2].trim(), per:m[3]+m[4], ibc:m[5], dRep:m[6], dCot:m[7]});
+    }
+    
+    out += '=== POST-95 PRIMARY REGEX: ' + post95Rows.length + ' ===\n';
+    let totalDiasPost = 0;
+    post95Rows.forEach((r, i) => {
+        totalDiasPost += parseInt(r.dCot);
+        out += (i+1) + '. ' + r.nit + ' | ' + r.emp + ' | ' + r.per + ' | $' + r.ibc + ' | Rep:' + r.dRep + ' | Cot:' + r.dCot + '\n';
+    });
+    out += 'Post-95 Total DiasCot: ' + totalDiasPost + ' | Weeks: ' + (totalDiasPost/7).toFixed(2) + '\n\n';
+    
+    // Fallback post-95 regex
+    const regexPostAlt = /(\d{5,15})\s+(.{3,60}?)\s+(?:SI|NO)\s+(\d{4})(\d{2})\s+\$\s*([\d.,]+)\s+\$\s*[\d.,]+\s+\$\s*[\d.,\-]*/g;
+    let post95AltRows = [];
+    while ((m = regexPostAlt.exec(post95T)) !== null) {
+        const emp = m[2].trim().toUpperCase();
+        if (emp.includes('RAZÓN') || emp.includes('NOMBRE') || emp === 'NIT') continue;
+        const afterM = post95T.substring(m.index + m[0].length);
+        const dm = afterM.match(/^\s*(?:[A-Z]\s+)?(\d{1,3})\s+\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}\s+\S+(?:\s+[^\d]*?)?\s+(\d{1,3})/);
+        if (dm) {
+            post95AltRows.push({nit:m[1], emp:m[2].trim(), per:m[3]+m[4], ibc:m[5], dRep:dm[1], dCot:dm[2]});
+        }
+    }
+    out += '=== POST-95 ALT REGEX: ' + post95AltRows.length + ' ===\n';
+    
+    // GRAND TOTAL
+    const totalW = (totalDiasPre + totalDiasPost) / 7;
+    out += '\n=== GRAND TOTAL ===\nDías Pre-95: ' + totalDiasPre + '\nDías Post-95: ' + totalDiasPost + '\nTotal Días: ' + (totalDiasPre + totalDiasPost) + '\nTotal Semanas: ' + totalW.toFixed(2) + '\n';
+    out += 'Expected: 1,014.00 semanas = 7,098 días\n';
+    
+    document.getElementById('output').textContent = out;
+}
+</script>
+</body></html>
