@@ -1396,12 +1396,8 @@
                                     let newMathTotalSemanas = newMathTotalDias / 7;
                                     let newDiffSemanas = Math.abs(newMathTotalSemanas - targetSemanas);
                                     
-                                    let stillNeedsCorrection = false;
-                                    if (applyCorrections) {
-                                        stillNeedsCorrection = newDiffSemanas > 0.145;
-                                    } else {
-                                        stillNeedsCorrection = targetSemanas < newMathTotalSemanas && newDiffSemanas > 0.01;
-                                    }
+                                    // El Paso 5 (ajuste proporcional) solo se activa si el check está marcado (applyCorrections === true)
+                                    let stillNeedsCorrection = applyCorrections && (newDiffSemanas > 0.145);
 
                                     if (stillNeedsCorrection && newMathTotalDias > 0) {
                                         let ratio = (targetSemanas * 7) / newMathTotalDias;
