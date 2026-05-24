@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cálculos Régimen de Prima Media Colpensiones | Tu Abogado Laboral</title>
+    <title>Captura de Historia Laboral Colpensiones | Tu Abogado Laboral</title>
     
-    <meta name="description" content="Módulo especializado para la captura y auditoría de historia laboral de Colpensiones, y cálculo de pensión, indemnización sustitutiva, entre otros.">
+    <meta name="description" content="Módulo especializado para la captura y auditoría de historia laboral de Colpensiones, y cálculo actuarial para Indemnización Sustitutiva de Vejez Colombia (Decreto 1730/2001).">
     
     <link rel="icon" type="image/webp" href="img/favicon.webp" />
     <link rel="stylesheet" href="css/critical.css" />
@@ -105,583 +105,20 @@
                     <span class="sep">/</span>
                     <a href="herramientas.html">Herramientas</a>
                     <span class="sep">/</span>
-                    <span class="current">Cálculos Régimen de Prima Media Colpensiones</span>
+                    <span class="current">Indemnización Sustitutiva</span>
                 </div>
             </div>
 
         <div id="root"></div>
 
-    <script src="js/datos-historios-ipc-smlv.js"></script>
-    <script>
-        // =========================================================================
-        // MOTOR DE CÁLCULO: PENSIÓN DE VEJEZ (Inlined para evitar cache/SW issues)
-        // =========================================================================
-        // js/calculadora-pension-vejez.js
-
-/**
- * Motor de cálculo actuarial para Pensión de Vejez (Régimen de Prima Media).
- * Ley 100 de 1993, Ley 797 de 2003 y Jurisprudencia Corte Suprema de Justicia.
- */
-
-// Helper local para parsear fechas
-const _parseFlexibleDate = (val) => {
-    if (!val) return null;
-    const str = String(val).trim();
-    const parts = str.split(/[\/\-]/);
-    if (parts.length === 3) {
-        if (parts[2].length === 4) return new Date(parts[2], parts[1]-1, parts[0]);
-        else if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
-    }
-    return new Date(str);
-};
-
-// Helper local para días comerciales (360)
-const _getDiasComerciales = (fechaInicio, fechaFin) => {
-    let d1 = fechaInicio.getDate();
-    let m1 = fechaInicio.getMonth();
-    let y1 = fechaInicio.getFullYear();
-    let d2 = fechaFin.getDate();
-    let m2 = fechaFin.getMonth();
-    let y2 = fechaFin.getFullYear();
-    
-    if (d1 === 31) d1 = 30;
-    if (d2 === 31) d2 = 30;
-    
-    const esFinFebrero1 = (m1 === 1) && (d1 === 28 || d1 === 29);
-    const esFinFebrero2 = (m2 === 1) && (d2 === 28 || d2 === 29);
-    if (esFinFebrero1) d1 = 30;
-    if (esFinFebrero2) d2 = 30;
-    
-    return ((y2 - y1) * 360) + ((m2 - m1) * 30) + (d2 - d1) + 1;
-};
-
-// Helper local para determinar mes comercial completo
-const _isFullCommercialMonth = (start, end) => {
-    if (!start || !end) return false;
-    if (start.getFullYear() !== end.getFullYear() || start.getMonth() !== end.getMonth()) return false;
-    const dias = _getDiasComerciales(start, end);
-    return dias >= 30 && start.getDate() <= 3;
-};
-
-/**
- * Ejecuta la estimación de pensión de vejez a partir del historial laboral de Colpensiones.
- */
-function calcularPensionVejez(history, formData, applyCorrections, safeGetIpc, totalSemanasPDF) {
-    const doIBLCalculation = (isTodaVida = false) => {
-        let targetFinalYear = formData.anoLiquidacion;
-        const ipcFinalKey = `${targetFinalYear - 1}-12`;
-        let ipcFinal = safeGetIpc(ipcFinalKey);
-        
-        let monthlyAggregation = {};
-        history.forEach((row) => {
-            if (!row.desde || !row.hasta || row.ibc <= 0) return;
-            const dStart = _parseFlexibleDate(row.desde);
-            const dEnd = _parseFlexibleDate(row.hasta);
-            if (!dStart || !dEnd || dStart > dEnd) return;
-
-            let curStart = new Date(dStart.getTime());
-            while (curStart <= dEnd) {
-                let curYear = curStart.getFullYear();
-                let curMonth = curStart.getMonth();
-                let endOfMonth = new Date(curYear, curMonth + 1, 0);
-                let actEnd = dEnd < endOfMonth ? new Date(dEnd.getTime()) : new Date(endOfMonth.getTime());
-
-                const mKey = `${curYear}-${String(curMonth + 1).padStart(2, '0')}`;
-                if (!monthlyAggregation[mKey]) {
-                    monthlyAggregation[mKey] = {
-                        year: curYear,
-                        month: curMonth + 1,
-                        dayIbcMap: {},
-                        empresas: new Set()
-                    };
-                }
-
-                let actualStart = curStart.getDate();
-                let actualEnd = actEnd.getDate();
-                if (actualStart === 31) actualStart = 30;
-                if (actualEnd === 31) actualEnd = 30;
-                const isFebEnd = (curMonth === 1) && (actualEnd === 28 || actualEnd === 29);
-                if (isFebEnd) actualEnd = 30;
-
-                const periodStart = new Date(curStart.getTime());
-                const periodEnd = new Date(actEnd.getTime());
-                const applyCorrFullMonth = applyCorrections && _isFullCommercialMonth(periodStart, periodEnd);
-
-                let dayFrom = actualStart;
-                let dayTo = actualEnd;
-                if (applyCorrFullMonth) { dayFrom = 1; dayTo = 30; }
-
-                for (let d = dayFrom; d <= dayTo; d++) {
-                    const existing = monthlyAggregation[mKey].dayIbcMap[d] || 0;
-                    monthlyAggregation[mKey].dayIbcMap[d] = Math.max(existing, row.ibc);
-                }
-
-                monthlyAggregation[mKey].empresas.add(row.empresa);
-                curStart = new Date(curYear, curMonth + 1, 1);
-            }
-        });
-
-        let aggregatedMonthsData = Object.keys(monthlyAggregation).map(k => monthlyAggregation[k]);
-        aggregatedMonthsData.sort((a, b) => {
-            if (a.year !== b.year) return b.year - a.year;
-            return b.month - a.month;
-        });
-        
-        let targetDays = isTodaVida ? Infinity : 3600;
-        let remainingDays = targetDays; 
-        let sumIaXDias = 0; 
-        let consumedDays = 0;
-        let detailedReport = []; 
-        
-        for (const seg of aggregatedMonthsData) {
-            if (remainingDays <= 0) break;
-            
-            const dayKeys = seg.dayIbcMap ? Object.keys(seg.dayIbcMap).map(x => parseInt(x, 10)) : [];
-            const realActiveDaysInMonth = Math.min(dayKeys.length, 30);
-            if (realActiveDaysInMonth === 0) continue;
-
-            const daysToTake = Math.min(realActiveDaysInMonth, remainingDays);
-            const monthlyIBCContributionSum = dayKeys.reduce((s, d) => s + (seg.dayIbcMap[d] || 0), 0);
-            const combinedAveragedMonthlyRate = monthlyIBCContributionSum / realActiveDaysInMonth;
-
-            const monthStr = String(seg.month).padStart(2, '0');
-            
-            const ipcInicialKey = `${seg.year - 1}-12`;
-            const ipcInicial = safeGetIpc(ipcInicialKey) || 1; 
-            
-            const factorIndexacion = ipcFinal / ipcInicial;
-            const ibcIndexadoIA = combinedAveragedMonthlyRate * factorIndexacion;
-            const iaXDias = ibcIndexadoIA * daysToTake; 
-            
-            detailedReport.push({
-                empresa: Array.from(seg.empresas).join(' | '),
-                desde: `01/${monthStr}/${seg.year}`,
-                hasta: `30/${monthStr}/${seg.year}`,
-                dias: daysToTake,
-                fechaIpcFinal: `Dic. ${targetFinalYear - 1}`,
-                ipcFinal: ipcFinal,
-                fechaIpcInicial: `Dic. ${seg.year - 1}`,
-                ipcInicial: ipcInicial,
-                ibcHistorico: combinedAveragedMonthlyRate, 
-                ibcIndexado: ibcIndexadoIA, 
-                iaXDias: iaXDias 
-            });
-
-            sumIaXDias += iaXDias;
-            remainingDays -= daysToTake;
-            consumedDays += daysToTake;
-        }
-
-        const ibl = consumedDays > 0 ? sumIaXDias / consumedDays : 0;
-        return { ibl, consumedDays, sumIaXDias, detailedReport, isTodaVida };
-    };
-
-    if (!formData.edad || formData.edad <= 0) {
-        throw new Error("Por rigor legal, digite la Edad del afiliado y vuelva al Paso 2 para liquidar.");
-    }
-
-    const calc10Years = doIBLCalculation(false);
-    const calcTodaVida = doIBLCalculation(true);
-
-    const totalSem = (totalSemanasPDF !== undefined && totalSemanasPDF !== null && totalSemanasPDF > 0) ? totalSemanasPDF : (calcTodaVida.consumedDays / 7);
-    const ageInYears = parseFloat(formData.edad) || 0;
-    const requiredAge = formData.genero === 'F' ? 57 : 62;
-    const isVerification = totalSem >= 1300 && ageInYears >= requiredAge;
-
-    let bestCalc = calc10Years;
-    let bestName = "Los Últimos 10 Años (3.600 Días)";
-    
-    if (calcTodaVida.ibl > calc10Years.ibl) {
-        bestCalc = calcTodaVida;
-        bestName = "Toda la Vida (Art. 21 Ley 100)";
-    }
-
-    const smlvs = bestCalc.ibl / formData.smlv;
-    let tasaBase = 65.5 - (0.5 * smlvs);
-    if (tasaBase < 55) tasaBase = 55.00;
-
-    const getRes = (aplicarTopeColpensiones) => {
-        let semExtra = Math.max(0, totalSem - 1300);
-        if (aplicarTopeColpensiones) semExtra = Math.min(semExtra, 500); 
-        const grupos = Math.floor(semExtra / 50);
-        let tasaFinal = tasaBase + (grupos * 1.5);
-        if (tasaFinal > 80.00) tasaFinal = 80.00; 
-        
-        const mesadaCalculada = Math.round(bestCalc.ibl * (tasaFinal / 100));
-        const mesadaFinal = Math.max(formData.smlv, Math.min(mesadaCalculada, formData.smlv * 25)); 
-        
-        let porcentajeSalud = 12;
-        if (mesadaFinal <= formData.smlv) {
-            porcentajeSalud = 4;
-        } else if (mesadaFinal > formData.smlv && mesadaFinal <= (formData.smlv * 3)) {
-            porcentajeSalud = 10;
-        }
-        const descuentoSalud = Math.round(mesadaFinal * (porcentajeSalud / 100));
-        const mesadaNeta = mesadaFinal - descuentoSalud;
-
-        return { rate: tasaFinal / 100, extra: semExtra, grupos, mesada: mesadaFinal, porcentajeSalud, descuentoSalud, mesadaNeta };
-    };
-
-    const vA = getRes(true); 
-    const vB = getRes(false); 
-    
-    return {
-        ibl: bestCalc.ibl,
-        bestName: bestName,
-        totalSem: totalSem,
-        tasaBase: tasaBase,
-        detailedReport: bestCalc.detailedReport,
-        detailedReport10Years: calc10Years.detailedReport,
-        detailedReportTodaVida: calcTodaVida.detailedReport,
-        calc10Years: calc10Years,
-        calcTodaVida: calcTodaVida,
-        sumIaXDias: bestCalc.sumIaXDias,
-        diasComputadosTotales: bestCalc.consumedDays,
-        vA: vA,
-        vB: vB,
-        isVerification: isVerification
-    };
-}
-
-
-        // =========================================================================
-        // MOTOR DE CÁLCULO: INDEMNIZACIÓN SUSTITUTIVA (Inlined para evitar cache/SW issues)
-        // =========================================================================
-        // js/calculadora-indemnizacion-sustitutiva.js
-
-/**
- * Motor de cálculo actuarial para Indemnización Sustitutiva de Vejez (Régimen de Prima Media).
- * Decreto 1730 de 2001.
- */
-
-        // (Los helpers locales _parseFlexibleDate, _getDiasComerciales y _isFullCommercialMonth ya están definidos arriba en la primera sección)
-
-// Helper local para aplicar correcciones automáticas (no muta original)
-const _applyAutomaticCorrections = (hist, flag) => {
-    if (!flag) return { history: hist.map(r => ({ ...r, corrected: false })), correctedCount: 0 };
-    let corrected = 0;
-    const cloned = hist.map(r => ({ ...r, corrected: false }));
-    cloned.forEach(row => {
-        try {
-            const s = _parseFlexibleDate(row.desde);
-            const e = _parseFlexibleDate(row.hasta);
-            if (s && e && _isFullCommercialMonth(s, e)) {
-                if ((Number(row.dias) || 0) !== 30) {
-                    row.dias = 30;
-                    row.corrected = true;
-                    corrected++;
-                }
-            }
-        } catch (e) {}
-    });
-    return { history: cloned, correctedCount: corrected };
-};
-
-// Helper local para obtener la tasa de cotización histórica por ley
-const _getTasaSafe = (fecha) => {
-    const ts = fecha.getTime();
-    const _TASAS = [
-        { d: new Date(1946, 0, 1).getTime(), h: new Date(1966, 11, 31).getTime(), p: 0.0455 },
-        { d: new Date(1967, 0, 1).getTime(), h: new Date(1971, 11, 31).getTime(), p: 0.045 },
-        { d: new Date(1972, 0, 1).getTime(), h: new Date(1977, 0, 31).getTime(), p: 0.06755 },
-        { d: new Date(1977, 1, 1).getTime(), h: new Date(1982, 1, 28).getTime(), p: 0.09 },
-        { d: new Date(1982, 2, 1).getTime(), h: new Date(1985, 8, 30).getTime(), p: 0.1125 },
-        { d: new Date(1985, 9, 1).getTime(), h: new Date(1993, 11, 31).getTime(), p: 0.065 },
-        { d: new Date(1994, 0, 1).getTime(), h: new Date(1994, 11, 31).getTime(), p: 0.115 },
-        { d: new Date(1995, 0, 1).getTime(), h: new Date(1995, 11, 31).getTime(), p: 0.125 },
-        { d: new Date(1996, 0, 1).getTime(), h: new Date(2003, 11, 31).getTime(), p: 0.135 },
-        { d: new Date(2004, 0, 1).getTime(), h: new Date(2004, 11, 31).getTime(), p: 0.145 },
-        { d: new Date(2005, 0, 1).getTime(), h: new Date(2005, 11, 31).getTime(), p: 0.15 },
-        { d: new Date(2006, 0, 1).getTime(), h: new Date(2007, 11, 31).getTime(), p: 0.155 },
-        { d: new Date(2008, 0, 1).getTime(), h: new Date(2026, 11, 31).getTime(), p: 0.16 }
-    ];
-    let tp = 0.16;
-    for (const r of _TASAS) { 
-        if (ts >= r.d && ts <= r.h) { tp = r.p; break; } 
-    }
-    return tp;
-};
-
-/**
- * Realiza la liquidación de la Indemnización Sustitutiva de Vejez.
- */
-function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, safeGetIpc) {
-    const { history: useHistory, correctedCount } = _applyAutomaticCorrections(history, applyCorrections);
-
-    const mesCierre = formData.mesLiquidacion || 12;
-    const anoCierre = formData.anoLiquidacion;
-    const ipcFinalKey = `${anoCierre}-${String(mesCierre).padStart(2, '0')}`;
-    const ipcFinal = safeGetIpc(ipcFinalKey);
-    
-    let detailedReport = [];
-    const MESES_CORTOS_M = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-
-    const pre95Records = [];
-    const post95Records = [];
-    let moraEntries = [];
-
-    useHistory.forEach(row => {
-        if (!row.desde || !row.hasta || row.ibc <= 0) return;
-        
-        const calcDias = row.diasCot != null ? row.diasCot : row.dias;
-        const dS = _parseFlexibleDate(row.desde);
-        const isPre95 = dS && dS.getFullYear() < 1995;
-
-        if (row.dias < 0 || calcDias <= 0) {
-            if (isPre95) {
-                moraEntries.push({ ...row, diasCot: Math.abs(row.dias), semanas: Math.abs(row.dias) / 7, ibcHistorico: row.ibc, esMora: true });
-                pre95Records.push({ ...row, dias: Math.abs(row.dias), diasCot: Math.abs(row.dias) });
-            }
-            return;
-        }
-
-        if (isPre95) {
-            pre95Records.push(row);
-        } else {
-            post95Records.push(row);
-        }
-    });
-
-    // PROCESAR PRE-1995
-    const coveredPre95Days = new Set();
-    pre95Records.forEach(row => {
-        const dStart = _parseFlexibleDate(row.desde);
-        const dEnd = _parseFlexibleDate(row.hasta);
-        if (!dStart || !dEnd || dStart > dEnd) return;
-        
-        let overlapCount = 0;
-        let calendarDaysInPeriod = 0;
-        for (let d = new Date(dStart.getTime()); d <= dEnd; d.setDate(d.getDate() + 1)) {
-            calendarDaysInPeriod++;
-            const dayStr = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-            if (coveredPre95Days.has(dayStr)) {
-                overlapCount++;
-            } else {
-                coveredPre95Days.add(dayStr);
-            }
-        }
-
-        const rawDias = row.diasCot != null ? row.diasCot : row.dias;
-        let effectiveOverlap = overlapCount;
-        if (calendarDaysInPeriod > 0 && rawDias < calendarDaysInPeriod) {
-            effectiveOverlap = Math.round(overlapCount * (rawDias / calendarDaysInPeriod));
-        }
-        
-        const calcDias = Math.max(0, rawDias - effectiveOverlap);
-        const year = dStart.getFullYear();
-        const mes = dStart.getMonth() + 1;
-        
-        const ipcInicialKey = `${year}-${String(mes).padStart(2, '0')}`;
-        const ipcInicial = safeGetIpc(ipcInicialKey);
-        const ibcIndexadoIA = (ipcInicial && ipcInicial > 0) ? row.ibc * (ipcFinal / ipcInicial) : row.ibc;
-        
-        const tasaP = _getTasaSafe(dStart);
-
-        detailedReport.push({
-            nit: row.nit || '',
-            empresa: row.empresa + (effectiveOverlap > 0 ? ` (-${effectiveOverlap}d simultáneos)` : ''),
-            mes: `${year}-${String(mes).padStart(2, '0')}`,
-            mesNombre: MESES_CORTOS_M[mes - 1] || '',
-            ano: year,
-            seccion: 'pre1995',
-            desde: row.desde,
-            hasta: row.hasta,
-            dias: row.dias,
-            diasCot: calcDias,
-            semanas: calcDias / 7,
-            ibcHistorico: row.ibc,
-            tasaP: tasaP,
-            ipcFinalFecha: `${MESES_CORTOS_M[mesCierre - 1]} ${anoCierre}`,
-            ipcFinal: ipcFinal,
-            ipcInicialFecha: `${MESES_CORTOS_M[mes - 1]} ${year}`,
-            ipcInicial: ipcInicial,
-            ibcIndexado: ibcIndexadoIA
-        });
-    });
-
-    // PROCESAR POST-1995
-    let expandedMonths = {};
-    post95Records.forEach(row => {
-        const dStart = _parseFlexibleDate(row.desde);
-        const dEnd = _parseFlexibleDate(row.hasta);
-        if (!dStart || !dEnd || dStart > dEnd) return;
-
-        let curStart = new Date(dStart.getTime());
-        
-        while (curStart <= dEnd) {
-            let curYear = curStart.getFullYear();
-            let curMonth = curStart.getMonth();
-            let endOfMonth = new Date(curYear, curMonth + 1, 0); 
-            let actEnd = dEnd < endOfMonth ? new Date(dEnd.getTime()) : new Date(endOfMonth.getTime());
-            
-            if (actEnd >= curStart) {
-                const isFullMonthSegment = curStart.getDate() === 1 && 
-                    (actEnd.getDate() === new Date(curYear, curMonth + 1, 0).getDate() || actEnd.getDate() >= 30);
-                
-                let assignedDays;
-                if (isFullMonthSegment) {
-                    assignedDays = 30;
-                } else {
-                    const diffTime = Math.abs(actEnd - curStart);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                    assignedDays = Math.min(30, diffDays + 1);
-                }
-                
-                let effectiveIbc = row.ibc;
-                let monthKey = `${curYear}-${String(curMonth + 1).padStart(2, '0')}`;
-                
-                if (!expandedMonths[monthKey]) {
-                    expandedMonths[monthKey] = {
-                        year: curYear,
-                        monthKey: monthKey,
-                        dias: Math.min(30, assignedDays),
-                        sumIbcXDias: effectiveIbc * assignedDays,
-                        empresas: [row.empresa],
-                        nits: [row.nit || ''],
-                        desde: new Date(curStart.getTime()),
-                        hasta: new Date(actEnd.getTime())
-                    };
-                } else {
-                    expandedMonths[monthKey].dias = Math.min(30, expandedMonths[monthKey].dias + assignedDays);
-                    expandedMonths[monthKey].sumIbcXDias += effectiveIbc * assignedDays;
-                    
-                    if (actEnd > expandedMonths[monthKey].hasta) expandedMonths[monthKey].hasta = new Date(actEnd.getTime());
-                    if (curStart < expandedMonths[monthKey].desde) expandedMonths[monthKey].desde = new Date(curStart.getTime());
-                    if (!expandedMonths[monthKey].empresas.includes(row.empresa)) {
-                        expandedMonths[monthKey].empresas.push(row.empresa);
-                    }
-                    const rowNit = row.nit || '';
-                    if (rowNit && !expandedMonths[monthKey].nits.includes(rowNit)) {
-                        expandedMonths[monthKey].nits.push(rowNit);
-                    }
-                }
-            }
-            curStart = new Date(curYear, curMonth + 1, 1); 
-        }
-    });
-
-    let splitHistoryPost95 = Object.values(expandedMonths);
-    splitHistoryPost95.sort((a,b) => a.monthKey.localeCompare(b.monthKey));
-
-    splitHistoryPost95.forEach(seg => {
-        const effectiveIbc = seg.sumIbcXDias / seg.dias; 
-        const mesSegmento = seg.monthKey.split('-')[1];
-        const ipcInicialKey = `${seg.year}-${mesSegmento}`;
-        const ipcInicial = safeGetIpc(ipcInicialKey);
-        const ibcIndexadoIA = (ipcInicial && ipcInicial > 0) ? effectiveIbc * (ipcFinal / ipcInicial) : effectiveIbc;
-        
-        const fechaSegmento = new Date(seg.year, parseInt(mesSegmento) - 1, 1);
-        const tasaP = _getTasaSafe(fechaSegmento);
-        
-        const mesNum = parseInt(mesSegmento);
-        const mesNombre = MESES_CORTOS_M[mesNum - 1];
-        const primerDia = new Date(seg.year, mesNum - 1, 1);
-        const ultimoDia = new Date(seg.year, mesNum, 0); 
-        const fmtDate = (d) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-        
-        detailedReport.push({
-            nit: (seg.nits || []).join(' + '),
-            empresa: seg.empresas.join(' + '),
-            mes: seg.monthKey,
-            mesNombre: mesNombre,
-            ano: seg.year,
-            seccion: 'post1995',
-            desde: fmtDate(primerDia),
-            hasta: fmtDate(ultimoDia),
-            dias: seg.dias,
-            diasCot: seg.dias,
-            semanas: seg.dias / 7,
-            ibcHistorico: effectiveIbc, 
-            tasaP: tasaP,
-            ipcFinalFecha: `${MESES_CORTOS_M[mesCierre - 1]} ${anoCierre}`,
-            ipcFinal: ipcFinal,
-            ipcInicialFecha: `${mesNombre} ${seg.year}`,
-            ipcInicial: ipcInicial,
-            ibcIndexado: ibcIndexadoIA
-        });
-    });
-
-    moraEntries.forEach(me => {
-        const dS = _parseFlexibleDate(me.desde);
-        const mesNum = dS ? dS.getMonth() + 1 : 1;
-        const yearS = dS ? dS.getFullYear() : 1990;
-        detailedReport.push({
-            nit: me.nit, empresa: me.empresa, mes: `${yearS}-${String(mesNum).padStart(2,'0')}`, mesNombre: MESES_CORTOS_M[mesNum-1], ano: yearS,
-            seccion: 'pre1995', desde: me.desde, hasta: me.hasta, dias: me.dias, diasCot: 0, semanas: me.semanas,
-            ibcHistorico: me.ibcHistorico, tasaP: 0, ipcFinalFecha: '', ipcFinal: 0, ipcInicialFecha: '', ipcInicial: 0, ibcIndexado: 0, esMora: true
-        });
-    });
-
-    detailedReport.sort((a, b) => {
-        const aDate = _parseFlexibleDate(a.desde);
-        const bDate = _parseFlexibleDate(b.desde);
-        return (aDate || new Date(0)) - (bDate || new Date(0));
-    });
-
-    let SCTotal = 0;
-    detailedReport.forEach(p => {
-        if (p.esMora) return;
-        if (p.semanas > 0) {
-            SCTotal += p.semanas;
-        }
-    });
-
-    if (SCTotal <= 0) throw new Error("No hay semanas computables para realizar la liquidación.");
-
-    let sumatoriaMasaTasa = 0;
-    let sumatoriaMasaSalarial = 0;
-
-    detailedReport.forEach(p => {
-        if (p.esMora) return;
-        if (p.semanas > 0) {
-            const masaTasa = p.tasaP * p.semanas;
-            sumatoriaMasaTasa += masaTasa;
-            
-            const masaSalarial = p.ibcIndexado * p.semanas;
-            sumatoriaMasaSalarial += masaSalarial;
-        }
-    });
-
-    const PPC = sumatoriaMasaTasa / SCTotal;
-    const promedioMensualPresente = sumatoriaMasaSalarial / SCTotal;
-    const SBC = promedioMensualPresente * (7 / 30);
-
-    // Sum of "No. Días" (p.dias) before and after 1995:
-    let totalGeneralDias = 0;
-    detailedReport.forEach(p => {
-        if (p.esMora) return;
-        totalGeneralDias += p.dias;
-    });
-    const semanasGeneral = totalGeneralDias / 7;
-    const ISP = SBC * semanasGeneral * PPC;
-
-    return { 
-        totalDias: totalGeneralDias,
-        semanas: semanasGeneral,
-        SC: semanasGeneral,
-        PPC: PPC,
-        SBC: SBC,
-        ingresoMensualPromedio: promedioMensualPresente,
-        indemnizacion: ISP,
-        detailedReport,
-        sumAportes: ISP
-    };
-}
-
-    </script>
-    
+    <script src="js/pension-rpm-data.js"></script>
+    <script src="js/indemnizacion-sustitutiva-rates.js"></script>
     <script type="text/babel">
         const { useState, useEffect } = React;
         const { jsPDF } = window.jspdf;
 
-        // Global diagnostic error listener
-        window.onerror = function(message, source, lineno, colno, error) {
-            alert('Error Global detectado:\n' + message + '\nEn: ' + source + ':' + lineno + ':' + colno + (error ? '\nStack: ' + error.stack : ''));
-            return false;
-        };
-
-        // `SMLV_DATA` e `IPC_DATA` provienen de `js/datos-historios-ipc-smlv.js`.
-        // `calcularPensionVejez` y `calcularIndemnizacionSustitutiva` provienen de sus respectivos archivos en `js/`.
+        // `SMLV_DATA`, `IPC_DATA` y `getIpc` provienen de `js/pension-rpm-data.js`.
+        // `getTasaP`, `calcularIndemnizacion`, etc. provienen de `js/indemnizacion-sustitutiva-rates.js`.
 
         const Icon = ({ name, className = "w-5 h-5" }) => {
             const icons = {
@@ -760,18 +197,6 @@ function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, s
             return isNaN(parsed) ? 0 : parsed;
         };
 
-        // Función de búsqueda IPC con fallback al mes-diciembre más cercano
-        const getIpc = (key) => {
-            if (typeof IPC_DATA === 'undefined') return 100;
-            if (IPC_DATA[key] !== undefined) return IPC_DATA[key];
-            const allKeys = Object.keys(IPC_DATA).sort();
-            let closest = allKeys[allKeys.length - 1];
-            for (let i = allKeys.length - 1; i >= 0; i--) {
-                if (allKeys[i] <= key) { closest = allKeys[i]; break; }
-            }
-            return IPC_DATA[closest] || 100;
-        };
-
         // safeGetIpc: fallback guard in case external data script didn't load
         const safeGetIpc = (key) => {
             try {
@@ -814,7 +239,6 @@ function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, s
                 nombre: '', 
                 cedula: '', 
                 edad: '',
-                genero: 'M',
                 mesLiquidacion: initDate.month,
                 anoLiquidacion: initDate.year, 
                 smlv: (typeof SMLV_DATA !== 'undefined' && SMLV_DATA[initDate.year]) ? SMLV_DATA[initDate.year] : 1300000 
@@ -826,10 +250,9 @@ function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, s
             const [resumenSemanas, setResumenSemanas] = useState([]);
             const [totalSemanasPDF, setTotalSemanasPDF] = useState(null);
             const [activeTab, setActiveTab] = useState('resumen');
-            const [tipoCalculo, setTipoCalculo] = useState('pension');
             const [results, setResults] = useState(null);
             const [showDetails, setShowDetails] = useState(false); 
-            const [applyCorrections, setApplyCorrections] = useState(false);
+            const [applyCorrections, setApplyCorrections] = useState(true);
             const [audit, setAudit] = useState({ reported: null, calculated: 0, gap: 0, correctedCount: 0 });
 
             const currentDate = new Date();
@@ -838,7 +261,7 @@ function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, s
             
             const isFechaCierreValid = formData.anoLiquidacion < currentYear || (formData.anoLiquidacion === currentYear && formData.mesLiquidacion <= currentMonth);
 
-            const isCedulaValid = formData.cedula.trim().length >= 3 && /^\d+$/.test(formData.cedula.trim());
+            const isCedulaValid = formData.cedula.trim().length >= 5 && /^\d+$/.test(formData.cedula.trim());
             const isEdadValid = !!formData.edad && Number(formData.edad) > 0;
             const isFormReady = isCedulaValid;
 
@@ -885,14 +308,14 @@ function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, s
                 const reported = (resumen || []).reduce((s, r) => s + (Number(r.semanas) || 0), 0);
                 const totalDias = h.reduce((s, r) => s + (Number(r.dias) || 0), 0);
                 const calculated = totalDias / 7;
-                const gap = totalSemanasPDF !== null ? (totalSemanasPDF - reported) : 0;
+                const gap = reported ? (calculated - reported) : 0;
                 return { reported, calculated, gap, correctedCount };
             };
 
             useEffect(() => {
                 const a = computeAudit(history, applyCorrections, resumenSemanas);
                 setAudit({ reported: a.reported, calculated: a.calculated, gap: a.gap, correctedCount: a.correctedCount });
-            }, [history, applyCorrections, resumenSemanas, totalSemanasPDF]);
+            }, [history, applyCorrections, resumenSemanas]);
 
             const handlePDF = async (file) => {
                 if (!isCedulaValid) return;
@@ -1235,517 +658,502 @@ function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, s
             const handleCalculate = () => {
                 try {
                     setLoading(true); setError(null); setShowDetails(false); 
-                    console.log("Iniciando cálculo. Tipo de cálculo:", tipoCalculo);
-                    console.log("History array length:", history.length);
-                    console.log("FormData:", formData);
+                    const { history: useHistory, correctedCount } = applyAutomaticCorrections(history, applyCorrections);
 
-                    if (tipoCalculo === 'pension') {
-                        if (!formData.edad || Number(formData.edad) <= 0) {
-                            setStep(1);
-                            setError("Por rigor legal, debe digitar la Edad del afiliado para liquidar la Pensión de Vejez.");
-                            setLoading(false);
+                    const mesCierre = formData.mesLiquidacion || 12;
+                    const anoCierre = formData.anoLiquidacion;
+                    const ipcFinalKey = `${anoCierre}-${String(mesCierre).padStart(2, '0')}`;
+                    const ipcFinal = safeGetIpc(ipcFinalKey);
+                    
+                    let detailedReport = [];
+                    const MESES_CORTOS_M = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+                    const getTasaSafe = (fecha) => {
+                        if (typeof getTasaCotizacion === 'function') return getTasaCotizacion(fecha);
+                        if (typeof getTasaP === 'function') return getTasaP(fecha.getFullYear());
+                        const ts = fecha.getTime();
+                        const _TASAS = [
+                            { d: new Date('1946-01-01').getTime(), h: new Date('1966-12-31').getTime(), p: 0.0455 },
+                            { d: new Date('1967-01-01').getTime(), h: new Date('1971-12-31').getTime(), p: 0.045 },
+                            { d: new Date('1972-01-01').getTime(), h: new Date('1977-01-31').getTime(), p: 0.0676 },
+                            { d: new Date('1977-02-01').getTime(), h: new Date('1982-02-28').getTime(), p: 0.09 },
+                            { d: new Date('1982-03-01').getTime(), h: new Date('1985-09-30').getTime(), p: 0.1125 },
+                            { d: new Date('1985-10-01').getTime(), h: new Date('1993-12-31').getTime(), p: 0.065 },
+                            { d: new Date('1994-01-01').getTime(), h: new Date('1994-12-31').getTime(), p: 0.115 },
+                            { d: new Date('1995-01-01').getTime(), h: new Date('1995-12-31').getTime(), p: 0.125 },
+                            { d: new Date('1996-01-01').getTime(), h: new Date('2003-12-31').getTime(), p: 0.135 },
+                            { d: new Date('2004-01-01').getTime(), h: new Date('2004-12-31').getTime(), p: 0.145 },
+                            { d: new Date('2005-01-01').getTime(), h: new Date('2005-12-31').getTime(), p: 0.15 },
+                            { d: new Date('2006-01-01').getTime(), h: new Date('2007-12-31').getTime(), p: 0.155 },
+                            { d: new Date('2008-01-01').getTime(), h: new Date('2026-12-31').getTime(), p: 0.16 }
+                        ];
+                        let tp = 0.16;
+                        for (const r of _TASAS) { if (ts >= r.d && ts <= r.h) { tp = r.p; break; } }
+                        return tp;
+                    };
+
+                    const pre95Records = [];
+                    const post95Records = [];
+                    let moraEntries = [];
+
+                    useHistory.forEach(row => {
+                        if (!row.desde || !row.hasta || row.ibc <= 0) return;
+                        
+                        const calcDias = row.diasCot != null ? row.diasCot : row.dias;
+                        const dS = parseFlexibleDate(row.desde);
+                        const isPre95 = dS && dS.getFullYear() < 1995;
+
+                        if (row.dias < 0 || calcDias <= 0) {
+                            if (isPre95) {
+                                moraEntries.push({ ...row, diasCot: Math.abs(row.dias), semanas: Math.abs(row.dias) / 7, ibcHistorico: row.ibc, esMora: true });
+                                pre95Records.push({ ...row, dias: Math.abs(row.dias), diasCot: Math.abs(row.dias) });
+                            }
                             return;
                         }
-                        const res = calcularPensionVejez(history, formData, applyCorrections, safeGetIpc, totalSemanasPDF);
-                        console.log("Resultado Pensión:", res);
-                        setResults(res);
-                        setStep(3);
-                    } else {
-                        console.log("Llamando a calcularIndemnizacionSustitutiva...");
-                        const res = calcularIndemnizacionSustitutiva(history, formData, applyCorrections, safeGetIpc);
-                        console.log("Resultado Indemnización:", res);
-                        setResults(res);
-                        setStep(3);
-                    }
-                } catch (e) { 
-                    console.error("Error detectado en handleCalculate:", e);
-                    alert("Error en el cálculo:\n" + e.message + "\n\nStack:\n" + e.stack);
-                    setError("Error matemático: " + e.message); 
-                } finally { 
-                    setLoading(false); 
-                }
+
+                        if (isPre95) {
+                            pre95Records.push(row);
+                        } else {
+                            post95Records.push(row);
+                        }
+                    });
+
+                    // PROCESAR PRE-1995 (SIN SEGMENTAR)
+                    const coveredPre95Days = new Set();
+                    pre95Records.forEach(row => {
+                        const dStart = parseFlexibleDate(row.desde);
+                        const dEnd = parseFlexibleDate(row.hasta);
+                        if (!dStart || !dEnd || dStart > dEnd) return;
+                        
+                        let overlapCount = 0;
+                        let calendarDaysInPeriod = 0;
+                        for (let d = new Date(dStart.getTime()); d <= dEnd; d.setDate(d.getDate() + 1)) {
+                            calendarDaysInPeriod++;
+                            const dayStr = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+                            if (coveredPre95Days.has(dayStr)) {
+                                overlapCount++;
+                            } else {
+                                coveredPre95Days.add(dayStr);
+                            }
+                        }
+
+                        const rawDias = row.diasCot != null ? row.diasCot : row.dias;
+                        // Si rawDias es menor que los días calendario, escalamos el traslape
+                        let effectiveOverlap = overlapCount;
+                        if (calendarDaysInPeriod > 0 && rawDias < calendarDaysInPeriod) {
+                            effectiveOverlap = Math.round(overlapCount * (rawDias / calendarDaysInPeriod));
+                        }
+                        
+                        const calcDias = Math.max(0, rawDias - effectiveOverlap);
+                        
+                        const year = dStart.getFullYear();
+                        const mes = dStart.getMonth() + 1;
+                        
+                        const ipcInicialKey = `${year}-${String(mes).padStart(2, '0')}`;
+                        const ipcInicial = safeGetIpc(ipcInicialKey);
+                        const ibcIndexadoIA = (ipcInicial && ipcInicial > 0) ? row.ibc * (ipcFinal / ipcInicial) : row.ibc;
+                        
+                        const tasaP = getTasaSafe(dStart);
+
+                        detailedReport.push({
+                            nit: row.nit || '',
+                            empresa: row.empresa + (effectiveOverlap > 0 ? ` (-${effectiveOverlap}d simultáneos)` : ''),
+                            mes: `${year}-${String(mes).padStart(2, '0')}`,
+                            mesNombre: MESES_CORTOS_M[mes - 1] || '',
+                            ano: year,
+                            seccion: 'pre1995',
+                            desde: row.desde,
+                            hasta: row.hasta,
+                            dias: row.dias,
+                            diasCot: calcDias,
+                            semanas: calcDias / 7,
+                            ibcHistorico: row.ibc,
+                            tasaP: tasaP,
+                            ipcFinalFecha: `${MESES_CORTOS_M[mesCierre - 1]} ${anoCierre}`,
+                            ipcFinal: ipcFinal,
+                            ipcInicialFecha: `${MESES_CORTOS_M[mes - 1]} ${year}`,
+                            ipcInicial: ipcInicial,
+                            ibcIndexado: ibcIndexadoIA
+                        });
+                    });
+
+                    // PROCESAR POST-1995
+                    let expandedMonths = {};
+                    post95Records.forEach(row => {
+                        const dStart = parseFlexibleDate(row.desde);
+                        const dEnd = parseFlexibleDate(row.hasta);
+                        if (!dStart || !dEnd || dStart > dEnd) return;
+
+                        let curStart = new Date(dStart.getTime());
+                        
+                        while (curStart <= dEnd) {
+                            let curYear = curStart.getFullYear();
+                            let curMonth = curStart.getMonth();
+                            
+                            let endOfMonth = new Date(curYear, curMonth + 1, 0); 
+                            let actEnd = dEnd < endOfMonth ? new Date(dEnd.getTime()) : new Date(endOfMonth.getTime());
+                            
+                            if (actEnd >= curStart) {
+                                // Regla B: Post-1995. Mes completo = 30, Fracción = diff + 1
+                                const isFullMonthSegment = curStart.getDate() === 1 && 
+                                    (actEnd.getDate() === new Date(curYear, curMonth + 1, 0).getDate() || actEnd.getDate() >= 30);
+                                
+                                let assignedDays;
+                                if (isFullMonthSegment) {
+                                    assignedDays = 30;
+                                } else {
+                                    const diffTime = Math.abs(actEnd - curStart);
+                                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                                    assignedDays = Math.min(30, diffDays + 1);
+                                }
+                                
+                                let effectiveIbc = row.ibc;
+                                let monthKey = `${curYear}-${String(curMonth + 1).padStart(2, '0')}`;
+                                
+                                if (!expandedMonths[monthKey]) {
+                                    expandedMonths[monthKey] = {
+                                        year: curYear,
+                                        monthKey: monthKey,
+                                        dias: Math.min(30, assignedDays),
+                                        sumIbcXDias: effectiveIbc * assignedDays,
+                                        empresas: [row.empresa],
+                                        nits: [row.nit || ''],
+                                        desde: new Date(curStart.getTime()),
+                                        hasta: new Date(actEnd.getTime())
+                                    };
+                                } else {
+                                    // Limitar a 30 días el mes, protegiendo capital (sumando IBCs concurrentes)
+                                    expandedMonths[monthKey].dias = Math.min(30, expandedMonths[monthKey].dias + assignedDays);
+                                    expandedMonths[monthKey].sumIbcXDias += effectiveIbc * assignedDays;
+                                    
+                                    if (actEnd > expandedMonths[monthKey].hasta) expandedMonths[monthKey].hasta = new Date(actEnd.getTime());
+                                    if (curStart < expandedMonths[monthKey].desde) expandedMonths[monthKey].desde = new Date(curStart.getTime());
+                                    if (!expandedMonths[monthKey].empresas.includes(row.empresa)) {
+                                        expandedMonths[monthKey].empresas.push(row.empresa);
+                                    }
+                                    const rowNit = row.nit || '';
+                                    if (rowNit && !expandedMonths[monthKey].nits.includes(rowNit)) {
+                                        expandedMonths[monthKey].nits.push(rowNit);
+                                    }
+                                }
+                            }
+                            curStart = new Date(curYear, curMonth + 1, 1); 
+                        }
+                    });
+
+                    let splitHistoryPost95 = Object.values(expandedMonths);
+                    splitHistoryPost95.sort((a,b) => a.monthKey.localeCompare(b.monthKey));
+
+                    splitHistoryPost95.forEach(seg => {
+                        const effectiveIbc = seg.sumIbcXDias / seg.dias; 
+                        const mesSegmento = seg.monthKey.split('-')[1];
+                        const ipcInicialKey = `${seg.year}-${mesSegmento}`;
+                        const ipcInicial = safeGetIpc(ipcInicialKey);
+                        const ibcIndexadoIA = (ipcInicial && ipcInicial > 0) ? effectiveIbc * (ipcFinal / ipcInicial) : effectiveIbc;
+                        
+                        const fechaSegmento = new Date(seg.year, parseInt(mesSegmento) - 1, 1);
+                        const tasaP = getTasaSafe(fechaSegmento);
+                        
+                        const mesNum = parseInt(mesSegmento);
+                        const mesNombre = MESES_CORTOS_M[mesNum - 1];
+                        const primerDia = new Date(seg.year, mesNum - 1, 1);
+                        const ultimoDia = new Date(seg.year, mesNum, 0); 
+                        const fmtDate = (d) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+                        
+                        detailedReport.push({
+                            nit: (seg.nits || []).join(' + '),
+                            empresa: seg.empresas.join(' + '),
+                            mes: seg.monthKey,
+                            mesNombre: mesNombre,
+                            ano: seg.year,
+                            seccion: 'post1995',
+                            desde: fmtDate(primerDia),
+                            hasta: fmtDate(ultimoDia),
+                            dias: seg.dias,
+                            diasCot: seg.dias,
+                            semanas: seg.dias / 7,
+                            ibcHistorico: effectiveIbc, 
+                            tasaP: tasaP,
+                            ipcFinalFecha: `${MESES_CORTOS_M[mesCierre - 1]} ${anoCierre}`,
+                            ipcFinal: ipcFinal,
+                            ipcInicialFecha: `${mesNombre} ${seg.year}`,
+                            ipcInicial: ipcInicial,
+                            ibcIndexado: ibcIndexadoIA
+                        });
+                    });
+
+                    moraEntries.forEach(me => {
+                        const dS = parseFlexibleDate(me.desde);
+                        const mesNum = dS ? dS.getMonth() + 1 : 1;
+                        const yearS = dS ? dS.getFullYear() : 1990;
+                        detailedReport.push({
+                            nit: me.nit, empresa: me.empresa, mes: `${yearS}-${String(mesNum).padStart(2,'0')}`, mesNombre: MESES_CORTOS_M[mesNum-1], ano: yearS,
+                            seccion: 'pre1995', desde: me.desde, hasta: me.hasta, dias: me.dias, diasCot: 0, semanas: me.semanas,
+                            ibcHistorico: me.ibcHistorico, tasaP: 0, ipcFinalFecha: '', ipcFinal: 0, ipcInicialFecha: '', ipcInicial: 0, ibcIndexado: 0, esMora: true
+                        });
+                    });
+
+                    detailedReport.sort((a, b) => {
+                        const aDate = parseFlexibleDate(a.desde);
+                        const bDate = parseFlexibleDate(b.desde);
+                        return (aDate || new Date(0)) - (bDate || new Date(0));
+                    });
+
+                    // C. Consolidación SC
+                    let SCTotal = 0;
+                    detailedReport.forEach(p => {
+                        if (p.esMora) return;
+                        if (p.semanas > 0) {
+                            SCTotal += p.semanas;
+                        }
+                    });
+
+                    if (SCTotal <= 0) throw new Error("No hay semanas computables para realizar la liquidación.");
+
+                    // Regla 2: PPC y Regla 3: SBC
+                    let sumatoriaMasaTasa = 0;
+                    let sumatoriaMasaSalarial = 0;
+
+                    detailedReport.forEach(p => {
+                        if (p.esMora) return;
+                        if (p.semanas > 0) {
+                            const masaTasa = p.tasaP * p.semanas;
+                            sumatoriaMasaTasa += masaTasa;
+                            
+                            const masaSalarial = p.ibcIndexado * p.semanas;
+                            sumatoriaMasaSalarial += masaSalarial;
+                        }
+                    });
+
+                    const PPC = sumatoriaMasaTasa / SCTotal;
+                    
+                    const promedioMensualPresente = sumatoriaMasaSalarial / SCTotal;
+                    const SBC = promedioMensualPresente * (7 / 30);
+                    
+                    const ISP = SBC * SCTotal * PPC;
+
+                    setResults({ 
+                        totalDias: SCTotal * 7,
+                        semanas: SCTotal,
+                        SC: SCTotal,
+                        PPC: PPC,
+                        SBC: SBC,
+                        ingresoMensualPromedio: promedioMensualPresente,
+                        indemnizacion: ISP,
+                        detailedReport,
+                        sumAportes: ISP
+                    });
+                    setStep(3);
+                } catch (e) { setError("Error matemático: " + e.message); } finally { setLoading(false); }
             };
 
             const exportPDF = () => {
-                if (tipoCalculo === 'pension') {
-                    const res = results;
-                    const doc = new jsPDF('landscape'); 
-                    const W = doc.internal.pageSize.getWidth();
-                    const H = doc.internal.pageSize.getHeight();
-                    
-                    const addFooter = () => {
-                        doc.setFontSize(7);
-                        doc.setTextColor(150, 150, 150);
-                        doc.text("NOTA LEGAL: Este documento es una simulación matemática estimada y automatizada basada en la Ley 100/1993 y jurisprudencia aplicable. No constituye un dictamen pericial definitivo, asesoría legal vinculante, ni obliga a Colpensiones o autoridades judiciales.", W/2, H - 10, { align: 'center' });
-                    };
+                const doc = new jsPDF('landscape'); 
+                const W = doc.internal.pageSize.getWidth();
+                
+                doc.setFillColor(30, 58, 138);
+                doc.rect(0, 0, W, 48, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(20);
+                doc.text("DICTAMEN PERICIAL - INDEMNIZACIÓN SUSTITUTIVA", W/2, 30, { align: 'center' });
+                // Marca visible y contact: TU ABOGADO LABORAL (propaganda sencilla)
+                doc.setFontSize(10);
+                doc.text("TU ABOGADO LABORAL", W - 15, 14, { align: 'right' });
+                doc.setFontSize(8);
+                doc.text("Contacto: +57 321 792 7495  ·  tuabogadolaboral@outlook.com", W - 15, 20, { align: 'right' });
+                
+                doc.setTextColor(30, 58, 138); 
+                doc.setFontSize(14); 
+                doc.text("1. Resumen de Liquidación", 15, 55);
+                
+                doc.setFontSize(10);
+                const afiliadoLabel = (formData.nombre && String(formData.nombre).trim()) ? String(formData.nombre).trim() : (formData.cedula || '—');
+                doc.text(`Afiliado: ${afiliadoLabel}`, 15, 65);
+                doc.text(`Documento: ${formData.cedula || '—'}`, 15, 71);
+                doc.text(`Total Días Computados: ${results.totalDias.toFixed(2)}`, 15, 77);
+                doc.text(`SBC (Salario Base Semanal): ${formatCurrency(results.SBC)}`, 15, 83);
+                doc.text(`SC (Semanas Cotizadas): ${results.SC.toFixed(2)}`, 15, 89);
+                doc.text(`PPC (% Ponderado Cotización): ${(results.PPC * 100).toFixed(4)}%`, 15, 95);
+                doc.text(`Fórmula: ISP = SBC × SC × PPC  —  Decreto 1730/2001 Art. 3`, 15, 101);
+                
+                doc.autoTable({ 
+                    startY: 107, 
+                    head: [['Concepto', 'Base Legal', 'Valor a Reconocer']], 
+                    body: [
+                        ['Indemnización Sustitutiva de Vejez', 'Decreto 1730 de 2001 (Art. 1)', formatCurrency(results.indemnizacion)]
+                    ], 
+                    theme: 'grid', 
+                    headStyles: { fillColor: [30, 58, 138] },
+                    styles: { fontSize: 12, cellPadding: 4, fontStyle: 'bold' }
+                });
 
-                    doc.setFillColor(15, 23, 42); 
-                    doc.rect(0, 0, W, 40, 'F');
-                    doc.setTextColor(255, 255, 255); 
-                    doc.setFontSize(20); 
-                    doc.text("REPORTE DE SIMULACIÓN PENSIONAL", W/2, 25, { align: 'center' });
-                    // Marca visible
-                    doc.setFontSize(9);
-                    doc.text("TU ABOGADO LABORAL", W - 15, 12, { align: 'right' });
-                    doc.setFontSize(8);
-                    doc.text("Contacto: +57 321 792 7495  ·  tuabogadolaboral@outlook.com", W - 15, 18, { align: 'right' });
-                    
-                    doc.setTextColor(15, 23, 42); 
-                    doc.setFontSize(14); 
-                    doc.text("1. Resumen de Proyección y Reliquidación", 15, 55);
-                    
-                    doc.setFontSize(10);
-                    const afiliadoLabel = (formData.nombre && String(formData.nombre).trim()) ? String(formData.nombre).trim() : (formData.cedula || '—');
-                    doc.text(`Afiliado: ${afiliadoLabel}`, 15, 65);
-                    doc.text(`Documento: ${formData.cedula || '—'}`, 15, 71);
-                    doc.text(`Semanas Totales Computadas: ${res.totalSem.toFixed(2)}`, 15, 75);
-                    doc.text(`IBL Indexado Ponderado: ${formatCurrency(res.ibl)}`, 15, 80);
-                    
-                    doc.autoTable({ 
-                        startY: 85, 
-                        head: [['Concepto', 'Cálculo Administrativo (Colpensiones)', 'Proyección Jurisprudencial (CSJ SL3501-2022)']], 
-                        body: [
-                            ['Mesada Bruta Estimada', formatCurrency(res.vA.mesada), formatCurrency(res.vB.mesada)], 
-                            [`Descuento Ley 2018/2020 Salud`, `-${formatCurrency(res.vA.descuentoSalud)} (${res.vA.porcentajeSalud}%)`, `-${formatCurrency(res.vB.descuentoSalud)} (${res.vB.porcentajeSalud}%)`],
-                            ['Mesada Neta a Pagar', formatCurrency(res.vA.mesadaNeta), formatCurrency(res.vB.mesadaNeta)],
-                            ['Beneficio Jurisprudencial (Bruto)', '-', `+ ${formatCurrency(res.vB.mesada - res.vA.mesada)}`]
-                        ], 
-                        theme: 'grid', 
-                        headStyles: { fillColor: [15, 23, 42] },
-                        styles: { fontSize: 11, cellPadding: 3, fontStyle: 'bold' }
-                    });
+                doc.addPage();
+                doc.setFillColor(30, 58, 138); 
+                doc.rect(0, 0, W, 30, 'F');
+                doc.setTextColor(255, 255, 255); 
+                doc.setFontSize(16); 
+                doc.text("ANEXO TÉCNICO: HISTORIAL MULTIANUAL CONSOLIDADO", W/2, 20, { align: 'center' });
 
+                doc.setTextColor(30, 58, 138); 
+                doc.setFontSize(11);
+                
+                doc.text(`Total Días Computados (Sin doble conteo por simultaneidad): ${results.totalDias.toFixed(2)}`, 15, 40);
+                doc.text(`SC: ${results.SC.toFixed(2)} semanas  |  SBC: ${formatCurrency(results.SBC)}  |  PPC: ${(results.PPC * 100).toFixed(4)}%`, 15, 48);
+
+                const pre95 = results.detailedReport.filter(r => r.seccion === 'pre1995').sort((a,b) => a.mes.localeCompare(b.mes));
+                const post95 = results.detailedReport.filter(r => r.seccion === 'post1995').sort((a,b) => a.mes.localeCompare(b.mes));
+
+                let currentY = 55;
+
+                // SECCIÓN 1: ANTES DE 1995
+                if (pre95.length > 0) {
+                    doc.setTextColor(30, 58, 138);
                     doc.setFontSize(12);
-                    doc.text("2. Desglose Teórico de la Tasa de Reemplazo", 15, doc.lastAutoTable.finalY + 12);
+                    doc.text("DETALLE DE PAGOS EFECTUADOS ANTERIORES A 1995", 15, currentY);
+                    currentY += 5;
 
-                    const baseRateStr = res.tasaBase.toFixed(2) + '%';
-                    const semExtraA = res.vA.extra;
-                    const semExtraB = res.vB.extra;
-                    const gruposA = Math.floor(semExtraA / 50);
-                    const gruposB = Math.floor(semExtraB / 50);
-                    const incA = (gruposA * 1.5).toFixed(2) + '%';
-                    const incB = (gruposB * 1.5).toFixed(2) + '%';
-                    const rateA = (res.vA.rate * 100).toFixed(2) + '%';
-                    const rateB = (res.vB.rate * 100).toFixed(2) + '%';
-
-                    doc.autoTable({
-                        startY: doc.lastAutoTable.finalY + 16,
-                        head: [['Fase de Estimación', 'Método Administrativo (Tope 1800 Sem.)', 'Método CSJ (Sin Límite Semanas)']],
-                        body: [
-                            ['Tasa Base', baseRateStr, baseRateStr],
-                            ['Semanas Adicionales a las 1.300', semExtraA.toFixed(1) + ' (Tope administrativo max)', semExtraB.toFixed(1) + ' (Totales estimadas)'],
-                            ['Grupos de 50 Semanas Completos', gruposA, gruposB],
-                            ['Incremento Proyectado (Grupos x 1.5%)', incA, incB],
-                            ['Tasa de Reemplazo Teórica (Max. 80%)', rateA, rateB]
-                        ],
-                        theme: 'striped',
-                        headStyles: { fillColor: [146, 64, 14] }, 
-                        styles: { fontSize: 10, cellPadding: 2 },
-                        pageBreak: 'avoid',
-                        rowPageBreak: 'avoid'
-                    });
-
-                    addFooter(); 
-
-                    doc.addPage();
-                    doc.setFillColor(15, 23, 42); 
-                    doc.rect(0, 0, W, 30, 'F');
-                    doc.setTextColor(255, 255, 255); 
-                    doc.setFontSize(16); 
-                    doc.text(`ANEXO MATEMÁTICO: PROYECCIÓN DETALLADA (${res.bestName.toUpperCase()})`, W/2, 20, { align: 'center' });
-
-                    doc.autoTable({
-                        startY: 38,
-                        head: [['Resumen de Parámetros de Liquidación (Fórmula de Ponderación Actuarial)', 'Valor Numérico Contabilizado']],
-                        body: [
-                            ['Ecuación de Ponderación', '=SUMA(IA X #DIAS) / Total Días Computados'],
-                            ['Sumatoria Histórica de Productos Financieros (IA x Días)', formatCurrency(res.sumIaXDias)],
-                            ['Divisor de Tiempos Reglamentarios (Total Días Computados)', res.diasComputadosTotales],
-                            ['IBL Estimado Definitivo (Ingreso Base de Liquidación)', formatCurrency(res.ibl)]
-                        ],
-                        theme: 'grid',
-                        headStyles: { fillColor: [71, 85, 105], halign: 'left', fontSize: 11 },
-                        styles: { fontSize: 10, cellPadding: 4 },
-                        columnStyles: {
-                            0: { fontStyle: 'bold', textColor: [51, 65, 85] },
-                            1: { fontStyle: 'bold', textColor: [15, 23, 42], halign: 'right' }
-                        }
-                    });
-
-                    const tableBody = res.detailedReport.map(r => [
-                        r.empresa.substring(0, 18),
-                        r.desde, r.hasta, r.dias,
-                        r.fechaIpcFinal, r.ipcFinal.toFixed(4),
-                        r.fechaIpcInicial, r.ipcInicial.toFixed(4),
-                        formatCurrency(r.ibcHistorico), formatCurrency(r.ibcIndexado),
-                        formatCurrency(r.iaXDias) 
+                    const pre95Body = pre95.map(r => [
+                        r.nit || '', r.empresa.substring(0, 20), r.desde, r.hasta,
+                        formatCurrency(r.ibcHistorico), r.semanas.toFixed(3), r.dias,
+                        (r.tasaP * 100).toFixed(2) + '%',
+                        r.ipcFinalFecha, r.ipcFinal.toFixed(4),
+                        r.ipcInicialFecha, r.ipcInicial.toFixed(4),
+                        formatCurrency(r.ibcIndexado)
                     ]);
 
                     doc.autoTable({
-                        startY: doc.lastAutoTable.finalY + 12,
-                        head: [['Razón Social / Aportante', 'Desde', 'Hasta', 'Días', 'F. IPC Final', 'IPC Final', 'F. IPC Inicial', 'IPC Inicial', 'Salario Base', 'Salario Indexado (IA)', 'IA X #DIAS']],
-                        body: tableBody,
+                        startY: currentY,
+                        head: [['NIT', 'Razón Social', 'Desde', 'Hasta', 'Salario (IBC)', 'Sem.', 'Días', '% Cotiz.', 'Fecha IPC Final', 'IPC Final', 'Fecha IPC Inicial', 'IPC Inicial', 'IBC Indexado']],
+                        body: pre95Body,
                         theme: 'striped',
-                        styles: { fontSize: 7, cellPadding: 1.5 },
-                        headStyles: { fillColor: [15, 23, 42] },
+                        styles: { fontSize: 5.5, cellPadding: 1.2 },
+                        headStyles: { fillColor: [30, 58, 138], fontSize: 5 },
                         columnStyles: {
-                            8: { halign: 'right' },
-                            9: { halign: 'right', fontStyle: 'bold' },
-                            10: { halign: 'right', fontStyle: 'bold', textColor: [4, 120, 87] } 
+                            0: { cellWidth: 16 }, 1: { cellWidth: 26 },
+                            2: { halign: 'center', cellWidth: 16 }, 3: { halign: 'center', cellWidth: 16 },
+                            4: { halign: 'right', cellWidth: 20 }, 5: { halign: 'center', cellWidth: 12 },
+                            6: { halign: 'center', cellWidth: 10 }, 7: { halign: 'center', cellWidth: 12, textColor: [180, 83, 9] },
+                            8: { halign: 'center', cellWidth: 22 }, 9: { halign: 'right', cellWidth: 16 },
+                            10: { halign: 'center', cellWidth: 22 }, 11: { halign: 'right', cellWidth: 16 },
+                            12: { halign: 'right', fontStyle: 'bold', cellWidth: 22 }
                         }
                     });
-
-                    addFooter(); 
-                    // Pie con marca
-                    doc.setFontSize(8);
-                    doc.setTextColor(120,120,120);
-                    doc.text("Tu Abogado Laboral — Centro de Herramientas", W/2, H - 6, { align: 'center' });
-                    doc.save(`Proyeccion_Pensional_${formData.cedula}.pdf`);
-                } else {
-                    const doc = new jsPDF('landscape'); 
-                    const W = doc.internal.pageSize.getWidth();
-                    
-                    doc.setFillColor(30, 58, 138);
-                    doc.rect(0, 0, W, 48, 'F');
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(20);
-                    doc.text("DICTAMEN PERICIAL - INDEMNIZACIÓN SUSTITUTIVA", W/2, 30, { align: 'center' });
-                    // Marca visible y contact: TU ABOGADO LABORAL (propaganda sencilla)
-                    doc.setFontSize(10);
-                    doc.text("TU ABOGADO LABORAL", W - 15, 14, { align: 'right' });
-                    doc.setFontSize(8);
-                    doc.text("Contacto: +57 321 792 7495  ·  tuabogadolaboral@outlook.com", W - 15, 20, { align: 'right' });
-                    
-                    doc.setTextColor(30, 58, 138); 
-                    doc.setFontSize(14); 
-                    doc.text("1. Resumen de Liquidación", 15, 55);
-                    
-                    doc.setFontSize(10);
-                    const afiliadoLabel = (formData.nombre && String(formData.nombre).trim()) ? String(formData.nombre).trim() : (formData.cedula || '—');
-                    doc.text(`Afiliado: ${afiliadoLabel}`, 15, 65);
-                    doc.text(`Documento: ${formData.cedula || '—'}`, 15, 71);
-                    doc.text(`Total Días Computados: ${results.totalDias.toFixed(2)}`, 15, 77);
-                    doc.text(`SBC (Salario Base Semanal): ${formatCurrency(results.SBC)}`, 15, 83);
-                    doc.text(`SC (Semanas Cotizadas): ${results.SC.toFixed(2)}`, 15, 89);
-                    doc.text(`PPC (% Ponderado Cotización): ${(results.PPC * 100).toFixed(4)}%`, 15, 95);
-                    doc.text(`Fórmula: ISP = SBC × SC × PPC  —  Decreto 1730/2001 Art. 3`, 15, 101);
-                    
-                    doc.autoTable({ 
-                        startY: 107, 
-                        head: [['Concepto', 'Base Legal', 'Valor a Reconocer']], 
-                        body: [
-                            ['Indemnización Sustitutiva de Vejez', 'Decreto 1730 de 2001 (Art. 1)', formatCurrency(results.indemnizacion)]
-                        ], 
-                        theme: 'grid', 
-                        headStyles: { fillColor: [30, 58, 138] },
-                        styles: { fontSize: 12, cellPadding: 4, fontStyle: 'bold' }
-                    });
-
-                    doc.addPage();
-                    doc.setFillColor(30, 58, 138); 
-                    doc.rect(0, 0, W, 30, 'F');
-                    doc.setTextColor(255, 255, 255); 
-                    doc.setFontSize(16); 
-                    doc.text("ANEXO TÉCNICO: HISTORIAL MULTIANUAL CONSOLIDADO", W/2, 20, { align: 'center' });
-
-                    doc.setTextColor(30, 58, 138); 
-                    doc.setFontSize(11);
-                    
-                    doc.text(`Total Días Computados (Sin doble conteo por simultaneidad): ${results.totalDias.toFixed(2)}`, 15, 40);
-                    doc.text(`SC: ${results.SC.toFixed(2)} semanas  |  SBC: ${formatCurrency(results.SBC)}  |  PPC: ${(results.PPC * 100).toFixed(4)}%`, 15, 48);
-
-                    const pre95 = results.detailedReport.filter(r => r.seccion === 'pre1995').sort((a,b) => a.mes.localeCompare(b.mes));
-                    const post95 = results.detailedReport.filter(r => r.seccion === 'post1995').sort((a,b) => a.mes.localeCompare(b.mes));
-
-                    let currentY = 55;
-
-                    // SECCIÓN 1: ANTES DE 1995
-                    if (pre95.length > 0) {
-                        doc.setTextColor(30, 58, 138);
-                        doc.setFontSize(12);
-                        doc.text("DETALLE DE PAGOS EFECTUADOS ANTERIORES A 1995", 15, currentY);
-                        currentY += 5;
-
-                        const pre95Body = pre95.map(r => [
-                            r.nit || '', r.empresa.substring(0, 20), r.desde, r.hasta,
-                            formatCurrency(r.ibcHistorico), r.semanas.toFixed(3), r.dias,
-                            (r.tasaP * 100).toFixed(2) + '%',
-                            r.ipcFinalFecha, r.ipcFinal.toFixed(4),
-                            r.ipcInicialFecha, r.ipcInicial.toFixed(4),
-                            formatCurrency(r.ibcIndexado)
-                        ]);
-
-                        doc.autoTable({
-                            startY: currentY,
-                            head: [['NIT', 'Razón Social', 'Desde', 'Hasta', 'Salario (IBC)', 'Sem.', 'Días', '% Cotiz.', 'Fecha IPC Final', 'IPC Final', 'Fecha IPC Inicial', 'IPC Inicial', 'IBC Indexado']],
-                            body: pre95Body,
-                            theme: 'striped',
-                            styles: { fontSize: 5.5, cellPadding: 1.2 },
-                            headStyles: { fillColor: [30, 58, 138], fontSize: 5 },
-                            columnStyles: {
-                                0: { cellWidth: 16 }, 1: { cellWidth: 26 },
-                                2: { halign: 'center', cellWidth: 16 }, 3: { halign: 'center', cellWidth: 16 },
-                                4: { halign: 'right', cellWidth: 20 }, 5: { halign: 'center', cellWidth: 12 },
-                                6: { halign: 'center', cellWidth: 10 }, 7: { halign: 'center', cellWidth: 12, textColor: [180, 83, 9] },
-                                8: { halign: 'center', cellWidth: 22 }, 9: { halign: 'right', cellWidth: 16 },
-                                10: { halign: 'center', cellWidth: 22 }, 11: { halign: 'right', cellWidth: 16 },
-                                12: { halign: 'right', fontStyle: 'bold', cellWidth: 22 }
-                            }
-                        });
-                        currentY = doc.lastAutoTable.finalY + 10;
-                    }
-
-                    // SECCIÓN 2: A PARTIR DE 1995
-                    if (post95.length > 0) {
-                        if (currentY > 250) { doc.addPage('landscape'); currentY = 20; }
-                        doc.setTextColor(30, 58, 138);
-                        doc.setFontSize(12);
-                        doc.text("DETALLE DE PAGOS EFECTUADOS A PARTIR DE 1995", 15, currentY);
-                        currentY += 5;
-
-                        const post95Body = post95.map(r => [
-                            r.nit || '', r.empresa.substring(0, 20), r.desde, r.hasta,
-                            formatCurrency(r.ibcHistorico), r.semanas.toFixed(3), r.dias, r.diasCot != null ? r.diasCot : r.dias,
-                            (r.tasaP * 100).toFixed(2) + '%',
-                            r.ipcFinalFecha, r.ipcFinal.toFixed(4),
-                            r.ipcInicialFecha, r.ipcInicial.toFixed(4),
-                            formatCurrency(r.ibcIndexado)
-                        ]);
-
-                        doc.autoTable({
-                            startY: currentY,
-                            head: [['NIT', 'Razón Social', 'Desde', 'Hasta', 'Salario (IBC)', 'Sem.', 'Días Rep', 'Días Cot', '% Cotiz.', 'Fecha IPC Final', 'IPC Final', 'Fecha IPC Inicial', 'IPC Inicial', 'IBC Indexado']],
-                            body: post95Body,
-                            theme: 'striped',
-                            styles: { fontSize: 5.5, cellPadding: 1.2 },
-                            headStyles: { fillColor: [30, 58, 138], fontSize: 5 },
-                            columnStyles: {
-                                0: { cellWidth: 15 }, 1: { cellWidth: 24 },
-                                2: { halign: 'center', cellWidth: 15 }, 3: { halign: 'center', cellWidth: 15 },
-                                4: { halign: 'right', cellWidth: 18 }, 5: { halign: 'center', cellWidth: 11 },
-                                6: { halign: 'center', cellWidth: 11 }, 7: { halign: 'center', cellWidth: 11, fontStyle: 'bold' },
-                                8: { halign: 'center', cellWidth: 11, textColor: [180, 83, 9] },
-                                9: { halign: 'center', cellWidth: 20 }, 10: { halign: 'right', cellWidth: 14 },
-                                11: { halign: 'center', cellWidth: 20 }, 12: { halign: 'right', cellWidth: 14 },
-                                13: { halign: 'right', fontStyle: 'bold', cellWidth: 20 }
-                            }
-                        });
-                    }
-
-                    // Pie de página con marca
-                    doc.setFontSize(8);
-                    doc.setTextColor(120,120,120);
-                    doc.text("Tu Abogado Laboral — Dictamen pericial generado automáticamente", W/2, doc.internal.pageSize.getHeight() - 12, { align: 'center' });
-                    doc.save(`Indemnizacion_Sustitutiva_Corregida_${formData.cedula}.pdf`);
+                    currentY = doc.lastAutoTable.finalY + 10;
                 }
+
+                // SECCIÓN 2: A PARTIR DE 1995
+                if (post95.length > 0) {
+                    if (currentY > 250) { doc.addPage('landscape'); currentY = 20; }
+                    doc.setTextColor(30, 58, 138);
+                    doc.setFontSize(12);
+                    doc.text("DETALLE DE PAGOS EFECTUADOS A PARTIR DE 1995", 15, currentY);
+                    currentY += 5;
+
+                    const post95Body = post95.map(r => [
+                        r.nit || '', r.empresa.substring(0, 20), r.desde, r.hasta,
+                        formatCurrency(r.ibcHistorico), r.semanas.toFixed(3), r.dias, r.diasCot != null ? r.diasCot : r.dias,
+                        (r.tasaP * 100).toFixed(2) + '%',
+                        r.ipcFinalFecha, r.ipcFinal.toFixed(4),
+                        r.ipcInicialFecha, r.ipcInicial.toFixed(4),
+                        formatCurrency(r.ibcIndexado)
+                    ]);
+
+                    doc.autoTable({
+                        startY: currentY,
+                        head: [['NIT', 'Razón Social', 'Desde', 'Hasta', 'Salario (IBC)', 'Sem.', 'Días Rep', 'Días Cot', '% Cotiz.', 'Fecha IPC Final', 'IPC Final', 'Fecha IPC Inicial', 'IPC Inicial', 'IBC Indexado']],
+                        body: post95Body,
+                        theme: 'striped',
+                        styles: { fontSize: 5.5, cellPadding: 1.2 },
+                        headStyles: { fillColor: [30, 58, 138], fontSize: 5 },
+                        columnStyles: {
+                            0: { cellWidth: 15 }, 1: { cellWidth: 24 },
+                            2: { halign: 'center', cellWidth: 15 }, 3: { halign: 'center', cellWidth: 15 },
+                            4: { halign: 'right', cellWidth: 18 }, 5: { halign: 'center', cellWidth: 11 },
+                            6: { halign: 'center', cellWidth: 11 }, 7: { halign: 'center', cellWidth: 11, fontStyle: 'bold' },
+                            8: { halign: 'center', cellWidth: 11, textColor: [180, 83, 9] },
+                            9: { halign: 'center', cellWidth: 20 }, 10: { halign: 'right', cellWidth: 14 },
+                            11: { halign: 'center', cellWidth: 20 }, 12: { halign: 'right', cellWidth: 14 },
+                            13: { halign: 'right', fontStyle: 'bold', cellWidth: 20 }
+                        }
+                    });
+                }
+
+                // Pie de página con marca
+                doc.setFontSize(8);
+                doc.setTextColor(120,120,120);
+                doc.text("Tu Abogado Laboral — Dictamen pericial generado automáticamente", W/2, doc.internal.pageSize.getHeight() - 12, { align: 'center' });
+                doc.save(`Indemnizacion_Sustitutiva_Corregida_${formData.cedula}.pdf`);
             };
 
             const exportExcel = () => {
-                if (tipoCalculo === 'pension') {
-                    const res = results;
-                    
-                    // Determinar cuál es el mejor cálculo (mayor IBL)
-                    const bestCalc = res.calcTodaVida && res.calcTodaVida.ibl > res.calc10Years.ibl 
-                        ? res.calcTodaVida : res.calc10Years;
-                    const bestReport = bestCalc === res.calcTodaVida 
-                        ? (res.detailedReportTodaVida || []) : (res.detailedReport10Years || []);
-                    const bestTitle = bestCalc === res.calcTodaVida 
-                        ? 'TODA LA VIDA (ART. 21 LEY 100)' : '10 ÚLTIMOS AÑOS (3.600 DÍAS)';
+                const res = results;
+                
+                const preData = [
+                    ['TU ABOGADO LABORAL'],
+                    ['Contacto:', '+57 321 792 7495', 'tuabogadolaboral@outlook.com'],
+                    [],
+                    ['LIQUIDACIÓN INDEMNIZACIÓN SUSTITUTIVA DE VEJEZ'],
+                    ['Base Legal:', 'Decreto 1730 de 2001 (Art. 1)'],
+                    [],
+                    ['DATOS DEL AFILIADO'],
+                    ['Afiliado:', (formData.nombre && String(formData.nombre).trim()) ? String(formData.nombre).trim() : (formData.cedula || '—')],
+                    ['Documento:', formData.cedula || '—'],
+                    ['Fecha de Liquidación:', `${MESES_NOMBRES[(formData.mesLiquidacion || 12) - 1]} ${formData.anoLiquidacion}`],
+                    [],
+                    ['RESUMEN DE LIQUIDACIÓN'],
+                    ['Total Días Computados:', res.totalDias],
+                    ['SBC (Salario Base Semanal):', res.SBC],
+                    ['SC (Semanas Cotizadas):', res.SC],
+                    ['PPC (% Ponderado Cotización):', (res.PPC * 100).toFixed(4) + '%'],
+                    ['Fórmula:', 'ISP = SBC × SC × PPC'],
+                    ['Base Legal:', 'Decreto 1730/2001 Art. 3'],
+                    ['INDEMNIZACIÓN SUSTITUTIVA:', res.indemnizacion],
+                    [],
+                    ['DETALLE ACTUARIAL MENSUALIZADO']
+                ];
 
-                    // === HOJA PRINCIPAL ===
-                    const headerData = [
-                        ['TU ABOGADO LABORAL'],
-                        ['Contacto:', '+57 321 792 7495', 'tuabogadolaboral@outlook.com'],
-                        [],
-                        ['LIQUIDACIÓN DE PENSIÓN ' + bestTitle + ' - TU ABOGADO LABORAL'],
-                        [],
-                        ['', 'Afiliado', formData.nombre && String(formData.nombre).trim() ? String(formData.nombre).trim() : (formData.cedula || '—')],
-                        ['', 'CEDULA', formData.cedula || '—', 'Cédula'],
-                        ['', 'EN EL QUE SE LIQUIDARÁ', formData.anoLiquidacion, 'Año en el cual se liquida'],
-                        ['', 'USUARIO COLPENSIONES', '', 'Usuario para consulta en línea'],
-                        ['', 'PASSWORD', '', 'Clave de acceso'],
-                        [],
-                        ['', 'SMLV AÑO LIQUIDACIÓN', formData.smlv, 'Salario Mínimo año liquidación'],
-                        ['', 'IBL', bestCalc.ibl, 'Ingreso Base Liquidación'],
-                        ['', 'TASA DE REEMPLAZO - H', (res.vA.rate * 100).toFixed(2) + '%', 'Promedio Ponderado de los porcentajes'],
-                        [],
-                        ['', 'MONTO DE LA PENSIÓN', '$', res.vA.mesada, 'Monto de la pensión mensual'],
-                        []
-                    ];
+                const pre95x = res.detailedReport.filter(r => r.seccion === 'pre1995').sort((a,b) => a.mes.localeCompare(b.mes));
+                const post95x = res.detailedReport.filter(r => r.seccion === 'post1995').sort((a,b) => a.mes.localeCompare(b.mes));
 
-                    // Headers de la tabla de detalle
-                    const tableHeaders = [
-                        'Nit Empresa',
-                        'Empresa',
-                        'IBC (SALARIO)',
-                        'Fecha desde',
-                        'Fecha hasta',
-                        'semanas',
-                        'Num días',
-                        'días Acum',
-                        'Fecha IPC Final',
-                        'IPC final',
-                        'Fecha IPC Inicial',
-                        'IPC inicial',
-                        'IBC INDEXADO (IA)'
-                    ];
+                let excelRows = [];
 
-                    let diasAcum = 0;
-                    const tableData = bestReport.map(r => {
-                        diasAcum += r.dias;
-                        return [
-                            '', // NIT
-                            r.empresa,
-                            r.ibcHistorico,
-                            r.desde,
-                            r.hasta,
-                            (r.dias / 7).toFixed(2),
-                            r.dias,
-                            diasAcum,
-                            r.fechaIpcFinal,
-                            r.ipcFinal,
-                            r.fechaIpcInicial,
-                            r.ipcInicial,
-                            r.iaXDias
-                        ];
-                    });
-
-                    // Fila de totales
-                    const totalsRow = [
-                        'TOTALES', '', '', '', '',
-                        (bestCalc.consumedDays / 7).toFixed(2),
-                        bestCalc.consumedDays,
-                        diasAcum,
-                        '', '', '', '',
-                        bestCalc.sumIaXDias
-                    ];
-
-                    const allData = [...headerData, tableHeaders, ...tableData, totalsRow];
-                    const wsMain = XLSX.utils.aoa_to_sheet(allData);
-                    wsMain['!cols'] = [
-                        {wch: 5}, {wch: 30}, {wch: 18}, {wch: 14}, {wch: 14},
-                        {wch: 10}, {wch: 10}, {wch: 10}, {wch: 18}, {wch: 12},
-                        {wch: 18}, {wch: 12}, {wch: 20}
-                    ];
-
-                    // === HOJA RESUMEN ===
-                    const resumenData = [
-                        ['RESUMEN COMPARATIVO DE SIMULACIÓN PENSIONAL'],
-                        ['Base Legal:', 'Ley 100 de 1993 / Ley 797 de 2003'],
-                        [],
-                        ['DATOS DEL AFILIADO'],
-                        ['Nombre:', formData.nombre || 'Usuario ' + formData.cedula],
-                        ['Documento:', formData.cedula],
-                        ['Edad:', formData.edad],
-                        ['Género:', formData.genero === 'F' ? 'Femenino' : 'Masculino'],
-                        ['SMLV:', formData.smlv],
-                        [],
-                        ['COMPARACIÓN IBL'],
-                        ['', 'Últimos 10 Años', 'Toda la Vida'],
-                        ['Días Computados', res.calc10Years ? res.calc10Years.consumedDays : 0, res.calcTodaVida ? res.calcTodaVida.consumedDays : 0],
-                        ['Sumatoria (IA × Días)', res.calc10Years ? res.calc10Years.sumIaXDias : 0, res.calcTodaVida ? res.calcTodaVida.sumIaXDias : 0],
-                        ['IBL ($)', res.calc10Years ? res.calc10Years.ibl : 0, res.calcTodaVida ? res.calcTodaVida.ibl : 0],
-                        ['>>> MEJOR IBL:', res.bestName, res.ibl],
-                        [],
-                        ['CÁLCULO DE PENSIÓN (Mejor IBL)'],
-                        ['Semanas Totales:', res.totalSem],
-                        ['IBL ($):', res.ibl],
-                        ['Tasa Base (65.5 - 0.5s):', res.tasaBase.toFixed(2) + '%'],
-                        [],
-                        ['PROYECCIÓN DUAL'],
-                        ['', 'Colpensiones (Tope 1.800 sem)', 'Jurisprudencial (CSJ SL3501-2022)'],
-                        ['Semanas Adicionales (>1.300)', res.vA.extra.toFixed(2), res.vB.extra.toFixed(2)],
-                        ['Grupos de 50 Semanas', res.vA.grupos, res.vB.grupos],
-                        ['Incremento Densidad', (res.vA.grupos * 1.5).toFixed(2) + '%', (res.vB.grupos * 1.5).toFixed(2) + '%'],
-                        ['Tasa de Reemplazo (máx 80%)', (res.vA.rate * 100).toFixed(2) + '%', (res.vB.rate * 100).toFixed(2) + '%'],
-                        ['Mesada Bruta ($)', res.vA.mesada, res.vB.mesada],
-                        ['Descuento Salud', '-' + res.vA.descuentoSalud + ' (' + res.vA.porcentajeSalud + '%)', '-' + res.vB.descuentoSalud + ' (' + res.vB.porcentajeSalud + '%)'],
-                        ['Mesada Neta ($)', res.vA.mesadaNeta, res.vB.mesadaNeta],
-                        [],
-                        ['Diferencial Mensual Bruto:', res.vB.mesada - res.vA.mesada],
-                        ['Diferencial Anual (×13):', (res.vB.mesada - res.vA.mesada) * 13],
-                        [],
-                        ['Nota:', 'Este documento es una simulación matemática estimada. No constituye dictamen pericial definitivo.']
-                    ];
-
-                    const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
-                    wsResumen['!cols'] = [{wch: 35}, {wch: 35}, {wch: 35}];
-
-                    const workbook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(workbook, wsMain, 'Liquidación Pensional');
-                    XLSX.utils.book_append_sheet(workbook, wsResumen, 'Resumen Comparativo');
-
-                    XLSX.writeFile(workbook, `Simulacion_Pensional_${formData.cedula}.xlsx`);
-                } else {
-                    const res = results;
-                    
-                    const preData = [
-                        ['TU ABOGADO LABORAL'],
-                        ['Contacto:', '+57 321 792 7495', 'tuabogadolaboral@outlook.com'],
-                        [],
-                        ['LIQUIDACIÓN INDEMNIZACIÓN SUSTITUTIVA DE VEJEZ'],
-                        ['Base Legal:', 'Decreto 1730 de 2001 (Art. 1)'],
-                        [],
-                        ['DATOS DEL AFILIADO'],
-                        ['Afiliado:', (formData.nombre && String(formData.nombre).trim()) ? String(formData.nombre).trim() : (formData.cedula || '—')],
-                        ['Documento:', formData.cedula || '—'],
-                        ['Fecha de Liquidación:', `${MESES_NOMBRES[(formData.mesLiquidacion || 12) - 1]} ${formData.anoLiquidacion}`],
-                        [],
-                        ['RESUMEN DE LIQUIDACIÓN'],
-                        ['Total Días Computados:', res.totalDias],
-                        ['SBC (Salario Base Semanal):', res.SBC],
-                        ['SC (Semanas Cotizadas):', res.SC],
-                        ['PPC (% Ponderado Cotización):', (res.PPC * 100).toFixed(4) + '%'],
-                        ['Fórmula:', 'ISP = SBC × SC × PPC'],
-                        ['Base Legal:', 'Decreto 1730/2001 Art. 3'],
-                        ['INDEMNIZACIÓN SUSTITUTIVA:', res.indemnizacion],
-                        [],
-                        ['DETALLE ACTUARIAL MENSUALIZADO']
-                    ];
-
-                    const pre95x = res.detailedReport.filter(r => r.seccion === 'pre1995').sort((a,b) => a.mes.localeCompare(b.mes));
-                    const post95x = res.detailedReport.filter(r => r.seccion === 'post1995').sort((a,b) => a.mes.localeCompare(b.mes));
-
-                    let excelRows = [];
-
-                    // SECCIÓN 1: ANTES DE 1995
-                    if (pre95x.length > 0) {
-                        excelRows.push(['DETALLE DE PAGOS EFECTUADOS ANTERIORES A 1995']);
-                        excelRows.push(['NIT Aportante', 'Razón Social', 'Desde', 'Hasta', 'Salario (IBC)', 'Semanas', 'No. Días', '% Cotización', 'Fecha IPC Final', 'IPC Final', 'Fecha IPC Inicial', 'IPC Inicial', 'IBC Indexado']);
-                        pre95x.forEach(r => excelRows.push([r.nit || '', r.empresa, r.desde, r.hasta, r.ibcHistorico, r.semanas, r.dias, r.tasaP * 100, r.ipcFinalFecha, r.ipcFinal, r.ipcInicialFecha, r.ipcInicial, r.ibcIndexado]));
-                        const pre95Dias = pre95x.reduce((s,r) => s + r.dias, 0);
-                        const pre95Semanas = pre95x.reduce((s,r) => s + r.semanas, 0);
-                        excelRows.push(['Subtotal Pre-1995', '', '', '', '', pre95Semanas, pre95Dias, '', '', '', '', '', '']);
-                        excelRows.push([]);
-                    }
-
-                    // SECCIÓN 2: A PARTIR DE 1995
-                    if (post95x.length > 0) {
-                        excelRows.push(['DETALLE DE PAGOS EFECTUADOS A PARTIR DE 1995']);
-                        excelRows.push(['NIT Aportante', 'Razón Social', 'Desde', 'Hasta', 'Salario (IBC)', 'Semanas', 'Días Rep', 'Días Cot', '% Cotización', 'Fecha IPC Final', 'IPC Final', 'Fecha IPC Inicial', 'IPC Inicial', 'IBC Indexado']);
-                        post95x.forEach(r => excelRows.push([r.nit || '', r.empresa, r.desde, r.hasta, r.ibcHistorico, r.semanas, r.dias, r.diasCot != null ? r.diasCot : r.dias, r.tasaP * 100, r.ipcFinalFecha, r.ipcFinal, r.ipcInicialFecha, r.ipcInicial, r.ibcIndexado]));
-                        const post95Dias = post95x.reduce((s,r) => s + r.dias, 0);
-                        const post95DiasCot = post95x.reduce((s,r) => s + (r.diasCot != null ? r.diasCot : r.dias), 0);
-                        const post95Semanas = post95x.reduce((s,r) => s + r.semanas, 0);
-                        excelRows.push(['Subtotal Post-1995', '', '', '', '', post95Semanas, post95Dias, post95DiasCot, '', '', '', '', '', '']);
-                        excelRows.push([]);
-                    }
-
-                    excelRows.push(['TOTAL GENERAL DÍAS', '', '', res.totalDias]);
-
-                    const allData = [...preData, ...excelRows];
-
-                    const ws = XLSX.utils.aoa_to_sheet(allData);
-
-                    // Ancho de columnas
-                    ws['!cols'] = [
-                        {wch: 16}, {wch: 28}, {wch: 12}, {wch: 12}, {wch: 16}, {wch: 10}, {wch: 10}, {wch: 12}, {wch: 18}, {wch: 12}, {wch: 18}, {wch: 12}, {wch: 18}
-                    ];
-
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, 'Indemnización Sustitutiva');
-                    XLSX.writeFile(wb, `Indemnizacion_Sustitutiva_Detalle_${formData.cedula}.xlsx`);
+                // SECCIÓN 1: ANTES DE 1995
+                if (pre95x.length > 0) {
+                    excelRows.push(['DETALLE DE PAGOS EFECTUADOS ANTERIORES A 1995']);
+                    excelRows.push(['NIT Aportante', 'Razón Social', 'Desde', 'Hasta', 'Salario (IBC)', 'Semanas', 'No. Días', '% Cotización', 'Fecha IPC Final', 'IPC Final', 'Fecha IPC Inicial', 'IPC Inicial', 'IBC Indexado']);
+                    pre95x.forEach(r => excelRows.push([r.nit || '', r.empresa, r.desde, r.hasta, r.ibcHistorico, r.semanas, r.dias, r.tasaP * 100, r.ipcFinalFecha, r.ipcFinal, r.ipcInicialFecha, r.ipcInicial, r.ibcIndexado]));
+                    const pre95Dias = pre95x.reduce((s,r) => s + r.dias, 0);
+                    const pre95Semanas = pre95x.reduce((s,r) => s + r.semanas, 0);
+                    excelRows.push(['Subtotal Pre-1995', '', '', '', '', pre95Semanas, pre95Dias, '', '', '', '', '', '']);
+                    excelRows.push([]);
                 }
+
+                // SECCIÓN 2: A PARTIR DE 1995
+                if (post95x.length > 0) {
+                    excelRows.push(['DETALLE DE PAGOS EFECTUADOS A PARTIR DE 1995']);
+                    excelRows.push(['NIT Aportante', 'Razón Social', 'Desde', 'Hasta', 'Salario (IBC)', 'Semanas', 'Días Rep', 'Días Cot', '% Cotización', 'Fecha IPC Final', 'IPC Final', 'Fecha IPC Inicial', 'IPC Inicial', 'IBC Indexado']);
+                    post95x.forEach(r => excelRows.push([r.nit || '', r.empresa, r.desde, r.hasta, r.ibcHistorico, r.semanas, r.dias, r.diasCot != null ? r.diasCot : r.dias, r.tasaP * 100, r.ipcFinalFecha, r.ipcFinal, r.ipcInicialFecha, r.ipcInicial, r.ibcIndexado]));
+                    const post95Dias = post95x.reduce((s,r) => s + r.dias, 0);
+                    const post95DiasCot = post95x.reduce((s,r) => s + (r.diasCot != null ? r.diasCot : r.dias), 0);
+                    const post95Semanas = post95x.reduce((s,r) => s + r.semanas, 0);
+                    excelRows.push(['Subtotal Post-1995', '', '', '', '', post95Semanas, post95Dias, post95DiasCot, '', '', '', '', '', '']);
+                    excelRows.push([]);
+                }
+
+                excelRows.push(['TOTAL GENERAL DÍAS', '', '', res.totalDias]);
+
+                const allData = [...preData, ...excelRows];
+
+                const ws = XLSX.utils.aoa_to_sheet(allData);
+
+                // Ancho de columnas
+                ws['!cols'] = [
+                    {wch: 16}, {wch: 28}, {wch: 12}, {wch: 12}, {wch: 16}, {wch: 10}, {wch: 10}, {wch: 12}, {wch: 18}, {wch: 12}, {wch: 18}, {wch: 12}, {wch: 18}
+                ];
+
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Indemnización Sustitutiva');
+                XLSX.writeFile(wb, `Indemnizacion_Sustitutiva_Detalle_${formData.cedula}.xlsx`);
             };
 
             const exportAuditExcel = () => {
@@ -2201,40 +1609,31 @@ function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, s
                                                 <label className="text-xs font-semibold text-slate-500 mb-1.5 block uppercase tracking-wide">No. Documento <span className="text-red-500">*</span></label>
                                                 <div className="relative">
                                                     <i className="fas fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                                                    <input type={showCedula ? "text" : "password"} className="w-full p-3.5 pl-11 pr-10 rounded-xl input-legal text-sm font-mono font-semibold tracking-widest" value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value.replace(/\D/g, '')})} placeholder="Solo números" />
+                                                    <input type={showCedula ? "text" : "password"} className="w-full p-3.5 pl-11 pr-10 rounded-xl input-legal text-sm font-mono font-semibold tracking-widest" value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} placeholder="Solo números" />
                                                     <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors" onClick={() => setShowCedula(!showCedula)} title={showCedula ? "Ocultar Cédula" : "Mostrar Cédula"}>
                                                         <i className={showCedula ? "fas fa-eye-slash" : "fas fa-eye"}></i>
                                                     </button>
                                                 </div>
                                             </div>
                                             <div>
-                                                <label className="text-xs font-semibold text-slate-500 mb-1.5 block uppercase tracking-wide">Género <span className="text-slate-400 font-normal normal-case">(Pensión)</span></label>
-                                                <select className="w-full p-3.5 rounded-xl input-legal text-sm font-semibold bg-[#f8fafc] text-slate-700 outline-none" value={formData.genero || 'M'} onChange={e => setFormData({...formData, genero: e.target.value})}>
-                                                    <option value="M">Masculino (62 años)</option>
-                                                    <option value="F">Femenino (57 años)</option>
-                                                </select>
+                                                <label className="text-xs font-semibold text-slate-500 mb-1.5 block uppercase tracking-wide">Edad <span className="text-slate-400 font-normal normal-case">(Opcional)</span></label>
+                                                <input type="number" className="w-full p-3.5 rounded-xl input-legal text-sm font-bold text-center" value={formData.edad} onChange={e => setFormData({...formData, edad: e.target.value})} placeholder="Ej: 62" />
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100">
-                                            <div>
-                                                <label className="text-xs font-semibold text-slate-500 mb-1.5 block uppercase tracking-wide">Edad <span className="text-slate-400 font-normal normal-case">(Pensión)</span></label>
-                                                <input type="number" className="w-full p-3.5 rounded-xl input-legal text-sm font-bold text-center" value={formData.edad} onChange={e => setFormData({...formData, edad: e.target.value})} placeholder="Ej: 62" />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-semibold text-slate-500 mb-1.5 block uppercase tracking-wide">Fecha de Cierre <span className="text-slate-400 font-normal normal-case">(Cálculo)</span></label>
-                                                <div className="relative">
-                                                    <i className="far fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                                                    <input type="month" className="w-full p-3.5 pl-11 rounded-xl input-legal text-sm font-bold uppercase" 
-                                                        value={`${formData.anoLiquidacion}-${String(formData.mesLiquidacion).padStart(2, '0')}`} 
-                                                        onChange={e => {
-                                                            if (e.target.value) {
-                                                                const [y, m] = e.target.value.split('-');
-                                                                setFormData({...formData, anoLiquidacion: parseInt(y), mesLiquidacion: parseInt(m)});
-                                                            }
-                                                        }} 
-                                                    />
-                                                </div>
+                                        <div className="pt-2 border-t border-slate-100">
+                                            <label className="text-xs font-semibold text-slate-500 mb-1.5 block uppercase tracking-wide">Fecha de Cierre <span className="text-slate-400 font-normal normal-case">(Cálculo)</span></label>
+                                            <div className="relative">
+                                                <i className="far fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                                <input type="month" className="w-full p-3.5 pl-11 rounded-xl input-legal text-sm font-bold uppercase" 
+                                                    value={`${formData.anoLiquidacion}-${String(formData.mesLiquidacion).padStart(2, '0')}`} 
+                                                    onChange={e => {
+                                                        if (e.target.value) {
+                                                            const [y, m] = e.target.value.split('-');
+                                                            setFormData({...formData, anoLiquidacion: parseInt(y), mesLiquidacion: parseInt(m)});
+                                                        }
+                                                    }} 
+                                                />
                                             </div>
                                         </div>
                                         {!isFechaCierreValid && (
@@ -2299,17 +1698,9 @@ function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, s
                                         </div>
                                     </div>
                                     <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto mt-4 sm:mt-0">
-                                        <select 
-                                            value={tipoCalculo} 
-                                            onChange={e => setTipoCalculo(e.target.value)} 
-                                            className="p-3 rounded-xl border border-slate-200 text-sm font-semibold bg-white text-slate-700 outline-none focus:border-primary cursor-pointer shadow-sm hover:border-slate-300 transition-all"
-                                        >
-                                            <option value="pension">Liquidación Pensión de Vejez</option>
-                                            <option value="indemnizacion">Indemnización Sustitutiva</option>
-                                        </select>
                                         <button className="bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:bg-slate-800 transition-colors shadow-sm flex items-center space-x-2 text-sm w-full sm:w-auto justify-center" onClick={handleCalculate}>
                                             <Icon name="calc" className="w-4 h-4" />
-                                            <span>{tipoCalculo === 'pension' ? 'Calcular Pensión de Vejez' : 'Calcular Indemnización'}</span>
+                                            <span>Calcular Indemnización</span>
                                         </button>
                                     </div>
                                 </div>
@@ -2372,6 +1763,10 @@ function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, s
                                         <span>{audit.reported !== null ? audit.reported.toFixed(2) : '—'}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
+                                        <span className="font-semibold">Semanas Calculadas (Días/7)</span>
+                                        <span>{audit.calculated ? audit.calculated.toFixed(2) : '0.00'}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
                                         <span className="font-semibold">Diferencia (gap)</span>
                                         <span>{audit.gap ? audit.gap.toFixed(2) : '0.00'}</span>
                                     </div>
@@ -2400,313 +1795,176 @@ function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, s
 
                     {step === 3 && results && (
                         <div className="space-y-6 animate-in slide-in-from-bottom-4">
-                            {tipoCalculo === 'pension' ? (
-                                <>
-                                    <div className="grid md:grid-cols-3 gap-4">
-                                        <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-primary">
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">IBL Estimado Ponderado</p>
-                                            <h3 className="text-2xl font-black text-primary mt-1">{formatCurrency(results.ibl)}</h3>
-                                            <p className="text-xs text-slate-500 mt-1">{results.bestName}</p>
-                                        </div>
-                                        <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-secondary">
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Semanas Totales</p>
-                                            <h3 className="text-2xl font-black text-primary mt-1">{results.totalSem.toFixed(2)}</h3>
-                                            <p className="text-xs text-slate-500 mt-1">Histórico general</p>
-                                        </div>
-                                        <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-slate-400">
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Tasa Base</p>
-                                            <h3 className="text-2xl font-black text-primary mt-1">{results.tasaBase.toFixed(2)}%</h3>
-                                            <p className="text-xs text-slate-500 mt-1">Fórmula proyectada: 65.5 - 0.5s</p>
-                                        </div>
-                                    </div>
+                            
+                            <div className="grid md:grid-cols-3 gap-4">
+                                <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-primary">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">SBC — Salario Base Semanal</p>
+                                    <h3 className="text-2xl font-black text-primary mt-1">{formatCurrency(results.SBC)}</h3>
+                                    <p className="text-xs text-slate-500 mt-1">IMP: {formatCurrency(results.ingresoMensualPromedio)} × 7/30</p>
+                                </div>
+                                <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-accent">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">SC — Semanas Cotizadas</p>
+                                    <h3 className="text-2xl font-black text-primary mt-1">{results.SC.toFixed(2)}</h3>
+                                    <p className="text-xs text-slate-500 mt-1">{results.totalDias.toFixed(2)} días / 7</p>
+                                </div>
+                                <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-secondary">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">PPC — % Ponderado Cotización</p>
+                                    <h3 className="text-2xl font-black text-primary mt-1">{(results.PPC * 100).toFixed(4)}%</h3>
+                                    <p className="text-xs text-slate-500 mt-1">Σ(P×días) / Σ(días)</p>
+                                </div>
+                            </div>
 
-                                    <div className="space-y-6">
-                                        <div className="card-legal p-8 rounded-2xl flex flex-col relative border-primary/20 ring-1 ring-primary/10 bg-white shadow-md">
-                                            <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-4 py-2 rounded-bl-lg rounded-tr-xl tracking-wider">RESULTADO PRINCIPAL</div>
-                                            <div className="mb-6">
-                                                <h3 className="text-2xl font-bold text-primary mt-3">Cálculo Colpensiones</h3>
-                                                <p className="text-sm font-medium text-slate-500 mt-1">Estimación Ley 797 de 2003 (Tope 1.800 Semanas)</p>
-                                            </div>
-                                            <div className="grid md:grid-cols-2 gap-8 items-center mb-4">
-                                                <div className="space-y-4">
-                                                    <div className="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
-                                                        <span className="text-slate-600">Semanas Adicionales Computadas</span>
-                                                        <span className="font-bold text-slate-800">{results.vA.extra.toFixed(2)}</span>
-                                                    </div>
-                                                    <div className="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
-                                                        <span className="text-slate-600">Incremento Proy. (1.5% x Grupo 50)</span>
-                                                        <span className="font-bold text-slate-800">{(results.vA.grupos * 1.5).toFixed(2)}%</span>
-                                                    </div>
-                                                    <div className="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
-                                                        <span className="text-slate-600 font-semibold">Tasa de Reemplazo Calculada</span>
-                                                        <span className="font-bold text-primary text-base">{(results.vA.rate * 100).toFixed(2)}%</span>
-                                                    </div>
-                                                </div>
-                                                <div className="bg-slate-50/80 p-6 rounded-xl border border-slate-200">
-                                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 text-center">Mesada Bruta {results.isVerification ? 'Verificada' : 'Proyectada'}</p>
-                                                    <p className="text-4xl font-black text-slate-800 text-center">{formatCurrency(results.vA.mesada)}</p>
-                                                    <div className="mt-6 pt-4 border-t border-slate-200 grid grid-cols-2 gap-4 text-left">
-                                                        <div>
-                                                            <p className="text-[10px] uppercase text-slate-400 font-bold">Salud ({results.vA.porcentajeSalud}%)</p>
-                                                            <p className="text-sm font-semibold text-red-500">-{formatCurrency(results.vA.descuentoSalud)}</p>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <p className="text-[10px] uppercase text-slate-400 font-bold">Neto a Recibir</p>
-                                                            <p className="text-lg font-black text-green-600">{formatCurrency(results.vA.mesadaNeta)}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                            <div className="card-legal p-8 rounded-2xl flex flex-col items-center bg-slate-50 border-2 border-secondary/30 relative">
+                                <div className="absolute top-0 right-0 bg-secondary text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-lg rounded-tr-xl tracking-wider">DECRETO 1730/2001 ART. 3</div>
+                                <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2 mt-4">Indemnización Sustitutiva a Recibir</p>
+                                <p className="text-5xl md:text-6xl font-black text-primary mb-4">{formatCurrency(results.indemnizacion)}</p>
+                                <div className="bg-white border border-slate-200 px-6 py-3 rounded-lg text-sm text-slate-600 font-mono flex flex-col items-center shadow-sm">
+                                    <span className="font-bold text-primary mb-1">ISP = SBC × SC × PPC</span>
+                                    <span>{formatCurrency(results.SBC)} × {results.SC.toFixed(2)} × {(results.PPC * 100).toFixed(4)}%</span>
+                                </div>
+                            </div>
+
+                            <div className="mt-8">
+                                <button 
+                                    onClick={() => setShowDetails(!showDetails)}
+                                    className="flex items-center justify-center w-full py-4 bg-white text-primary font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm"
+                                >
+                                    <Icon name="table" className="w-5 h-5 mr-2 text-secondary" />
+                                    {showDetails ? "Ocultar Detalle Actuarial (Tabla Mensualizada)" : "Ver Detalle Actuarial (Tabla Mensualizada)"}
+                                </button>
+
+                                {showDetails && (() => {
+                                    const pre95 = results.detailedReport.filter(r => r.seccion === 'pre1995').sort((a,b) => a.mes.localeCompare(b.mes));
+                                    const post95 = results.detailedReport.filter(r => r.seccion === 'post1995').sort((a,b) => a.mes.localeCompare(b.mes));
+                                    const pre95Dias = pre95.reduce((s,r) => s + r.dias, 0);
+                                    const pre95DiasCot = pre95.reduce((s,r) => s + (r.diasCot || Math.max(0, r.dias)), 0);
+                                    const post95Dias = post95.reduce((s,r) => s + r.dias, 0);
+                                    const post95DiasCot = post95.reduce((s,r) => s + (r.diasCot != null ? r.diasCot : r.dias), 0);
+                                    return (
+                                    <div className="mt-4 space-y-6 animate-in slide-in-from-top-4">
+                                        {/* SECCIÓN 1: ANTES DE 1995 */}
+                                        {pre95.length > 0 && (
+                                        <div>
+                                            <h4 className="text-sm font-bold text-primary mb-2 uppercase tracking-wide">Detalle de Pagos Efectuados Anteriores a 1995</h4>
+                                            <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-inner bg-white max-h-[400px]">
+                                                <table className="w-full text-[10px] text-left whitespace-nowrap">
+                                                    <thead className="bg-slate-100 text-slate-600 uppercase font-bold tracking-wider sticky top-0 border-b border-slate-200">
+                                                        <tr>
+                                                            <th className="p-2">(1) NIT</th>
+                                                            <th className="p-2">(2) Razón Social</th>
+                                                            <th className="p-2 text-center">(3) Desde</th>
+                                                            <th className="p-2 text-center">(4) Hasta</th>
+                                                            <th className="p-2 text-right">(5) Salario (IBC)</th>
+                                                            <th className="p-2 text-center">(6) Semanas</th>
+                                                            <th className="p-2 text-center">(7) Días</th>
+                                                            <th className="p-2 text-center">(8) % Cotiz.</th>
+                                                            <th className="p-2 text-center">Fecha IPC Final</th>
+                                                            <th className="p-2 text-right">(9) IPC Final</th>
+                                                            <th className="p-2 text-center">Fecha IPC Inicial</th>
+                                                            <th className="p-2 text-right">(10) IPC Inicial</th>
+                                                            <th className="p-2 text-right">(11) IBC Indexado</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {pre95.map((r, i) => (
+                                                            <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                                                <td className="p-2 font-mono text-slate-500">{r.nit || ''}</td>
+                                                                <td className="p-2 font-medium text-slate-700 truncate max-w-[140px]" title={r.empresa}>{r.empresa}</td>
+                                                                <td className="p-2 font-mono text-center">{r.desde}</td>
+                                                                <td className="p-2 font-mono text-center">{r.hasta}</td>
+                                                                <td className="p-2 text-right text-slate-600">{formatCurrency(r.ibcHistorico)}</td>
+                                                                <td className="p-2 text-center text-slate-600">{r.semanas.toFixed(3)}</td>
+                                                                <td className={`p-2 text-center font-bold ${r.dias < 0 ? 'text-red-600' : ''}`}>{r.dias}</td>
+                                                                <td className="p-2 text-center font-bold text-secondary">{(r.tasaP * 100).toFixed(2)}%</td>
+                                                                <td className="p-2 text-center text-slate-500">{r.ipcFinalFecha}</td>
+                                                                <td className="p-2 text-right text-slate-600">{r.ipcFinal.toFixed(4)}</td>
+                                                                <td className="p-2 text-center text-slate-500">{r.ipcInicialFecha}</td>
+                                                                <td className="p-2 text-right text-slate-600">{r.ipcInicial.toFixed(4)}</td>
+                                                                <td className="p-2 text-right font-bold text-primary">{formatCurrency(r.ibcIndexado)}</td>
+                                                            </tr>
+                                                        ))}
+                                                        <tr className="bg-slate-100 font-bold border-t-2 border-slate-300">
+                                                            <td colSpan="5" className="p-2 text-right">Subtotal Pre-1995:</td>
+                                                            <td className="p-2 text-center">{pre95.reduce((s,r) => s + r.semanas, 0).toFixed(3)}</td>
+                                                            <td className="p-2 text-center">{pre95Dias} <span className="text-xs text-slate-400">(Cot: {pre95DiasCot})</span></td>
+                                                            <td colSpan="6"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-
-                                        {results.totalSem > 1800 && (
-                                            <div className="card-legal p-5 rounded-xl border border-slate-100 bg-slate-50/50">
-                                                <div className="mb-3">
-                                                    <h4 className="text-sm font-bold text-slate-600"><i className="fas fa-info-circle mr-1 text-slate-400"></i> Nota Jurisprudencial (Corte Suprema)</h4>
-                                                    <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                                                        Si se aplica el criterio de la Sentencia <a href="https://www.cortesuprema.gov.co/corte/wp-content/uploads/relatorias/la/bnov2022/SL3501-2022.pdf" target="_blank" className="text-secondary hover:underline font-bold">SL3501-2022</a> (eliminando el tope máximo de 1.800 semanas para el cálculo de incrementos), 
-                                                        la tasa de reemplazo sería de <strong>{(results.vB.rate * 100).toFixed(2)}%</strong>, proyectando una Mesada Bruta de <strong>{formatCurrency(results.vB.mesada)}</strong> 
-                                                        y un Neto a Pagar de <strong>{formatCurrency(results.vB.mesadaNeta)}</strong>, lo cual representaría un diferencial a favor de <strong>{formatCurrency(results.vB.mesada - results.vA.mesada)}</strong> al mes.
-                                                    </p>
-                                                </div>
-                                            </div>
                                         )}
-                                    </div>
 
-                                    <div className="mt-8">
-                                        <button 
-                                            onClick={() => setShowDetails(!showDetails)}
-                                            className="flex items-center justify-center w-full py-4 bg-white text-primary font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm"
-                                        >
-                                            <Icon name="table" className="w-5 h-5 mr-2 text-secondary" />
-                                            {showDetails ? "Ocultar Detalle Actuarial" : "Ver Detalle Actuarial"}
-                                        </button>
-
-                                        {showDetails && (
-                                            <div className="mt-4 space-y-6 animate-in slide-in-from-top-4">
-                                                <div>
-                                                    <h4 className="text-sm font-bold text-primary mb-2 uppercase tracking-wide">Detalle de Aportes Indexados por IPC</h4>
-                                                    <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-inner bg-white max-h-[400px]">
-                                                        <table className="w-full text-[10px] text-left whitespace-nowrap">
-                                                            <thead className="bg-slate-100 text-slate-600 uppercase font-bold tracking-wider sticky top-0 border-b border-slate-200">
-                                                                <tr>
-                                                                    <th className="p-2">Razón Social / Aportante</th>
-                                                                    <th className="p-2 text-center">Desde</th>
-                                                                    <th className="p-2 text-center">Hasta</th>
-                                                                    <th className="p-2 text-center">Días</th>
-                                                                    <th className="p-2 text-center">F. IPC Final</th>
-                                                                    <th className="p-2 text-right">IPC Final</th>
-                                                                    <th className="p-2 text-center">F. IPC Inicial</th>
-                                                                    <th className="p-2 text-right">IPC Inicial</th>
-                                                                    <th className="p-2 text-right">Salario Base</th>
-                                                                    <th className="p-2 text-right">Salario Indexado</th>
-                                                                    <th className="p-2 text-right">IA × Días</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {results.detailedReport.map((r, i) => (
-                                                                    <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                                                        <td className="p-2 font-medium text-slate-700 truncate max-w-[180px]" title={r.empresa}>{r.empresa}</td>
-                                                                        <td className="p-2 font-mono text-center">{r.desde}</td>
-                                                                        <td className="p-2 font-mono text-center">{r.hasta}</td>
-                                                                        <td className="p-2 text-center">{r.dias}</td>
-                                                                        <td className="p-2 text-center text-slate-500">{r.fechaIpcFinal}</td>
-                                                                        <td className="p-2 text-right text-slate-600">{r.ipcFinal.toFixed(4)}</td>
-                                                                        <td className="p-2 text-center text-slate-500">{r.fechaIpcInicial}</td>
-                                                                        <td className="p-2 text-right text-slate-600">{r.ipcInicial.toFixed(4)}</td>
-                                                                        <td className="p-2 text-right text-slate-600">{formatCurrency(r.ibcHistorico)}</td>
-                                                                        <td className="p-2 text-right font-bold text-primary">{formatCurrency(r.ibcIndexado)}</td>
-                                                                        <td className="p-2 text-right font-bold text-green-700">{formatCurrency(r.iaXDias)}</td>
-                                                                    </tr>
-                                                                ))}
-                                                                <tr className="bg-slate-100 font-bold border-t-2 border-slate-300">
-                                                                    <td colSpan="3" className="p-2 text-right">Total Días Computados:</td>
-                                                                    <td className="p-2 text-center">{results.diasComputadosTotales}</td>
-                                                                    <td colSpan="6" className="p-2 text-right">Sumatoria Productos (IA × Días):</td>
-                                                                    <td className="p-2 text-right text-green-800">{formatCurrency(results.sumIaXDias)}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
+                                        {/* SECCIÓN 2: A PARTIR DE 1995 */}
+                                        {post95.length > 0 && (
+                                        <div>
+                                            <h4 className="text-sm font-bold text-primary mb-2 uppercase tracking-wide">Detalle de Pagos Efectuados a Partir de 1995</h4>
+                                            <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-inner bg-white max-h-[400px]">
+                                                <table className="w-full text-[10px] text-left whitespace-nowrap">
+                                                    <thead className="bg-slate-100 text-slate-600 uppercase font-bold tracking-wider sticky top-0 border-b border-slate-200">
+                                                        <tr>
+                                                            <th className="p-2">(1) NIT</th>
+                                                            <th className="p-2">(2) Razón Social</th>
+                                                            <th className="p-2 text-center">(3) Desde</th>
+                                                            <th className="p-2 text-center">(4) Hasta</th>
+                                                            <th className="p-2 text-right">(5) Salario (IBC)</th>
+                                                            <th className="p-2 text-center">(6) Semanas</th>
+                                                            <th className="p-2 text-center">(7) Días Rep</th>
+                                                            <th className="p-2 text-center">(7b) Días Cot</th>
+                                                            <th className="p-2 text-center">(8) % Cotiz.</th>
+                                                            <th className="p-2 text-center">Fecha IPC Final</th>
+                                                            <th className="p-2 text-right">(9) IPC Final</th>
+                                                            <th className="p-2 text-center">Fecha IPC Inicial</th>
+                                                            <th className="p-2 text-right">(10) IPC Inicial</th>
+                                                            <th className="p-2 text-right">(11) IBC Indexado</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {post95.map((r, i) => (
+                                                            <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                                                <td className="p-2 font-mono text-slate-500">{r.nit || ''}</td>
+                                                                <td className="p-2 font-medium text-slate-700 truncate max-w-[140px]" title={r.empresa}>{r.empresa}</td>
+                                                                <td className="p-2 font-mono text-center">{r.desde}</td>
+                                                                <td className="p-2 font-mono text-center">{r.hasta}</td>
+                                                                <td className="p-2 text-right text-slate-600">{formatCurrency(r.ibcHistorico)}</td>
+                                                                <td className="p-2 text-center text-slate-600">{r.semanas.toFixed(3)}</td>
+                                                                <td className={`p-2 text-center ${r.dias !== (r.diasCot != null ? r.diasCot : r.dias) ? 'text-red-500' : ''}`}>{r.dias}</td>
+                                                                <td className="p-2 text-center font-bold text-primary">{r.diasCot != null ? r.diasCot : r.dias}</td>
+                                                                <td className="p-2 text-center font-bold text-secondary">{(r.tasaP * 100).toFixed(2)}%</td>
+                                                                <td className="p-2 text-center text-slate-500">{r.ipcFinalFecha}</td>
+                                                                <td className="p-2 text-right text-slate-600">{r.ipcFinal.toFixed(4)}</td>
+                                                                <td className="p-2 text-center text-slate-500">{r.ipcInicialFecha}</td>
+                                                                <td className="p-2 text-right text-slate-600">{r.ipcInicial.toFixed(4)}</td>
+                                                                <td className="p-2 text-right font-bold text-primary">{formatCurrency(r.ibcIndexado)}</td>
+                                                            </tr>
+                                                        ))}
+                                                        <tr className="bg-slate-100 font-bold border-t-2 border-slate-300">
+                                                            <td colSpan="5" className="p-2 text-right">Subtotal Post-1995:</td>
+                                                            <td className="p-2 text-center">{post95.reduce((s,r) => s + r.semanas, 0).toFixed(3)}</td>
+                                                            <td className="p-2 text-center">{post95Dias}</td>
+                                                            <td className="p-2 text-center font-bold text-primary">{post95DiasCot}</td>
+                                                            <td colSpan="6"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
+                                        </div>
                                         )}
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="grid md:grid-cols-3 gap-4">
-                                        <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-primary">
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">SBC — Salario Base Semanal</p>
-                                            <h3 className="text-2xl font-black text-primary mt-1">{formatCurrency(results.SBC)}</h3>
-                                            <p className="text-xs text-slate-500 mt-1">IMP: {formatCurrency(results.ingresoMensualPromedio)} × 7/30</p>
-                                        </div>
-                                        <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-accent">
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">SC — Semanas Cotizadas</p>
-                                            <h3 className="text-2xl font-black text-primary mt-1">{results.SC.toFixed(2)}</h3>
-                                            <p className="text-xs text-slate-500 mt-1">{results.totalDias.toFixed(2)} días / 7</p>
-                                        </div>
-                                        <div className="card-legal p-6 rounded-2xl flex flex-col justify-center border-t-4 border-t-secondary">
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">PPC — % Ponderado Cotización</p>
-                                            <h3 className="text-2xl font-black text-primary mt-1">{(results.PPC * 100).toFixed(4)}%</h3>
-                                            <p className="text-xs text-slate-500 mt-1">Σ(P×días) / Σ(días)</p>
+
+                                        {/* TOTAL GENERAL */}
+                                        <div className="bg-slate-100 p-4 rounded-xl flex justify-between items-center font-bold text-sm">
+                                            <span className="text-slate-700">TOTAL GENERAL DÍAS:</span>
+                                            <span className="text-primary text-lg">{results.totalDias}</span>
                                         </div>
                                     </div>
-
-                                    <div className="card-legal p-8 rounded-2xl flex flex-col items-center bg-slate-50 border-2 border-secondary/30 relative">
-                                        <div className="absolute top-0 right-0 bg-secondary text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-lg rounded-tr-xl tracking-wider">DECRETO 1730/2001 ART. 3</div>
-                                        <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2 mt-4">Indemnización Sustitutiva a Recibir</p>
-                                        <p className="text-5xl md:text-6xl font-black text-primary mb-4">{formatCurrency(results.indemnizacion)}</p>
-                                        <div className="bg-white border border-slate-200 px-6 py-3 rounded-lg text-sm text-slate-600 font-mono flex flex-col items-center shadow-sm">
-                                            <span className="font-bold text-primary mb-1">ISP = SBC × SC × PPC</span>
-                                            <span>{formatCurrency(results.SBC)} × {results.SC.toFixed(2)} × {(results.PPC * 100).toFixed(4)}%</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-8">
-                                        <button 
-                                            onClick={() => setShowDetails(!showDetails)}
-                                            className="flex items-center justify-center w-full py-4 bg-white text-primary font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm"
-                                        >
-                                            <Icon name="table" className="w-5 h-5 mr-2 text-secondary" />
-                                            {showDetails ? "Ocultar Detalle Actuarial (Tabla Mensualizada)" : "Ver Detalle Actuarial (Tabla Mensualizada)"}
-                                        </button>
-
-                                        {showDetails && (() => {
-                                            const pre95 = results.detailedReport.filter(r => r.seccion === 'pre1995').sort((a,b) => a.mes.localeCompare(b.mes));
-                                            const post95 = results.detailedReport.filter(r => r.seccion === 'post1995').sort((a,b) => a.mes.localeCompare(b.mes));
-                                            const pre95Dias = pre95.reduce((s,r) => s + r.dias, 0);
-                                            const pre95DiasCot = pre95.reduce((s,r) => s + (r.diasCot || Math.max(0, r.dias)), 0);
-                                            const post95Dias = post95.reduce((s,r) => s + r.dias, 0);
-                                            const post95DiasCot = post95.reduce((s,r) => s + (r.diasCot != null ? r.diasCot : r.dias), 0);
-                                            return (
-                                            <div className="mt-4 space-y-6 animate-in slide-in-from-top-4">
-                                                {pre95.length > 0 && (
-                                                <div>
-                                                    <h4 className="text-sm font-bold text-primary mb-2 uppercase tracking-wide">Detalle de Pagos Efectuados Anteriores a 1995</h4>
-                                                    <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-inner bg-white max-h-[400px]">
-                                                        <table className="w-full text-[10px] text-left whitespace-nowrap">
-                                                            <thead className="bg-slate-100 text-slate-600 uppercase font-bold tracking-wider sticky top-0 border-b border-slate-200">
-                                                                <tr>
-                                                                    <th className="p-2">(1) NIT</th>
-                                                                    <th className="p-2">(2) Razón Social</th>
-                                                                    <th className="p-2 text-center">(3) Desde</th>
-                                                                    <th className="p-2 text-center">(4) Hasta</th>
-                                                                    <th className="p-2 text-right">(5) Salario (IBC)</th>
-                                                                    <th className="p-2 text-center">(6) Semanas</th>
-                                                                    <th className="p-2 text-center">(7) Días</th>
-                                                                    <th className="p-2 text-center">(8) % Cotiz.</th>
-                                                                    <th className="p-2 text-center">Fecha IPC Final</th>
-                                                                    <th className="p-2 text-right">(9) IPC Final</th>
-                                                                    <th className="p-2 text-center">Fecha IPC Inicial</th>
-                                                                    <th className="p-2 text-right">(10) IPC Inicial</th>
-                                                                    <th className="p-2 text-right">(11) IBC Indexado</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {pre95.map((r, i) => (
-                                                                    <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                                                        <td className="p-2 font-mono text-slate-500">{r.nit || ''}</td>
-                                                                        <td className="p-2 font-medium text-slate-700 truncate max-w-[140px]" title={r.empresa}>{r.empresa}</td>
-                                                                        <td className="p-2 font-mono text-center">{r.desde}</td>
-                                                                        <td className="p-2 font-mono text-center">{r.hasta}</td>
-                                                                        <td className="p-2 text-right text-slate-600">{formatCurrency(r.ibcHistorico)}</td>
-                                                                        <td className="p-2 text-center text-slate-600">{r.semanas.toFixed(3)}</td>
-                                                                        <td className={`p-2 text-center font-bold ${r.dias < 0 ? 'text-red-600' : ''}`}>{r.dias}</td>
-                                                                        <td className="p-2 text-center font-bold text-secondary">{(r.tasaP * 100).toFixed(2)}%</td>
-                                                                        <td className="p-2 text-center text-slate-500">{r.ipcFinalFecha}</td>
-                                                                        <td className="p-2 text-right text-slate-600">{r.ipcFinal.toFixed(4)}</td>
-                                                                        <td className="p-2 text-center text-slate-500">{r.ipcInicialFecha}</td>
-                                                                        <td className="p-2 text-right text-slate-600">{r.ipcInicial.toFixed(4)}</td>
-                                                                        <td className="p-2 text-right font-bold text-primary">{formatCurrency(r.ibcIndexado)}</td>
-                                                                    </tr>
-                                                                ))}
-                                                                <tr className="bg-slate-100 font-bold border-t-2 border-slate-300">
-                                                                    <td colSpan="5" className="p-2 text-right">Subtotal Pre-1995:</td>
-                                                                    <td className="p-2 text-center">{pre95.reduce((s,r) => s + r.semanas, 0).toFixed(3)}</td>
-                                                                    <td className="p-2 text-center">{pre95Dias} <span className="text-xs text-slate-400">(Cot: {pre95DiasCot})</span></td>
-                                                                    <td colSpan="6"></td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                )}
-
-                                                {post95.length > 0 && (
-                                                <div>
-                                                    <h4 className="text-sm font-bold text-primary mb-2 uppercase tracking-wide">Detalle de Pagos Efectuados a Partir de 1995</h4>
-                                                    <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-inner bg-white max-h-[400px]">
-                                                        <table className="w-full text-[10px] text-left whitespace-nowrap">
-                                                            <thead className="bg-slate-100 text-slate-600 uppercase font-bold tracking-wider sticky top-0 border-b border-slate-200">
-                                                                <tr>
-                                                                    <th className="p-2">(1) NIT</th>
-                                                                    <th className="p-2">(2) Razón Social</th>
-                                                                    <th className="p-2 text-center">(3) Desde</th>
-                                                                    <th className="p-2 text-center">(4) Hasta</th>
-                                                                    <th className="p-2 text-right">(5) Salario (IBC)</th>
-                                                                    <th className="p-2 text-center">(6) Semanas</th>
-                                                                    <th className="p-2 text-center">(7) Días Rep</th>
-                                                                    <th className="p-2 text-center">(7b) Días Cot</th>
-                                                                    <th className="p-2 text-center">(8) % Cotiz.</th>
-                                                                    <th className="p-2 text-center">Fecha IPC Final</th>
-                                                                    <th className="p-2 text-right">(9) IPC Final</th>
-                                                                    <th className="p-2 text-center">Fecha IPC Inicial</th>
-                                                                    <th className="p-2 text-right">(10) IPC Inicial</th>
-                                                                    <th className="p-2 text-right">(11) IBC Indexado</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {post95.map((r, i) => (
-                                                                    <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                                                        <td className="p-2 font-mono text-slate-500">{r.nit || ''}</td>
-                                                                        <td className="p-2 font-medium text-slate-700 truncate max-w-[140px]" title={r.empresa}>{r.empresa}</td>
-                                                                        <td className="p-2 font-mono text-center">{r.desde}</td>
-                                                                        <td className="p-2 font-mono text-center">{r.hasta}</td>
-                                                                        <td className="p-2 text-right text-slate-600">{formatCurrency(r.ibcHistorico)}</td>
-                                                                        <td className="p-2 text-center text-slate-600">{r.semanas.toFixed(3)}</td>
-                                                                        <td className={`p-2 text-center ${r.dias !== (r.diasCot != null ? r.diasCot : r.dias) ? 'text-red-500' : ''}`}>{r.dias}</td>
-                                                                        <td className="p-2 text-center font-bold text-primary">{r.diasCot != null ? r.diasCot : r.dias}</td>
-                                                                        <td className="p-2 text-center font-bold text-secondary">{(r.tasaP * 100).toFixed(2)}%</td>
-                                                                        <td className="p-2 text-center text-slate-500">{r.ipcFinalFecha}</td>
-                                                                        <td className="p-2 text-right text-slate-600">{r.ipcFinal.toFixed(4)}</td>
-                                                                        <td className="p-2 text-center text-slate-500">{r.ipcInicialFecha}</td>
-                                                                        <td className="p-2 text-right text-slate-600">{r.ipcInicial.toFixed(4)}</td>
-                                                                        <td className="p-2 text-right font-bold text-primary">{formatCurrency(r.ibcIndexado)}</td>
-                                                                    </tr>
-                                                                ))}
-                                                                <tr className="bg-slate-100 font-bold border-t-2 border-slate-300">
-                                                                    <td colSpan="5" className="p-2 text-right">Subtotal Post-1995:</td>
-                                                                    <td className="p-2 text-center">{post95.reduce((s,r) => s + r.semanas, 0).toFixed(3)}</td>
-                                                                    <td className="p-2 text-center">{post95Dias}</td>
-                                                                    <td className="p-2 text-center font-bold text-primary">{post95DiasCot}</td>
-                                                                    <td colSpan="6"></td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                )}
-
-                                                <div className="bg-slate-100 p-4 rounded-xl flex justify-between items-center font-bold text-sm">
-                                                    <span className="text-slate-700">TOTAL GENERAL DÍAS:</span>
-                                                    <span className="text-primary text-lg">{results.totalDias}</span>
-                                                </div>
-                                            </div>
-                                            );
-                                        })()}
-                                    </div>
-                                </>
-                            )}
+                                    );
+                                })()}
+                            </div>
 
                             <div className="card-legal p-6 md:p-8 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6 bg-slate-50 border-l-4 border-l-primary mt-8">
                                 <div className="flex-1 text-center md:text-left">
                                     <h5 className="text-xl font-bold text-primary">Reporte Técnico Generado</h5>
-                                    <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                                        {tipoCalculo === 'pension' 
-                                         ? 'El documento ahora refleja la proyección e indexación de su IBL y mesada pensional conforme a la Ley 100 de 1993 y la jurisprudencia aplicable.' 
-                                         : 'El documento ahora refleja la agrupación mensual de sus aportes, garantizando que el total de semanas coincida con el aval de Colpensiones, sin perder capital por tiempos simultáneos.'}
-                                    </p>
+                                    <p className="text-sm text-slate-600 mt-2 leading-relaxed">El documento ahora refleja la agrupación mensual de sus aportes, garantizando que el total de semanas coincida con el aval de Colpensiones, sin perder capital por tiempos simultáneos.</p>
                                 </div>
                                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                                     <button className="bg-green-600 text-white px-6 py-3.5 rounded-xl font-semibold hover:bg-green-700 transition-colors flex items-center space-x-2 shrink-0 shadow-sm w-full md:w-auto justify-center" onClick={exportExcel}>
@@ -2715,7 +1973,7 @@ function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, s
                                     </button>
                                     <button className="bg-[#e2231a] text-white px-6 py-3.5 rounded-xl font-semibold hover:bg-[#c11b14] transition-colors flex items-center space-x-2 shrink-0 shadow-sm w-full md:w-auto justify-center" onClick={exportPDF}>
                                         <i className="fas fa-file-pdf w-4 h-4 mr-2 text-white" aria-hidden="true"></i>
-                                        <span>{tipoCalculo === 'pension' ? 'Informe PDF' : 'Dictamen PDF'}</span>
+                                        <span>Dictamen PDF</span>
                                     </button>
                                 </div>
                             </div>

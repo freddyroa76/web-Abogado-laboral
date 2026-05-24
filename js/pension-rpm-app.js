@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const formatCurrency = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(v);
 
     function checkReadyToUpload() {
-        const isCedulaValid = state.formData.cedula && state.formData.cedula.trim().length >= 5;
+        const isCedulaValid = state.formData.cedula && state.formData.cedula.trim().length >= 3;
         const isEdadValid = state.formData.edad && state.formData.edad > 0;
         const uploaderArea = document.getElementById('uploader-area');
         
@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     DOM.inputs.fileResumen.addEventListener('click', (e) => {
-        const isCedulaValid = state.formData.cedula && state.formData.cedula.trim().length >= 5;
+        const isCedulaValid = state.formData.cedula && state.formData.cedula.trim().length >= 3;
         const isEdadValid = state.formData.edad && state.formData.edad > 0;
         
         let missing = [];
