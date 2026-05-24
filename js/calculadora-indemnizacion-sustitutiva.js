@@ -69,23 +69,9 @@ const _applyAutomaticCorrections = (hist, flag) => {
 // Helper local para obtener la tasa de cotización histórica por ley
 const _getTasaSafe = (fecha) => {
     const ts = fecha.getTime();
-    const _TASAS = [
-        { d: new Date(1946, 0, 1).getTime(), h: new Date(1966, 11, 31).getTime(), p: 0.0455 },
-        { d: new Date(1967, 0, 1).getTime(), h: new Date(1971, 11, 31).getTime(), p: 0.045 },
-        { d: new Date(1972, 0, 1).getTime(), h: new Date(1977, 0, 31).getTime(), p: 0.06755 },
-        { d: new Date(1977, 1, 1).getTime(), h: new Date(1982, 1, 28).getTime(), p: 0.09 },
-        { d: new Date(1982, 2, 1).getTime(), h: new Date(1985, 8, 30).getTime(), p: 0.1125 },
-        { d: new Date(1985, 9, 1).getTime(), h: new Date(1993, 11, 31).getTime(), p: 0.065 },
-        { d: new Date(1994, 0, 1).getTime(), h: new Date(1994, 11, 31).getTime(), p: 0.115 },
-        { d: new Date(1995, 0, 1).getTime(), h: new Date(1995, 11, 31).getTime(), p: 0.125 },
-        { d: new Date(1996, 0, 1).getTime(), h: new Date(2003, 11, 31).getTime(), p: 0.135 },
-        { d: new Date(2004, 0, 1).getTime(), h: new Date(2004, 11, 31).getTime(), p: 0.145 },
-        { d: new Date(2005, 0, 1).getTime(), h: new Date(2005, 11, 31).getTime(), p: 0.15 },
-        { d: new Date(2006, 0, 1).getTime(), h: new Date(2007, 11, 31).getTime(), p: 0.155 },
-        { d: new Date(2008, 0, 1).getTime(), h: new Date(2026, 11, 31).getTime(), p: 0.16 }
-    ];
     let tp = 0.16;
-    for (const r of _TASAS) { 
+    const tasas = typeof TASAS_COTIZACION_HISTORICA !== 'undefined' ? TASAS_COTIZACION_HISTORICA : [];
+    for (const r of tasas) { 
         if (ts >= r.d && ts <= r.h) { tp = r.p; break; } 
     }
     return tp;
@@ -94,91 +80,239 @@ const _getTasaSafe = (fecha) => {
 /**
  * Realiza la liquidación de la Indemnización Sustitutiva de Vejez.
  */
-function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, safeGetIpc) {
-    const { history: useHistory, correctedCount } = _applyAutomaticCorrections(history, applyCorrections);
-
+function calcularIndemnizacionSustitutiva(history, resumenSemanas, formData, applyCorrections, safeGetIpc) {
     const mesCierre = formData.mesLiquidacion || 12;
     const anoCierre = formData.anoLiquidacion;
     const ipcFinalKey = `${anoCierre}-${String(mesCierre).padStart(2, '0')}`;
     const ipcFinal = safeGetIpc(ipcFinalKey);
-    
-    let detailedReport = [];
+
     const MESES_CORTOS_M = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
-    const pre95Records = [];
-    const post95Records = [];
-    let moraEntries = [];
+    // 1. GENERAR SEGMENTACIÓN MENSUAL (Hoja "Verificación y Segmentación")
+    const getCalendarDays = (start, end) => {
+        return Math.floor((Date.UTC(end.getFullYear(), end.getMonth(), end.getDate()) - Date.UTC(start.getFullYear(), start.getMonth(), start.getDate())) / (1000 * 60 * 60 * 24)) + 1;
+    };
 
-    useHistory.forEach(row => {
-        if (!row.desde || !row.hasta || row.ibc <= 0) return;
+    let segmentedRows = [];
+
+    resumenSemanas.forEach((row, sortIndex) => {
+        let dStart = _parseFlexibleDate(row.desde);
+        let dEnd = _parseFlexibleDate(row.hasta);
+        if (!dStart || !dEnd) return;
+
+        let totalCalDays = getCalendarDays(dStart, dEnd);
         
-        const calcDias = row.diasCot != null ? row.diasCot : row.dias;
-        const dS = _parseFlexibleDate(row.desde);
-        const isPre95 = dS && dS.getFullYear() < 1995;
-
-        if (row.dias < 0 || calcDias <= 0) {
-            if (isPre95) {
-                moraEntries.push({ ...row, diasCot: Math.abs(row.dias), semanas: Math.abs(row.dias) / 7, ibcHistorico: row.ibc, esMora: true });
-                pre95Records.push({ ...row, dias: Math.abs(row.dias), diasCot: Math.abs(row.dias) });
-            }
+        // Si el check está activo y el periodo total es de un mes o menos (<= 31 días),
+        // aplicamos directamente (semanas * 7) redondeado a entero.
+        if (applyCorrections && totalCalDays <= 31) {
+            let targetSemanas = Number(row.semanas) || 0;
+            let calcDias = Math.round(targetSemanas * 7);
+            let calcSemanas = targetSemanas;
+            
+            segmentedRows.push({
+                sortIndex: sortIndex, 
+                nit: row.nit || '', 
+                empresa: row.empresa, 
+                desde: new Date(dStart.getTime()), 
+                hasta: new Date(dEnd.getTime()),
+                ibc: row.ibc, 
+                calcDias: calcDias, 
+                calcSemanas: calcSemanas,
+                observacion: targetSemanas === 0 ? 'Ajuste exacto a 0 (PDF)' : 'Ajuste exacto a 1 mes (PDF)'
+            });
             return;
         }
 
-        if (isPre95) {
-            pre95Records.push(row);
-        } else {
-            post95Records.push(row);
-        }
-    });
-
-    // PROCESAR PRE-1995
-    const coveredPre95Days = new Set();
-    pre95Records.forEach(row => {
-        const dStart = _parseFlexibleDate(row.desde);
-        const dEnd = _parseFlexibleDate(row.hasta);
-        if (!dStart || !dEnd || dStart > dEnd) return;
+        let current = new Date(dStart.getTime());
+        let rowSegments = [];
         
-        let overlapCount = 0;
-        let calendarDaysInPeriod = 0;
-        for (let d = new Date(dStart.getTime()); d <= dEnd; d.setDate(d.getDate() + 1)) {
-            calendarDaysInPeriod++;
-            const dayStr = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-            if (coveredPre95Days.has(dayStr)) {
-                overlapCount++;
+        // 1. Cálculo Inicial Matemático puro (según periodo de Resumen de Semanas)
+        while (current <= dEnd) {
+            let curYear = current.getFullYear();
+            let curMonth = current.getMonth();
+            let endOfMonth = new Date(curYear, curMonth + 1, 0);
+            let actEnd = dEnd < endOfMonth ? new Date(dEnd.getTime()) : new Date(endOfMonth.getTime());
+            
+            let calcDias = 0;
+            if (curYear < 1995) {
+                calcDias = getCalendarDays(current, actEnd);
             } else {
-                coveredPre95Days.add(dayStr);
+                calcDias = _getDiasComerciales(current, actEnd);
+            }
+
+            rowSegments.push({
+                sortIndex: sortIndex, 
+                nit: row.nit || '', 
+                empresa: row.empresa, 
+                desde: new Date(current.getTime()), 
+                hasta: new Date(actEnd.getTime()),
+                ibc: row.ibc, 
+                calcDias: calcDias, 
+                calcSemanas: Number((calcDias / 7).toFixed(4)),
+                observacion: ''
+            });
+            
+            current = new Date(curYear, curMonth + 1, 1);
+        }
+
+        // 2. Validación de Desvío
+        if (rowSegments.length > 0) {
+            let targetSemanas = Number(row.semanas) || 0;
+            let mathTotalDias = rowSegments.reduce((sum, seg) => sum + seg.calcDias, 0);
+            let mathTotalSemanas = mathTotalDias / 7;
+            let diffSemanas = Math.abs(mathTotalSemanas - targetSemanas);
+            
+            let needsCorrection = false;
+            let obsText = '';
+            
+            if (applyCorrections) {
+                needsCorrection = targetSemanas === 0 || diffSemanas > 0.145; // > 0.14 semanas
+                obsText = targetSemanas === 0 ? 'Ajuste exacto a 0 (PDF)' : 'Ajuste proporcional al PDF';
+            } else {
+                if (targetSemanas < mathTotalSemanas && diffSemanas > 0.01) {
+                    needsCorrection = true;
+                    obsText = targetSemanas === 0 ? 'Tope a 0 (Según PDF)' : 'Tope aplicado según Resumen (PDF)';
+                }
+            }
+
+            if (needsCorrection) {
+                if (targetSemanas === 0) {
+                    rowSegments.forEach(seg => {
+                        seg.calcDias = 0;
+                        seg.calcSemanas = 0;
+                        seg.observacion = obsText;
+                    });
+                } else if (rowSegments.length === 1) {
+                    // 3. REGLA: Si el ítem a desglosar está dentro de UN MISMO MES CALENDARIO
+                    // se aplican directamente las semanas de "Resumen de Semanas"
+                    rowSegments[0].calcDias = Math.round(targetSemanas * 7);
+                    rowSegments[0].calcSemanas = targetSemanas;
+                    rowSegments[0].observacion = 'Ajuste directo según Resumen (Mes único)';
+                } else {
+                    // 4. REGLA: Si el desvío corresponde a periodos MAYORES A UN MES
+                    // buscar el detalle para corregir con esos datos
+                    let anyDetailFound = false;
+                    
+                    rowSegments.forEach(seg => {
+                        let segYear = seg.desde.getFullYear();
+                        let segMonth = seg.desde.getMonth();
+                        
+                        let exactMonthHistory = history.filter(h => {
+                            let matchEmpresa = false;
+                            if (row.nit && h.nit && row.nit.trim() === h.nit.trim()) {
+                                matchEmpresa = true;
+                            } else if (row.empresa && h.empresa) {
+                                let rEmp = row.empresa.trim().toUpperCase();
+                                let hEmp = h.empresa.trim().toUpperCase();
+                                if (rEmp === hEmp || rEmp.includes(hEmp) || hEmp.includes(rEmp)) {
+                                    matchEmpresa = true;
+                                }
+                            }
+                            if (!matchEmpresa) return false;
+                            
+                            if (segYear < 1995) {
+                                let hStart = _parseFlexibleDate(h.desde);
+                                let hEnd = _parseFlexibleDate(h.hasta);
+                                if (!hStart || !hEnd) return false;
+                                return (seg.desde <= hEnd && seg.hasta >= hStart);
+                            } else {
+                                if (h.periodo) {
+                                    let targetPeriodo = `${segYear}${String(segMonth + 1).padStart(2, '0')}`;
+                                    return h.periodo === targetPeriodo;
+                                } else {
+                                    let hStart = _parseFlexibleDate(h.desde);
+                                    return hStart && hStart.getFullYear() === segYear && hStart.getMonth() === segMonth;
+                                }
+                            }
+                        });
+
+                        if (exactMonthHistory.length > 0) {
+                            let extractedDias = null;
+                            if (segYear < 1995) {
+                                let hExact = exactMonthHistory.find(h => {
+                                    let hStart = _parseFlexibleDate(h.desde);
+                                    let hEnd = _parseFlexibleDate(h.hasta);
+                                    return hStart && hEnd && hStart.getMonth() === hEnd.getMonth() && hStart.getFullYear() === hEnd.getFullYear();
+                                });
+                                if (hExact) extractedDias = Number(hExact.dias || 0);
+                            } else {
+                                extractedDias = exactMonthHistory.reduce((sum, h) => sum + Number(h.dias || 0), 0);
+                            }
+
+                            if (extractedDias !== null) {
+                                seg.calcDias = extractedDias;
+                                seg.calcSemanas = Number((extractedDias / 7).toFixed(4));
+                                seg.observacion = 'Corregido con Detalle de Pagos';
+                                anyDetailFound = true;
+                            }
+                        }
+                    });
+
+                    // Lógica ya escrita: Si tras buscar el detalle persiste un desvío, se ajusta proporcionalmente
+                    let newMathTotalDias = rowSegments.reduce((sum, seg) => sum + seg.calcDias, 0);
+                    let newMathTotalSemanas = newMathTotalDias / 7;
+                    let newDiffSemanas = Math.abs(newMathTotalSemanas - targetSemanas);
+                    
+                    // El Paso 5 (ajuste proporcional) solo se activa si el check está marcado (applyCorrections === true)
+                    let stillNeedsCorrection = applyCorrections && (newDiffSemanas > 0.145);
+
+                    if (stillNeedsCorrection && newMathTotalDias > 0) {
+                        let ratio = (targetSemanas * 7) / newMathTotalDias;
+                        let accumulatedSemanas = 0;
+                        
+                        for (let i = 0; i < rowSegments.length - 1; i++) {
+                            let newDias = Math.round(rowSegments[i].calcDias * ratio);
+                            let newSemanas = Number((newDias / 7).toFixed(4));
+                            rowSegments[i].calcDias = newDias;
+                            rowSegments[i].calcSemanas = newSemanas;
+                            rowSegments[i].observacion = rowSegments[i].observacion === 'Corregido con Detalle de Pagos' ? 'Detalle + Proporcional' : obsText;
+                            accumulatedSemanas += newSemanas;
+                        }
+                        
+                        let lastNewSemanas = Number((targetSemanas - accumulatedSemanas).toFixed(4));
+                        let lastNewDias = Math.round(lastNewSemanas * 7);
+                        rowSegments[rowSegments.length - 1].calcDias = lastNewDias;
+                        rowSegments[rowSegments.length - 1].calcSemanas = lastNewSemanas;
+                        rowSegments[rowSegments.length - 1].observacion = rowSegments[rowSegments.length - 1].observacion === 'Corregido con Detalle de Pagos' ? 'Detalle + Proporcional' : obsText;
+                    }
+                }
             }
         }
 
-        const rawDias = row.diasCot != null ? row.diasCot : row.dias;
-        let effectiveOverlap = overlapCount;
-        if (calendarDaysInPeriod > 0 && rawDias < calendarDaysInPeriod) {
-            effectiveOverlap = Math.round(overlapCount * (rawDias / calendarDaysInPeriod));
-        }
-        
-        const calcDias = Math.max(0, rawDias - effectiveOverlap);
-        const year = dStart.getFullYear();
-        const mes = dStart.getMonth() + 1;
+        segmentedRows.push(...rowSegments);
+    });
+
+    // Ordenar cronológicamente
+    segmentedRows.sort((a, b) => a.desde - b.desde);
+
+    // 2. CONSTRUIR DETALLE ACTUARIAL DETALLADO MENSUALIZADO
+    let detailedReport = [];
+    const fmtDate = (d) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+
+    segmentedRows.forEach(seg => {
+        const year = seg.desde.getFullYear();
+        const mes = seg.desde.getMonth() + 1;
         
         const ipcInicialKey = `${year}-${String(mes).padStart(2, '0')}`;
         const ipcInicial = safeGetIpc(ipcInicialKey);
-        const ibcIndexadoIA = (ipcInicial && ipcInicial > 0) ? row.ibc * (ipcFinal / ipcInicial) : row.ibc;
+        const ibcIndexadoIA = (ipcInicial && ipcInicial > 0) ? seg.ibc * (ipcFinal / ipcInicial) : seg.ibc;
         
-        const tasaP = _getTasaSafe(dStart);
+        const tasaP = _getTasaSafe(seg.desde);
+        const seccion = year < 1995 ? 'pre1995' : 'post1995';
 
         detailedReport.push({
-            nit: row.nit || '',
-            empresa: row.empresa + (effectiveOverlap > 0 ? ` (-${effectiveOverlap}d simultáneos)` : ''),
+            nit: seg.nit || '',
+            empresa: seg.empresa + (seg.observacion ? ` (${seg.observacion})` : ''),
             mes: `${year}-${String(mes).padStart(2, '0')}`,
             mesNombre: MESES_CORTOS_M[mes - 1] || '',
             ano: year,
-            seccion: 'pre1995',
-            desde: row.desde,
-            hasta: row.hasta,
-            dias: row.dias,
-            diasCot: calcDias,
-            semanas: calcDias / 7,
-            ibcHistorico: row.ibc,
+            seccion: seccion,
+            desde: fmtDate(seg.desde),
+            hasta: fmtDate(seg.hasta),
+            dias: seg.calcDias,
+            diasCot: seg.calcDias,
+            semanas: seg.calcSemanas,
+            ibcHistorico: seg.ibc,
             tasaP: tasaP,
             ipcFinalFecha: `${MESES_CORTOS_M[mesCierre - 1]} ${anoCierre}`,
             ipcFinal: ipcFinal,
@@ -188,131 +322,13 @@ function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, s
         });
     });
 
-    // PROCESAR POST-1995
-    let expandedMonths = {};
-    post95Records.forEach(row => {
-        const dStart = _parseFlexibleDate(row.desde);
-        const dEnd = _parseFlexibleDate(row.hasta);
-        if (!dStart || !dEnd || dStart > dEnd) return;
-
-        let curStart = new Date(dStart.getTime());
-        
-        while (curStart <= dEnd) {
-            let curYear = curStart.getFullYear();
-            let curMonth = curStart.getMonth();
-            let endOfMonth = new Date(curYear, curMonth + 1, 0); 
-            let actEnd = dEnd < endOfMonth ? new Date(dEnd.getTime()) : new Date(endOfMonth.getTime());
-            
-            if (actEnd >= curStart) {
-                const isFullMonthSegment = curStart.getDate() === 1 && 
-                    (actEnd.getDate() === new Date(curYear, curMonth + 1, 0).getDate() || actEnd.getDate() >= 30);
-                
-                let assignedDays;
-                if (isFullMonthSegment) {
-                    assignedDays = 30;
-                } else {
-                    const diffTime = Math.abs(actEnd - curStart);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                    assignedDays = Math.min(30, diffDays + 1);
-                }
-                
-                let effectiveIbc = row.ibc;
-                let monthKey = `${curYear}-${String(curMonth + 1).padStart(2, '0')}`;
-                
-                if (!expandedMonths[monthKey]) {
-                    expandedMonths[monthKey] = {
-                        year: curYear,
-                        monthKey: monthKey,
-                        dias: Math.min(30, assignedDays),
-                        sumIbcXDias: effectiveIbc * assignedDays,
-                        empresas: [row.empresa],
-                        nits: [row.nit || ''],
-                        desde: new Date(curStart.getTime()),
-                        hasta: new Date(actEnd.getTime())
-                    };
-                } else {
-                    expandedMonths[monthKey].dias = Math.min(30, expandedMonths[monthKey].dias + assignedDays);
-                    expandedMonths[monthKey].sumIbcXDias += effectiveIbc * assignedDays;
-                    
-                    if (actEnd > expandedMonths[monthKey].hasta) expandedMonths[monthKey].hasta = new Date(actEnd.getTime());
-                    if (curStart < expandedMonths[monthKey].desde) expandedMonths[monthKey].desde = new Date(curStart.getTime());
-                    if (!expandedMonths[monthKey].empresas.includes(row.empresa)) {
-                        expandedMonths[monthKey].empresas.push(row.empresa);
-                    }
-                    const rowNit = row.nit || '';
-                    if (rowNit && !expandedMonths[monthKey].nits.includes(rowNit)) {
-                        expandedMonths[monthKey].nits.push(rowNit);
-                    }
-                }
-            }
-            curStart = new Date(curYear, curMonth + 1, 1); 
-        }
-    });
-
-    let splitHistoryPost95 = Object.values(expandedMonths);
-    splitHistoryPost95.sort((a,b) => a.monthKey.localeCompare(b.monthKey));
-
-    splitHistoryPost95.forEach(seg => {
-        const effectiveIbc = seg.sumIbcXDias / seg.dias; 
-        const mesSegmento = seg.monthKey.split('-')[1];
-        const ipcInicialKey = `${seg.year}-${mesSegmento}`;
-        const ipcInicial = safeGetIpc(ipcInicialKey);
-        const ibcIndexadoIA = (ipcInicial && ipcInicial > 0) ? effectiveIbc * (ipcFinal / ipcInicial) : effectiveIbc;
-        
-        const fechaSegmento = new Date(seg.year, parseInt(mesSegmento) - 1, 1);
-        const tasaP = _getTasaSafe(fechaSegmento);
-        
-        const mesNum = parseInt(mesSegmento);
-        const mesNombre = MESES_CORTOS_M[mesNum - 1];
-        const primerDia = new Date(seg.year, mesNum - 1, 1);
-        const ultimoDia = new Date(seg.year, mesNum, 0); 
-        const fmtDate = (d) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-        
-        detailedReport.push({
-            nit: (seg.nits || []).join(' + '),
-            empresa: seg.empresas.join(' + '),
-            mes: seg.monthKey,
-            mesNombre: mesNombre,
-            ano: seg.year,
-            seccion: 'post1995',
-            desde: fmtDate(primerDia),
-            hasta: fmtDate(ultimoDia),
-            dias: seg.dias,
-            diasCot: seg.dias,
-            semanas: seg.dias / 7,
-            ibcHistorico: effectiveIbc, 
-            tasaP: tasaP,
-            ipcFinalFecha: `${MESES_CORTOS_M[mesCierre - 1]} ${anoCierre}`,
-            ipcFinal: ipcFinal,
-            ipcInicialFecha: `${mesNombre} ${seg.year}`,
-            ipcInicial: ipcInicial,
-            ibcIndexado: ibcIndexadoIA
-        });
-    });
-
-    moraEntries.forEach(me => {
-        const dS = _parseFlexibleDate(me.desde);
-        const mesNum = dS ? dS.getMonth() + 1 : 1;
-        const yearS = dS ? dS.getFullYear() : 1990;
-        detailedReport.push({
-            nit: me.nit, empresa: me.empresa, mes: `${yearS}-${String(mesNum).padStart(2,'0')}`, mesNombre: MESES_CORTOS_M[mesNum-1], ano: yearS,
-            seccion: 'pre1995', desde: me.desde, hasta: me.hasta, dias: me.dias, diasCot: 0, semanas: me.semanas,
-            ibcHistorico: me.ibcHistorico, tasaP: 0, ipcFinalFecha: '', ipcFinal: 0, ipcInicialFecha: '', ipcInicial: 0, ibcIndexado: 0, esMora: true
-        });
-    });
-
-    detailedReport.sort((a, b) => {
-        const aDate = _parseFlexibleDate(a.desde);
-        const bDate = _parseFlexibleDate(b.desde);
-        return (aDate || new Date(0)) - (bDate || new Date(0));
-    });
-
+    // 3. OBTENER FACTORES Y LIQUIDACIÓN
     let SCTotal = 0;
+    let totalGeneralDias = 0;
     detailedReport.forEach(p => {
         if (p.esMora) return;
-        if (p.semanas > 0) {
-            SCTotal += p.semanas;
-        }
+        SCTotal += p.semanas;
+        totalGeneralDias += p.dias;
     });
 
     if (SCTotal <= 0) throw new Error("No hay semanas computables para realizar la liquidación.");
@@ -322,35 +338,22 @@ function calcularIndemnizacionSustitutiva(history, formData, applyCorrections, s
 
     detailedReport.forEach(p => {
         if (p.esMora) return;
-        if (p.semanas > 0) {
-            const masaTasa = p.tasaP * p.semanas;
-            sumatoriaMasaTasa += masaTasa;
-            
-            const masaSalarial = p.ibcIndexado * p.semanas;
-            sumatoriaMasaSalarial += masaSalarial;
-        }
+        sumatoriaMasaTasa += p.tasaP * p.dias;
+        sumatoriaMasaSalarial += p.ibcIndexado * p.dias;
     });
 
-    const PPC = sumatoriaMasaTasa / SCTotal;
-    const promedioMensualPresente = sumatoriaMasaSalarial / SCTotal;
-    const SBC = promedioMensualPresente * (7 / 30);
-
-    // Sum of "No. Días" (p.dias) before and after 1995:
-    let totalGeneralDias = 0;
-    detailedReport.forEach(p => {
-        if (p.esMora) return;
-        totalGeneralDias += p.dias;
-    });
-    const semanasGeneral = totalGeneralDias / 7;
-    const ISP = SBC * semanasGeneral * PPC;
+    const PPC = totalGeneralDias > 0 ? (sumatoriaMasaTasa / totalGeneralDias) : 0;
+    const promedioMensualPonderado = totalGeneralDias > 0 ? (sumatoriaMasaSalarial / totalGeneralDias) : 0;
+    const SBC = (promedioMensualPonderado / 30) * 7;
+    const ISP = SBC * SCTotal * PPC;
 
     return { 
         totalDias: totalGeneralDias,
-        semanas: semanasGeneral,
-        SC: semanasGeneral,
+        semanas: SCTotal,
+        SC: SCTotal,
         PPC: PPC,
         SBC: SBC,
-        ingresoMensualPromedio: promedioMensualPresente,
+        ingresoMensualPromedio: promedioMensualPonderado,
         indemnizacion: ISP,
         detailedReport,
         sumAportes: ISP

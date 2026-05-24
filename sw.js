@@ -1,4 +1,4 @@
-const CACHE_NAME = "abogado-laboral-v26";
+const CACHE_NAME = "abogado-laboral-v30";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
@@ -11,7 +11,6 @@ const ASSETS_TO_CACHE = [
   "./js/main.js",
   "./js/html2pdf.bundle.min.js",
   "./js/datos-historios-ipc-smlv.js",
-  "./js/pension-rpm-app.js",
   "./js/calculadora-pension-vejez.js",
   "./js/calculadora-indemnizacion-sustitutiva.js",
   "./img/logo-principal.webp",
